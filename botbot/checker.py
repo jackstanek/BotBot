@@ -55,3 +55,8 @@ def has_permission_issues(path):
             return PROB_FILE_NOT_GRPRD
         else:
             return PROB_NO_PROBLEM
+
+def is_fastq(path):
+    """Check whether a given file is a fastq file."""
+    if os.path.splitext(path)[1] == ".fastq":
+        return PROB_FILE_IS_FASTQ
