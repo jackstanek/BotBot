@@ -1,6 +1,6 @@
-import stat
+import stat, os
 
-from problems import *
+from botbot.problems import *
 
 class Checker:
     """
