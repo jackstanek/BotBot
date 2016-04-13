@@ -1,6 +1,6 @@
-import stat
+import stat, os
 
-from problems import *
+from botbot.problems import *
 
 # Holds a set of checks that can be run on a file to make sure that
 # it's suitable for the shared directory. Runs checks recursively on a
