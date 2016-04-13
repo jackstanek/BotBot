@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os, stat, sys
-import checker
+from . import checker
 
 from enum import Enum
 
