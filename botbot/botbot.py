@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os, stat, sys
-import botbot.checker
+import checker
 
 from enum import Enum
 

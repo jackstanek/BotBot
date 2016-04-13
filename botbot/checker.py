@@ -1,6 +1,6 @@
 import stat, os
 
-from botbot.problems import *
+from problems import *
 
 class Checker:
     """
@@ -32,9 +32,11 @@ class Checker:
         list of issues with the file at that path.
         """
         self.all_problems = list()
+        mode = os.stat(path).st_mode
 
         for f in os.listdir(path):
             newpath = os.path.join(path, f)
+            np_mode = os.stat(newpath).st_mode
 
             if stat.S_ISDIR(np_mode):
                 self.check_tree(newpath)
@@ -66,3 +68,5 @@ def is_fastq(path):
     """Check whether a given file is a fastq file."""
     if os.path.splitext(path)[1] == ".fastq":
         return PROB_FILE_IS_FASTQ
+    else:
+        return PROB_NO_PROBLEM
