@@ -1,4 +1,5 @@
 class Problem:
+    """Defines a problem that a file could have."""
     def __init__(self, code, message, fix):
         self.code = code
         self.message = message

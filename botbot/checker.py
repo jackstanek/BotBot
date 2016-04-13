@@ -2,30 +2,35 @@ import stat
 
 from problems import *
 
-# Holds a set of checks that can be run on a file to make sure that
-# it's suitable for the shared directory. Runs checks recursively on a
-# given path.
 class Checker:
-    # A set of all the checking functions this checker knows of.  All
+    """
+    Holds a set of checks that can be run on a file to make sure that
+    it's suitable for the shared directory. Runs checks recursively on a
+    given path.
+    """
+    # checks is a set of all the checking functions this checker knows of.  All
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
     def __init__(self):
         self.checks = set()
         self.all_problems = list()
 
-    # Add a new checking function to the set, or a list/tuple of functions.
+
     def register(self, fn):
+        """Add a new checking function to the set, or a list/tuple of functions."""
         if isinstance(fn, list) or isinstance(fn, tuple):
             for f in fn:
                 self.checks.add(f)
         else:
             self.checks.add(fn)
 
-    # Run all the checks on every file in the specified path,
-    # recursively. Returns a list of tuples. Each tuple contains 2
-    # elements: the first is the path of the file, and the second is a
-    # list of issues with the file at that path.
     def check_tree(self, path):
+        """
+        Run all the checks on every file in the specified path,
+        recursively. Returns a list of tuples. Each tuple contains 2
+        elements: the first is the path of the file, and the second is a
+        list of issues with the file at that path.
+        """
         self.all_problems = list()
 
         for f in os.listdir(path):
@@ -41,6 +46,7 @@ class Checker:
                 self.all_problems.append((newpath, current_problems))
 
     def pretty_print_issues(self):
+        """Print a list of issues with their fixes."""
         for p in self.all_problems:
             for m in p[1]:
                 print(p[0] + ": " + m.message + " " + m.fix)
