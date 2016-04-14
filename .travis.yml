@@ -4,7 +4,6 @@ python:
 
 install:
   - pip install .
-  - pip install -U pytest
-  - pip install -r requirements.txt
+  - pip install --user -r requirements.txt
 
 script: py.test
