@@ -31,7 +31,6 @@ class Checker:
         elements: the first is the path of the file, and the second is a
         list of issues with the file at that path.
         """
-        self.all_problems = list()
         mode = os.stat(path).st_mode
 
         for f in os.listdir(path):
@@ -55,8 +54,8 @@ class Checker:
         for prob in self.all_problems:
             prob_set = prob[1]
             n = len(prob_set)
-            if problems.PROB_NO_PROBLEM in prob_set and n > 1:
-                prob_set.remove(problems.PROB_NO_PROBLEM)
+            if problems.PROB_NO_PROBLEM in prob[1] and n > 1:
+                prob[1].remove(problems.PROB_NO_PROBLEM)
 
 
     def pretty_print_issues(self, verbose):
