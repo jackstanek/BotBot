@@ -43,9 +43,21 @@ class Checker:
             else:
                 current_problems = set()
                 for check in self.checks:
-                    current_problems.add(check(newpath))
+                    p = check(newpath)
+                    current_problems.add(p)
 
                 self.all_problems.append((newpath, current_problems))
+
+        # Note: this section removes the residual dummy errors
+        # from files that have other errors. It adds another O(n)
+        # loop where we could have done it in that previous loop,
+        # so we should probably optimize it at some point.
+        for prob in self.all_problems:
+            prob_set = prob[1]
+            n = len(prob_set)
+            if problems.PROB_NO_PROBLEM in prob_set and n > 1:
+                prob_set.remove(problems.PROB_NO_PROBLEM)
+
 
     def pretty_print_issues(self):
         """Print a list of issues with their fixes."""
