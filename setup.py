@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='BotBot',
-      version='0.0.1',
+      version='0.0.2',
       description='Laboratory computational resource management',
       author='Jack Stanek',
       author_email='stane064@umn.edu',
