@@ -41,9 +41,9 @@ class Checker:
             if stat.S_ISDIR(np_mode):
                 self.check_tree(newpath)
             else:
-                current_problems = list()
+                current_problems = set()
                 for check in self.checks:
-                    current_problems.append(check(newpath))
+                    current_problems.add(check(newpath))
 
                 self.all_problems.append((newpath, current_problems))
 
