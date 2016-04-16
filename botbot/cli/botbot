@@ -20,7 +20,7 @@ def main():
     c.register(checker_list)
 
     # Check the given directory
-    c.check_tree(arg.path)
+    c.check_tree(args.path)
 
     # Print the list of issues
     c.pretty_print_issues(args.verbose)
