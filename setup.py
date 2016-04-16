@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from distutils.core import setup
 
@@ -7,6 +7,7 @@ setup(name='BotBot',
       description='Laboratory computational resource management',
       author='Jack Stanek',
       author_email='stane064@umn.edu',
-      url='http://csbio.cs.umn.edu/schae234',
+      url='http://github.com/jackstanek/BotBot',
+      scripts=['botbot/cli/botbot'],
       packages=['botbot'],
-     )
+)
