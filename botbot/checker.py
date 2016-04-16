@@ -59,11 +59,15 @@ class Checker:
                 prob_set.remove(problems.PROB_NO_PROBLEM)
 
 
-    def pretty_print_issues(self):
+    def pretty_print_issues(self, verbose):
         """Print a list of issues with their fixes."""
         for p in self.all_problems:
             for m in p[1]:
-                print(p[0] + ": " + m.message + " " + m.fix)
+                if (verbose):
+                    print(p[0] + ": " + m.message + " " + m.fix)
+                else:
+                    if m != problems.PROB_NO_PROBLEM:
+                        print(p[0] + ": " + m.message + " " + m.fix)
 
 def has_permission_issues(path):
     """Check whether a given path has bad permissons."""

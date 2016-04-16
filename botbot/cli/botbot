@@ -1,16 +1,29 @@
 #!/usr/bin/python
 
-import os, stat, sys
+import argparse
 from botbot import checker, problems
 
-from enum import Enum
-
 def main():
+    parser = argparse.ArgumentParser(description="Manage lab computational resources.")
+
+    # Verbosity options
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument("-v", "--verbose", help="Print issues and fixes for all files", action="store_true")
+
+    # Path options
+    parser.add_argument("path", type=str, default=".", help="Path of the directory to check")
+
+    # Initialize the checker
+    args = parser.parse_args()
     checker_list = [checker.has_permission_issues, checker.is_fastq]
     c = checker.Checker()
     c.register(checker_list)
+
+    # Check the given directory
     c.check_tree('.')
-    c.pretty_print_issues()
+
+    # Print the list of issues
+    c.pretty_print_issues(args.verbose)
 
 if __name__ == '__main__':
     main()
