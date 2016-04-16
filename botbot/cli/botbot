@@ -1,11 +1,9 @@
 #!/usr/bin/python
 
 import os, stat, sys
-from . import checker
+from botbot import checker, problems
 
 from enum import Enum
-
-import problems
 
 def main():
     checker_list = [checker.has_permission_issues, checker.is_fastq]
