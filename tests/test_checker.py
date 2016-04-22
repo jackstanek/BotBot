@@ -1,16 +1,26 @@
 import pytest
+import os, stat
 
 from botbot import checker, problems
 
-# TODO: Implement real tests!
-#
-# Right now this is just here as a stub so that we at least have some
-# test for Travis to go through. We want complete test coverage,
-# eventually.
-
 def test_fastq_checker():
-    bad = checker.is_fastq("bad.fastq")
-    good = checker.is_fastq("good.py")
+    assert checker.is_fastq("bad.fastq") == problems.PROB_FILE_IS_FASTQ
+    assert checker.is_fastq("good.py") == problems.PROB_NO_PROBLEM
+    assert checker.is_fastq("fastq.actually_ok_too") == problems.PROB_NO_PROBLEM
 
-    assert bad == problems.PROB_FILE_IS_FASTQ
-    assert good == problems.PROB_NO_PROBLEM
+def test_permission_checker(tmpdir):
+    # Create a test file
+    p = tmpdir.join("bad_permissions.txt")
+    p.write('')
+    prev = tmpdir.chdir()
+
+    # Change its permissions a bunch... maybe this is too expensive?
+    for m in range(0o300, 0o700, 0o010):
+        p.chmod(m)
+        prob = checker.has_permission_issues(os.path.abspath(p.basename))
+        if not bool(0o040 & m): # octal Unix permission for 'group readable'
+            assert prob == problems.PROB_FILE_NOT_GRPRD
+        else:
+            assert prob == problems.PROB_NO_PROBLEM
+
+    prev.chdir()
