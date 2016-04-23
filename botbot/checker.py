@@ -82,6 +82,7 @@ def has_permission_issues(path):
 def is_fastq(path):
     """Check whether a given file is a fastq file."""
     if os.path.splitext(path)[1] == ".fastq":
-        return problems.PROB_FILE_IS_FASTQ
-    else:
-        return problems.PROB_NO_PROBLEM
+        if not os.path.islink(path):
+            return problems.PROB_FILE_IS_FASTQ
+
+    return problems.PROB_NO_PROBLEM
