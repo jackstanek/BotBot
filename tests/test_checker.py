@@ -3,6 +3,23 @@ import os, stat
 
 from botbot import checker, problems
 
+# Tests for Checker class methods
+def test_checker_register_accept_single_function():
+    c = checker.Checker()
+    c.register(lambda: print("Hello world!"))
+    assert len(c.checks) == 1
+
+def test_checker_register_accept_function_list():
+    c = checker.Checker()
+
+    # Function list
+    f = list()
+    f.append(lambda : print("Hello world!"))
+    f.append(lambda i : i + i)
+    c.register(f)
+
+# Tests for checking functions
+
 def test_fastq_checker_path_names():
     assert checker.is_fastq("bad.fastq") == problems.PROB_FILE_IS_FASTQ
     assert checker.is_fastq("good.py") == problems.PROB_NO_PROBLEM

@@ -18,8 +18,11 @@ class Checker:
 
     def register(self, fn):
         """Add a new checking function to the set, or a list/tuple of functions."""
-        for f in list(fn):
-            self.checks.add(f)
+        if hasattr(fn, '__call__'):
+            self.checks.add(fn)
+        else:
+            for f in list(fn):
+                self.checks.add(f)
 
     def check_tree(self, path):
         """
