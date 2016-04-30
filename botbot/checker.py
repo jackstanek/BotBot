@@ -50,6 +50,8 @@ class Checker:
                         self.all_problems.append([chk_path, curr])
                 except FileNotFoundError:
                     self.all_problems.append([chk_path, [problems.PROB_BROKEN_LINK]])
+                except PermissionError:
+                    self.all_problems.append([chk_path, [problems.PROB_DIR_NOT_WRITABLE]])
 
     def pretty_print_issues(self, verbose):
         """Print a list of issues with their fixes."""
