@@ -31,32 +31,25 @@ class Checker:
         elements: the first is the path of the file, and the second is a
         list of issues with the file at that path.
         """
-        mode = os.stat(path).st_mode
-
-        for f in os.listdir(path):
-            newpath = os.path.join(path, f)
-            np_mode = os.stat(newpath).st_mode
-
-            if stat.S_ISDIR(np_mode):
-                self.check_tree(newpath)
+        path = os.path.abspath(path)
+        to_check = [path]
+        while (True):
+            if len(to_check) == 0:
+                return
             else:
-                current_problems = set()
-                for check in self.checks:
-                    p = check(newpath)
-                    current_problems.add(p)
+                chk_path = to_check.pop()
+                try:
+                    if stat.S_ISDIR(os.stat(chk_path).st_mode):
+                        for f in os.listdir(chk_path):
+                            to_check.append(os.path.join(chk_path, f))
+                    else:
+                        curr = set()
+                        for check in self.checks:
+                            curr.add(check(chk_path))
 
-                self.all_problems.append((newpath, current_problems))
-
-        # Note: this section removes the residual dummy errors
-        # from files that have other errors. It adds another O(n)
-        # loop where we could have done it in that previous loop,
-        # so we should probably optimize it at some point.
-        for prob in self.all_problems:
-            prob_set = prob[1]
-            n = len(prob_set)
-            if problems.PROB_NO_PROBLEM in prob[1] and n > 1:
-                prob[1].remove(problems.PROB_NO_PROBLEM)
-
+                        self.all_problems.append([chk_path, curr])
+                except FileNotFoundError:
+                    self.all_problems.append([chk_path, [problems.PROB_BROKEN_LINK]])
 
     def pretty_print_issues(self, verbose):
         """Print a list of issues with their fixes."""
