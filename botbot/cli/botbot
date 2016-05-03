@@ -14,6 +14,7 @@ def main():
     parser.add_argument("path", type=str, default=".", help="Path of the directory to check")
     parser.add_argument("-p", action='store_const', const=checks.has_permission_issues, help='Check for group permissions issues')
     parser.add_argument("-F", action='store_const', const=checks.is_fastq, help='Check for raw FASTQ files')
+    parser.add_argument("-s", action='store_const', const=checks.sam_should_compress, help='Check for *.sam files')
 
     # Initialize the checker
     args = parser.parse_args()
