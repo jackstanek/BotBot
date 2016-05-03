@@ -20,3 +20,13 @@ def has_permission_issues(path):
             return problems.PROB_FILE_NOT_GRPRD
         else:
             return problems.PROB_NO_PROBLEM
+
+def sam_should_compress(path):
+    name, ext = os.path.splitext(path)
+    if ext == '.sam':
+        if os.path.isfile('.'.join((name, 'bam'))):
+            return problems.PROB_SAM_AND_BAM_EXIST
+        else:
+            return problems.PROB_SAM_SHOULD_COMPRESS
+
+    return problems.PROB_NO_PROBLEM

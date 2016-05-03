@@ -19,7 +19,9 @@ def main():
     args = parser.parse_args()
 
     c = checker.Checker()
-    default_checks = [checks.has_permission_issues, checks.is_fastq]
+    default_checks = [checks.has_permission_issues,
+                      checks.is_fastq,
+                      checks.sam_should_compress]
     checker_list = [i for i in vars(args).values() if callable(i)]
     if len(checker_list) > 0:
         c.register(checker_list)
