@@ -1,6 +1,6 @@
 import stat, os
 
-from . import problems
+from . import problems, checks
 
 class Checker:
     """
@@ -24,12 +24,14 @@ class Checker:
             for f in list(fn):
                 self.checks.add(f)
 
-    def check_tree(self, path):
+    def check_tree(self, path, link=False):
         """
         Run all the checks on every file in the specified path,
         recursively. Returns a list of tuples. Each tuple contains 2
-        elements: the first is the path of the file, and the second is a
-        list of issues with the file at that path.
+        elements: the first is the path of the file, and the second is
+        a list of issues with the file at that path. If link is True,
+        follow symlinks.
+
         """
         path = os.path.abspath(path)
         to_check = [path]
@@ -54,7 +56,12 @@ class Checker:
                     self.all_problems.append([chk_path, [problems.PROB_DIR_NOT_WRITABLE]])
 
     def pretty_print_issues(self, verbose):
-        """Print a list of issues with their fixes."""
+        """
+        Print a list of issues with their fixes. Only print issues which
+        are in problist, unless verbose is true, in which case print
+        all messages.
+
+        """
         for p in self.all_problems:
             for m in p[1]:
                 if (verbose):
@@ -63,21 +70,5 @@ class Checker:
                     if m != problems.PROB_NO_PROBLEM:
                         print(p[0] + ": " + m.message + " " + m.fix)
 
-def has_permission_issues(path):
-    """Check whether a given path has bad permissons."""
-    mode = os.stat(path).st_mode
-    if stat.S_ISDIR(mode) and not stat.S_IXGRP(mode):
-        return problems.PROB_DIR_NOT_EXEC
-    else:
-        if not bool(stat.S_IRGRP & mode):
-            return problems.PROB_FILE_NOT_GRPRD
-        else:
-            return problems.PROB_NO_PROBLEM
-
-def is_fastq(path):
-    """Check whether a given file is a fastq file."""
-    if os.path.splitext(path)[1] == ".fastq":
-        if not (os.path.islink(path) and os.path.abspath(path) == os.path.realpath(path)):
-            return problems.PROB_FILE_IS_FASTQ
-
-    return problems.PROB_NO_PROBLEM
+def is_link(path):
+    return (os.path.islink(path) and os.path.abspath(path) == os.path.realpath(path))

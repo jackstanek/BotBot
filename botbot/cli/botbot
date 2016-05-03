@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from botbot import checker, problems
+from botbot import checks, checker, problems
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -12,10 +12,12 @@ def main():
 
     # Path options
     parser.add_argument("path", type=str, default=".", help="Path of the directory to check")
+    parser.add_argument("-p", action='store_const', const=checks.has_permission_issues)
+    parser.add_argument("-F", action='store_const', const=checks.is_fastq)
 
     # Initialize the checker
     args = parser.parse_args()
-    checker_list = [checker.has_permission_issues, checker.is_fastq]
+    checker_list = [i for i in vars(args).values() if callable(i)]
     c = checker.Checker()
     c.register(checker_list)
 
