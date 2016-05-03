@@ -12,14 +12,19 @@ def main():
 
     # Path options
     parser.add_argument("path", type=str, default=".", help="Path of the directory to check")
-    parser.add_argument("-p", action='store_const', const=checks.has_permission_issues)
-    parser.add_argument("-F", action='store_const', const=checks.is_fastq)
+    parser.add_argument("-p", action='store_const', const=checks.has_permission_issues, help='Check for group permissions issues')
+    parser.add_argument("-F", action='store_const', const=checks.is_fastq, help='Check for raw FASTQ files')
 
     # Initialize the checker
     args = parser.parse_args()
-    checker_list = [i for i in vars(args).values() if callable(i)]
+
     c = checker.Checker()
-    c.register(checker_list)
+    default_checks = [checks.has_permission_issues, checks.is_fastq]
+    checker_list = [i for i in vars(args).values() if callable(i)]
+    if len(checker_list) > 0:
+        c.register(checker_list)
+    else:
+        c.register(default_checks)
 
     # Check the given directory
     c.check_tree(args.path)
