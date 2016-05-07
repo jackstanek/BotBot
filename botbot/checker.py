@@ -71,4 +71,4 @@ class Checker:
                         print(p[0] + ": " + m.message + " " + m.fix)
 
 def is_link(path):
-    return (os.path.islink(path) and os.path.abspath(path) == os.path.realpath(path))
+    return (os.path.islink(path) or os.path.abspath(path) != os.path.realpath(path))

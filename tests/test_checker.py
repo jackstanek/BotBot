@@ -1,7 +1,7 @@
 import pytest
 import os, stat
 
-from botbot import checker, problems
+from botbot import checker, problems, checks
 
 # Tests for Checker class methods
 def test_checker_register_accept_single_function():
@@ -20,22 +20,36 @@ def test_checker_register_accept_function_list():
 
 # Tests for checking functions
 
-def test_fastq_checker_path_names():
-    assert checker.is_fastq("bad.fastq") == problems.PROB_FILE_IS_FASTQ
-    assert checker.is_fastq("good.py") == problems.PROB_NO_PROBLEM
-    assert checker.is_fastq("fastq.actually_ok_too") == problems.PROB_NO_PROBLEM
-
-def test_fastq_checker_symlinks(tmpdir):
+def test_symlink_checker_same_directory(tmpdir):
     prev = tmpdir.chdir()
+    f = tmpdir.join('file.txt')
+    f.write('')
+    os.symlink(f.basename, 'link')
 
-    # Make a test file
-    p = tmpdir.join("bad.fastq")
-    p.write('')
-    os.symlink(p.basename, "good.fastq")
-
-    assert checker.is_fastq("bad.fastq") == problems.PROB_FILE_IS_FASTQ
-    assert checker.is_fastq("good.fastq") == problems.PROB_NO_PROBLEM
+    assert not checker.is_link(f.basename)
+    assert checker.is_link('link')
     prev.chdir()
+
+def test_symlink_checker_link_in_lower_directory(tmpdir):
+    prev = tmpdir.chdir()
+    f = tmpdir.join('file.txt')
+    f.write('')
+
+    os.mkdir('newdir')
+    os.symlink(f.basename, os.path.join('newdir', 'link'))
+
+    assert checker.is_link(os.path.join('newdir', 'link'))
+    assert not checker.is_link(f.basename)
+
+    prev.chdir()
+
+def test_is_fastq(tmpdir):
+    prev = tmpdir.chdir()
+    bad = tmpdir.join('bad.fastq')
+    os.symlink(bad.basename, 'good.fastq')
+
+    assert checks.is_fastq('bad.fastq') == problems.PROB_FILE_IS_FASTQ
+    assert checks.is_fastq('good.fastq') == problems.PROB_NO_PROBLEM
 
 def test_permission_checker(tmpdir):
     # Create a test file
@@ -46,7 +60,7 @@ def test_permission_checker(tmpdir):
     # Change its permissions a bunch... maybe this is too expensive?
     for m in range(0o300, 0o700, 0o010):
         p.chmod(m)
-        prob = checker.has_permission_issues(os.path.abspath(p.basename))
+        prob = checks.has_permission_issues(os.path.abspath(p.basename))
         if not bool(0o040 & m): # octal Unix permission for 'group readable'
             assert prob == problems.PROB_FILE_NOT_GRPRD
         else:
