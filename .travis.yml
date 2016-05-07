@@ -1,11 +1,10 @@
-sudo: false
+udo: false
 
 language: python
 python:
   - "3.5"
 
 install:
-  - pip install botbot
   - pip install -r requirements.txt
 
 script: py.test
