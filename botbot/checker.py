@@ -68,7 +68,7 @@ class Checker:
         for check in self.checks:
             curr.add(check(chk_path))
 
-        self.all_problems.append([chk_path, curr])
+        self.all_problems.append((chk_path, curr))
         self.info['problems'] += len(curr) - 1
         self.info['files'] += 1
 

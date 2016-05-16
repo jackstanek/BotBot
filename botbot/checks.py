@@ -19,8 +19,8 @@ def has_permission_issues(path):
     else:
         if not bool(stat.S_IRGRP & mode):
             return problems.PROB_FILE_NOT_GRPRD
-        else:
-            return problems.PROB_NO_PROBLEM
+
+    return problems.PROB_NO_PROBLEM
 
 def sam_should_compress(path):
     """Check if a *.SAM file should be compressed or deleted"""
