@@ -46,10 +46,25 @@ def test_symlink_checker_link_in_lower_directory(tmpdir):
 def test_is_fastq(tmpdir):
     prev = tmpdir.chdir()
     bad = tmpdir.join('bad.fastq')
+    bad.write('')
     os.symlink(bad.basename, 'good.fastq')
 
     assert checks.is_fastq('bad.fastq') == problems.PROB_FILE_IS_FASTQ
     assert checks.is_fastq('good.fastq') == problems.PROB_NO_PROBLEM
+
+def test_sam_detection(tmpdir):
+    prev = tmpdir.chdir()
+    bad = tmpdir.join('bad.sam')
+    bad.write('')
+
+    # Check raw file
+    assert checks.sam_should_compress('bad.sam') == problems.PROB_SAM_SHOULD_COMPRESS
+
+    bam = tmpdir.join('bad.bam')
+    bam.write('')
+    assert checks.sam_should_compress('bad.sam') == problems.PROB_SAM_AND_BAM_EXIST
+
+    prev.chdir()
 
 def test_permission_checker(tmpdir):
     # Create a test file
