@@ -39,7 +39,6 @@ class Checker:
         elements: the first is the path of the file, and the second is
         a list of issues with the file at that path. If link is True,
         follow symlinks.
-
         """
         path = os.path.abspath(path)
         to_check = [path]
@@ -66,10 +65,12 @@ class Checker:
         """Check a file against all checkers"""
         curr = set()
         for check in self.checks:
-            curr.add(check(chk_path))
+            prob = check(chk_path)
+            if prob != None:
+                curr.add(prob)
 
         self.all_problems.append((chk_path, curr))
-        self.info['problems'] += len(curr) - 1
+        self.info['problems'] += len(curr)
         self.info['files'] += 1
 
     def pretty_print_issues(self, verbose):
@@ -87,7 +88,7 @@ class Checker:
                 #     if m != problems.PROB_NO_PROBLEM:
                 #         print(p[0] + ": " + m.message + " " + m.fix)
 
-        infostring = "Found {problems} problems over {files} files in {time:f} seconds."
+        infostring = "Found {problems} problems over {files} files in {time:2f} seconds."
         print(infostring.format(**self.info))
 
 def is_link(path):
