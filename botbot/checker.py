@@ -66,7 +66,7 @@ class Checker:
         curr = set()
         for check in self.checks:
             prob = check(chk_path)
-            if prob != None:
+            if prob is not None:
                 curr.add(prob)
 
         self.add_entry(chk_path, curr)
