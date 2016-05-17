@@ -4,7 +4,7 @@ import stat
 import os
 import time
 
-from . import problems
+from botbot import problems
 
 class Checker:
     """

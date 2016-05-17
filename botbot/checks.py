@@ -1,6 +1,8 @@
-import os, stat
+"""Functions for checking files"""
+import os
+import stat
 
-from . import problems
+from botbot import problems
 from botbot.checker import is_link
 
 def is_fastq(path):
