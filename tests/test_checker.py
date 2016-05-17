@@ -50,7 +50,7 @@ def test_is_fastq(tmpdir):
     os.symlink(bad.basename, 'good.fastq')
 
     assert checks.is_fastq('bad.fastq') == problems.PROB_FILE_IS_FASTQ
-    assert checks.is_fastq('good.fastq') == problems.PROB_NO_PROBLEM
+    assert checks.is_fastq('good.fastq') is None
 
 def test_sam_raw_file_detection(tmpdir):
     prev = tmpdir.chdir()
@@ -82,6 +82,6 @@ def test_permission_checker(tmpdir):
         if not bool(0o040 & m): # octal Unix permission for 'group readable'
             assert prob == problems.PROB_FILE_NOT_GRPRD
         else:
-            assert prob == problems.PROB_NO_PROBLEM
+            assert prob is None
 
     prev.chdir()
