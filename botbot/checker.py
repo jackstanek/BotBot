@@ -82,13 +82,9 @@ class Checker:
         """
         for prob in self.all_problems:
             for mess in prob[1]:
-                if verbose:
-                    print(prob[0] + ": " + mess.message + " " + mess.fix)
-                # else:
-                #     if m != problems.PROB_NO_PROBLEM:
-                #         print(p[0] + ": " + m.message + " " + m.fix)
+                print(prob[0] + ": " + mess.message + " " + mess.fix)
 
-        infostring = "Found {problems} problems over {files} files in {time:2f} seconds."
+        infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.info))
 
 def is_link(path):
