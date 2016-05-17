@@ -57,9 +57,9 @@ class Checker:
                         self.check_file(chk_path)
 
                 except FileNotFoundError:
-                    self.all_problems.append([chk_path, [problems.PROB_BROKEN_LINK]])
+                    self.add_entry(chk_path, [problems.PROB_BROKEN_LINK])
                 except PermissionError:
-                    self.all_problems.append([chk_path, [problems.PROB_DIR_NOT_WRITABLE]])
+                    self.add_entry(chk_path, [problems.PROB_DIR_NOT_WRITABLE])
 
     def check_file(self, chk_path):
         """Check a file against all checkers"""
@@ -69,8 +69,14 @@ class Checker:
             if prob != None:
                 curr.add(prob)
 
-        self.all_problems.append((chk_path, curr))
-        self.info['problems'] += len(curr)
+        self.add_entry(chk_path, curr)
+
+    def add_entry(self, path, probs):
+        """Add an entry to the problem list"""
+        if len(probs) > 0:
+            self.all_problems.append((path, probs))
+            self.info['problems'] += len(probs)
+
         self.info['files'] += 1
 
     def pretty_print_issues(self, verbose):
@@ -80,9 +86,10 @@ class Checker:
         all messages.
 
         """
-        for prob in self.all_problems:
-            for mess in prob[1]:
-                print(prob[0] + ": " + mess.message + " " + mess.fix)
+        if verbose:
+            for prob in self.all_problems:
+                for mess in prob[1]:
+                    print(prob[0] + ": " + mess.message + " " + mess.fix)
 
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.info))
