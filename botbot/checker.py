@@ -87,14 +87,15 @@ class Checker:
         all messages.
 
         """
-        for issue in problems.every_problem.keys():
-            prob = problems.every_problem[issue]
-            files = [f[0] for f in self.all_problems if issue in f[1]]
+        if verbose:
+            for issue in problems.every_problem.keys():
+                prob = problems.every_problem[issue]
+                files = [f[0] for f in self.all_problems if issue in f[1]]
 
-            if len(files) > 0:
-                print("{0}:".format(prob.message))
-                for fi in files:
-                    print(fi)
+                if len(files) > 0:
+                    print("{0}:".format(prob.message))
+                    for fi in files:
+                        print(fi)
 
         # Print general statistics
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
