@@ -86,11 +86,7 @@ class Checker:
         all messages.
 
         """
-        if verbose:
-            for prob in self.all_problems:
-                for mess in prob[1]:
-                    print(prob[0] + ": " + mess.message + " " + mess.fix)
-
+        # TODO: Implement the new report generator.
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.info))
 

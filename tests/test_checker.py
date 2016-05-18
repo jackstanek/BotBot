@@ -49,7 +49,7 @@ def test_is_fastq(tmpdir):
     bad.write('')
     os.symlink(bad.basename, 'good.fastq')
 
-    assert checks.is_fastq('bad.fastq') == problems.PROB_FILE_IS_FASTQ
+    assert checks.is_fastq('bad.fastq') == 'PROB_FILE_IS_FASTQ'
     assert checks.is_fastq('good.fastq') is None
 
 def test_sam_raw_file_detection(tmpdir):
@@ -58,14 +58,14 @@ def test_sam_raw_file_detection(tmpdir):
     bad.write('')
 
     # Check raw file
-    assert checks.sam_should_compress('bad.sam') == problems.PROB_SAM_SHOULD_COMPRESS
+    assert checks.sam_should_compress('bad.sam') == 'PROB_SAM_SHOULD_COMPRESS'
     prev.chdir()
 
 def test_sam_and_bam_detection(tmpdir):
     prev = tmpdir.chdir()
     bam = tmpdir.join('bad.bam')
     bam.write('')
-    assert checks.sam_should_compress('bad.sam') == problems.PROB_SAM_AND_BAM_EXIST
+    assert checks.sam_should_compress('bad.sam') == 'PROB_SAM_AND_BAM_EXIST'
 
     prev.chdir()
 
@@ -80,7 +80,7 @@ def test_permission_checker(tmpdir):
         p.chmod(m)
         prob = checks.has_permission_issues(os.path.abspath(p.basename))
         if not bool(0o040 & m): # octal Unix permission for 'group readable'
-            assert prob == problems.PROB_FILE_NOT_GRPRD
+            assert prob == 'PROB_FILE_NOT_GRPRD'
         else:
             assert prob is None
 
