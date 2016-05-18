@@ -41,6 +41,7 @@ class Checker:
         follow symlinks.
         """
         path = os.path.abspath(path)
+        start = path
         to_check = [path]
         extime = time.time()
         while True:
@@ -57,9 +58,9 @@ class Checker:
                         self.check_file(chk_path)
 
                 except FileNotFoundError:
-                    self.add_entry(chk_path, [problems.PROB_BROKEN_LINK])
+                    self.add_entry(chk_path, ['PROB_BROKEN_LINK'])
                 except PermissionError:
-                    self.add_entry(chk_path, [problems.PROB_DIR_NOT_WRITABLE])
+                    self.add_entry(chk_path, ['PROB_DIR_NOT_WRITABLE'])
 
     def check_file(self, chk_path):
         """Check a file against all checkers"""
@@ -86,7 +87,16 @@ class Checker:
         all messages.
 
         """
-        # TODO: Implement the new report generator.
+        for issue in problems.every_problem.keys():
+            prob = problems.every_problem[issue]
+            files = [f[0] for f in self.all_problems if issue in f[1]]
+
+            if len(files) > 0:
+                print("{0}:".format(prob.message))
+                for fi in files:
+                    print(fi)
+
+        # Print general statistics
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.info))
 
