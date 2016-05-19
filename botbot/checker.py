@@ -25,7 +25,10 @@ class Checker:
         } # Information about the previous check
 
     def register(self, func):
-        """Add a new checking function to the set, or a list/tuple of functions."""
+        """
+        Add a new checking function to the set, or a list/tuple of
+        functions.
+        """
         if hasattr(func, '__call__'):
             self.checks.add(func)
         else:
@@ -44,23 +47,22 @@ class Checker:
         start = path
         to_check = [path]
         extime = time.time()
-        while True:
-            if len(to_check) == 0:
-                self.info['time'] = time.time() - extime
-                return
-            else:
-                chk_path = to_check.pop()
-                try:
-                    if stat.S_ISDIR(os.stat(chk_path).st_mode):
-                        for f in os.listdir(chk_path):
-                            to_check.append(os.path.join(chk_path, f))
-                    else:
-                        self.check_file(chk_path)
 
-                except FileNotFoundError:
-                    self.add_entry(chk_path, ['PROB_BROKEN_LINK'])
-                except PermissionError:
-                    self.add_entry(chk_path, ['PROB_DIR_NOT_WRITABLE'])
+        while len(to_check) > 0:
+            chk_path = to_check.pop()
+            try:
+                if stat.S_ISDIR(os.stat(chk_path).st_mode):
+                    new = [os.path.join(chk_path, f) for f in os.listdir(chk_path)]
+                    to_check.extend(new)
+                else:
+                    self.check_file(chk_path)
+
+            except FileNotFoundError:
+                self.add_entry(chk_path, [problems.PROB_BROKEN_LINK])
+            except PermissionError:
+                self.add_entry(chk_path, [problems.PROB_DIR_NOT_WRITABLE])
+
+        self.info['time'] = time.time() - extime
 
     def check_file(self, chk_path):
         """Check a file against all checkers"""
