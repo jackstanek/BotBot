@@ -24,6 +24,9 @@ def main():
                         const=checks.sam_should_compress,
                         help='Check for *.sam files')
 
+    parser.add_argument("-l", "--link", action='store_true',
+                        help='Dereference symlinks')
+
     # Initialize the checker
     args = parser.parse_args()
 
@@ -38,7 +41,7 @@ def main():
         c.register(default_checks)
 
     # Check the given directory
-    c.check_tree(args.path)
+    c.check_tree(args.path, args.link)
 
     # Print the list of issues
     c.pretty_print_issues(args.verbose)
