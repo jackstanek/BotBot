@@ -8,6 +8,9 @@ setup(name='BotBot',
       author='Jack Stanek',
       author_email='stane064@umn.edu',
       url='http://github.com/jackstanek/BotBot',
-      scripts=['botbot/cli/botbot'],
-      packages=['botbot'],
-)
+      entry_points={
+          'console_scripts': [
+              'botbot = botbot.botbot:main',
+          ]
+      },
+      packages=['botbot'])
