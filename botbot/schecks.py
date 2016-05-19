@@ -14,7 +14,7 @@ def file_group_executable(path):
     mode = os.stat(path).st_mode
     if stat.S_ISDIR(mode):
         return
-    if stat.S_IXUSR(mode) and not stat.S_IXGRP(mode):
+    if bool(stat.S_IXUSR & mode) and not bool(stat.S_IXGRP & mode):
         return 'PROB_FILE_NOT_GRPEXEC'
 
 def dir_group_readable(path):
@@ -23,7 +23,7 @@ def dir_group_readable(path):
     if not stat.S_ISDIR(mode):
         return
     else:
-        if not stat.S_IXGRP(mode):
+        if not bool(stat.S_IXGRP & mode):
             return 'PROB_DIR_NOT_ACCESSIBLE'
-        elif not stat.S_IWGRP(mode):
+        elif not bool(stat.S_IWGRP & mode):
             return 'PROB_DIR_NOT_WRITABLE'
