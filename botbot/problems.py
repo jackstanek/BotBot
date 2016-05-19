@@ -14,4 +14,6 @@ every_problem = {
     'PROB_BROKEN_LINK': Problem(4, 'Symbolic link points to nonexistant file.', 'Delete this link.'),
     'PROB_SAM_SHOULD_COMPRESS': Problem(5, '*.sam files are large.', 'Consider compressing.'),
     'PROB_SAM_AND_BAM_EXIST': Problem(6, 'The *.sam file has been compressed, but it still exists.', 'Delete the uncompressed copy.'),
+    'PROB_FILE_NOT_GRPEXEC': Problem(7, 'File is not group executable.', 'Run chmod 0755 on this file.'),
+    'PROB_DIR_NOT_ACCESSIBLE': Problem(8, 'Directory is not accessible to the group.', 'Run chmod 0755 on this directory.')
 }

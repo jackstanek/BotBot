@@ -25,5 +25,5 @@ def dir_group_readable(path):
     else:
         if not stat.S_IXGRP(mode):
             return 'PROB_DIR_NOT_ACCESSIBLE'
-        elif not stat.S_IRGRP(mode):
-            return 'PROB_DIR_NOT_READABLE'
+        elif not stat.S_IWGRP(mode):
+            return 'PROB_DIR_NOT_WRITABLE'
