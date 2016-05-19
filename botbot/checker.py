@@ -36,7 +36,7 @@ class Checker:
             for f in list(func):
                 self.checks.add(f)
 
-    def check_tree(self, path):
+    def check_tree(self, path, link=False):
         """
         Run all the checks on every file in the specified path,
         recursively. Returns a list of tuples. Each tuple contains 2
@@ -52,7 +52,9 @@ class Checker:
         while len(to_check) > 0:
             chk_path = to_check.pop()
             try:
-                if stat.S_ISDIR(os.stat(chk_path).st_mode):
+                if not link and is_link(chk_path):
+                    continue
+                elif stat.S_ISDIR(os.stat(chk_path).st_mode):
                     new = [os.path.join(chk_path, f) for f in os.listdir(chk_path)]
                     to_check.extend(new)
                 else:
@@ -81,7 +83,6 @@ class Checker:
         are in problist, unless verbose is true, in which case print
         all messages.
         TODO: Move into ReportWriter
-
         """
         # Print general statistics
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
