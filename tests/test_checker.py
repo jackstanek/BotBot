@@ -1,5 +1,7 @@
+import os
+import stat
+
 import pytest
-import os, stat
 
 from botbot import checker, problems, checks
 
@@ -66,22 +68,5 @@ def test_sam_and_bam_detection(tmpdir):
     bam = tmpdir.join('bad.bam')
     bam.write('')
     assert checks.sam_should_compress('bad.sam') == 'PROB_SAM_AND_BAM_EXIST'
-
-    prev.chdir()
-
-def test_permission_checker(tmpdir):
-    # Create a test file
-    p = tmpdir.join("bad_permissions.txt")
-    p.write('')
-    prev = tmpdir.chdir()
-
-    # Change its permissions a bunch... maybe this is too expensive?
-    for m in range(0o300, 0o700, 0o010):
-        p.chmod(m)
-        prob = checks.has_permission_issues(os.path.abspath(p.basename))
-        if not bool(0o040 & m): # octal Unix permission for 'group readable'
-            assert prob == 'PROB_FILE_NOT_GRPRD'
-        else:
-            assert prob is None
 
     prev.chdir()
