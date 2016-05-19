@@ -1,5 +1,5 @@
 import argparse
-from botbot import checks, checker
+from botbot import checks, schecks, checker
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -10,35 +10,23 @@ def main():
                            help="Print issues and fixes for all files",
                            action="store_true")
 
-    # Path options
-    parser.add_argument("path", type=str, default=".", help="Path of the directory to check")
-    parser.add_argument("-p", action='store_const',
-                        const=checks.has_permission_issues,
-                        help='Check for group permissions issues')
+    # Directory options
+    parser.add_argument("-s", "--shared",
+                        help="Use the shared folder ruleset",
+                        action="store_true")
 
-    parser.add_argument("-F", action='store_const',
-                        const=checks.is_fastq,
-                        help='Check for raw FASTQ files')
-
-    parser.add_argument("-s", action='store_const',
-                        const=checks.sam_should_compress,
-                        help='Check for *.sam files')
-
-    parser.add_argument("-l", "--link", action='store_true',
-                        help='Dereference symlinks')
 
     # Initialize the checker
     args = parser.parse_args()
 
     c = checker.Checker()
-    default_checks = [checks.has_permission_issues,
-                      checks.is_fastq,
-                      checks.sam_should_compress]
-    checker_list = [i for i in vars(args).values() if callable(i)]
-    if len(checker_list) > 0:
-        c.register(checker_list)
-    else:
-        c.register(default_checks)
+    clist = [checks.is_fastq,
+             checks.sam_should_compress]
+
+    if args.shared:
+        clist += [schecks.file_groupreadable,
+                  schecks.file_group_executable,
+                  schecks.dir_group_readable]
 
     # Check the given directory
     c.check_tree(args.path, args.link)
