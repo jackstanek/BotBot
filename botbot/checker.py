@@ -30,6 +30,7 @@ class Checker:
         functions.
         """
         if hasattr(func, '__call__'):
+
             self.checks.add(func)
         else:
             for f in list(func):
@@ -44,7 +45,7 @@ class Checker:
         follow symlinks.
         """
         path = os.path.abspath(path)
-        start = path
+        start = path # Currently unused, could be used to judge depth
         to_check = [path]
         extime = time.time()
 
@@ -58,9 +59,9 @@ class Checker:
                     self.check_file(chk_path)
 
             except FileNotFoundError:
-                self.add_entry(chk_path, [problems.PROB_BROKEN_LINK])
+                self.add_entry(chk_path, ['PROB_BROKEN_LINK'])
             except PermissionError:
-                self.add_entry(chk_path, [problems.PROB_DIR_NOT_WRITABLE])
+                self.add_entry(chk_path, ['PROB_DIR_NOT_WRITABLE'])
 
         self.info['time'] = time.time() - extime
 
