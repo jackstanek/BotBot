@@ -9,7 +9,7 @@ def is_fastq(path):
     """Check whether a given file is a fastq file."""
     if os.path.splitext(path)[1] == ".fastq":
         if not is_link(path):
-            return problems.PROB_FILE_IS_FASTQ
+            return 'PROB_FILE_IS_FASTQ'
 
 def has_permission_issues(path):
     """Check whether a given path has bad permissons."""
@@ -18,13 +18,13 @@ def has_permission_issues(path):
         return problems.PROB_DIR_NOT_WRITABLE
     else:
         if not bool(stat.S_IRGRP & mode):
-            return problems.PROB_FILE_NOT_GRPRD
+            return 'PROB_FILE_NOT_GRPRD'
 
 def sam_should_compress(path):
     """Check if a *.SAM file should be compressed or deleted"""
     name, ext = os.path.splitext(path)
     if ext == '.sam':
         if os.path.isfile('.'.join((name, 'bam'))):
-            return problems.PROB_SAM_AND_BAM_EXIST
+            return 'PROB_SAM_AND_BAM_EXIST'
         else:
-            return problems.PROB_SAM_SHOULD_COMPRESS
+            return 'PROB_SAM_SHOULD_COMPRESS'
