@@ -2,7 +2,6 @@
 import os
 import stat
 
-from botbot import problems
 from botbot.checker import is_link
 
 def is_fastq(path):
