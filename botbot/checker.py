@@ -4,7 +4,7 @@ import stat
 import os
 import time
 
-from botbot import problems
+from botbot import problist as pl
 
 class Checker:
     """
@@ -17,7 +17,7 @@ class Checker:
     # file specified in the path.
     def __init__(self):
         self.checks = set() # All checks to perform
-        self.all_problems = list() # List of files with their issues
+        self.probs = pl.ProblemList() # List of files with their issues
         self.info = {
             'files': 0,
             'problems': 0,
@@ -59,27 +59,19 @@ class Checker:
                     self.check_file(chk_path)
 
             except FileNotFoundError:
-                self.add_entry(chk_path, ['PROB_BROKEN_LINK'])
+                self.probs.add_problem(chk_path, 'PROB_BROKEN_LINK')
             except PermissionError:
-                self.add_entry(chk_path, ['PROB_DIR_NOT_WRITABLE'])
+                self.probs.add_problem(chk_path, 'PROB_DIR_NOT_WRITABLE')
 
         self.info['time'] = time.time() - extime
 
     def check_file(self, chk_path):
         """Check a file against all checkers"""
-        curr = set()
         for check in self.checks:
             prob = check(chk_path)
             if prob is not None:
-                curr.add(prob)
-
-        self.add_entry(chk_path, curr)
-
-    def add_entry(self, path, probs):
-        """Add an entry to the problem list"""
-        if len(probs) > 0:
-            self.all_problems.append((path, probs))
-            self.info['problems'] += len(probs)
+                self.probs.add_problem(chk_path, prob)
+                self.info['problems'] += 1
 
         self.info['files'] += 1
 
@@ -88,17 +80,9 @@ class Checker:
         Print a list of issues with their fixes. Only print issues which
         are in problist, unless verbose is true, in which case print
         all messages.
+        TODO: Move into ReportWriter
 
         """
-        for issue in problems.every_problem.keys():
-            prob = problems.every_problem[issue]
-            files = [f[0] for f in self.all_problems if issue in f[1]]
-
-            if len(files) > 0:
-                print("{0}:".format(prob.message))
-                for fi in files:
-                    print(fi)
-
         # Print general statistics
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.info))
