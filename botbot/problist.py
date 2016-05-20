@@ -1,8 +1,8 @@
 """Associating issues with a file"""
 
 class FileProblems:
-    def __init__(self, uid, prob):
-        self.uid = uid
+    def __init__(self, fi, prob):
+        self.fi = fi
         self.probs = {prob}
 
     def add(self, prob):
@@ -19,14 +19,14 @@ class ProblemList:
         if fi.path in self.problems:
             self.problems[fi.path].add(prob)
         else:
-            self.problems[fi.path] = FileProblems(fi.uid, prob)
+            self.problems[fi.path] = FileProblems(fi, prob)
 
     def files_with_problem(self, prob):
         """Get a list of files with a given problemp"""
         i = iter(self.problems.items())
-        return [p[0] for p in i if prob in p.probs]
+        return [p[1] for p in i if prob in p[1].probs]
 
     def files_by_user(self, uid):
         """Get a list of bad files belonging to the given user"""
         i = iter(self.problems.items())
-        return [p[0] for p in i if p[1].uid == uid]
+        return [p for p in i if p[1].uid == uid]

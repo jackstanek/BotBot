@@ -19,7 +19,7 @@ class Checker:
     # checks is a set of all the checking functions this checker knows of.  All
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
-    def __init__(self):
+    def __init__(self, out=sys.stdout):
         self.checks = set() # All checks to perform
         self.checklist = list()
         self.probs = pl.ProblemList() # List of files with their issues
@@ -29,7 +29,7 @@ class Checker:
             'problems': 0,
             'starttime': 0
         } # Information about the previous check
-        self.reporter = rep.ReportWriter(self)
+        self.reporter = rep.ReportWriter(self, out)
 
     def register(self, func):
         """
@@ -119,6 +119,7 @@ class Checker:
         self.status['time'] = time.time() - self.status['starttime']
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.status))
+        self.reporter.write()
 
 def is_link(path):
     """Check if the given path is a symbolic link"""
