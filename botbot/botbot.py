@@ -24,8 +24,7 @@ def main():
     args = parser.parse_args()
 
     c = checker.Checker()
-    clist = [checks.file_exists,
-             checks.is_fastq,
+    clist = [checks.is_fastq,
              checks.sam_should_compress]
 
     if args.shared:

@@ -49,7 +49,7 @@ class Checker:
         while len(to_add) > 0:
             try:
                 apath = fi.FileInfo(to_add.pop())
-                if is_link(apath):
+                if is_link(apath.path):
                     if not link:
                         continue
                     else:
@@ -115,6 +115,6 @@ class Checker:
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.status))
 
-def is_link(finfo):
+def is_link(path):
     """Check if the given path is a symbolic link"""
-    return os.path.islink(finfo.path) or os.path.abspath(finfo.path) != os.path.realpath(finfo.path)
+    return os.path.islink(path) or os.path.abspath(path) != os.path.realpath(path)
