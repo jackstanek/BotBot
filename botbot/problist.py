@@ -14,6 +14,9 @@ class ProblemList:
     def __init__(self):
         self.problems = dict()
 
+    def probcount(self):
+        return len(self.problems.keys())
+
     def add_problem(self, fi, prob):
         """Associate an issue with a file"""
         if fi.path in self.problems:

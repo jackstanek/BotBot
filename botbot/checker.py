@@ -26,7 +26,6 @@ class Checker:
         self.status = {
             'cfiles': 0,
             'files': 0,
-            'problems': 0,
             'starttime': 0
         } # Information about the previous check
         self.reporter = rep.ReportWriter(self, out)
@@ -42,11 +41,10 @@ class Checker:
             for f in list(func):
                 self.checks.add(f)
 
-    """
-    Build a list of files to check. If link is True, follow symlinks.
-
-    """
     def build_checklist(self, path, link=False, verbose=True):
+        """
+        Build a list of files to check. If link is True, follow symlinks.
+        """
         to_add = [os.path.join(path, f) for f in os.listdir(path)]
         while len(to_add) > 0:
             try:
@@ -55,10 +53,8 @@ class Checker:
                     if not link:
                         continue
                     else:
-                        # Check if link is broken
-                        with open(apath.path, mode='r') as exists:
-                            self.checklist.append(apath)
-                elif stat.S_ISDIR(os.stat(apath.path).st_mode):
+                        to_add.append(apath.path)
+                elif stat.S_ISDIR(apath.mode):
                     new = [os.path.join(apath.path, f) for f in os.listdir(apath.path)]
                     to_add.extend(new)
                 else:
@@ -76,6 +72,7 @@ class Checker:
             print('Located {0} files.'.format(self.status['files']))
 
     def check_all(self, path, link=False, verbose=False):
+        """Check the file list generated before."""
         self.build_checklist(path)
         self.status['starttime'] = time.time()
         for finfo in self.checklist:
@@ -92,7 +89,7 @@ class Checker:
             prob = check(finfo)
             if prob is not None:
                 self.probs.add_problem(finfo, prob)
-                self.status['problems'] += 1
+
         self.status['cfiles'] += 1
         # self.status['time'] = time.time() - self.status['starttime']
 
@@ -100,6 +97,7 @@ class Checker:
             self.write_status(40)
 
     def write_status(self, barlen):
+        """Write where we're at"""
         done = self.status['cfiles']
         total = self.status['files']
         perc = done / total
@@ -117,8 +115,8 @@ class Checker:
         """
         # Print general statistics
         self.status['time'] = time.time() - self.status['starttime']
-        infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
-        print(infostring.format(**self.status))
+        infostring = "Found {0} problems over {files} files in {time:.2f} seconds."
+        print(infostring.format(self.probs.probcount(), **self.status))
         self.reporter.write()
 
 def is_link(path):
