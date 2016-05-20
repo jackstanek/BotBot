@@ -8,6 +8,7 @@ import math
 
 from . import problist as pl
 from . import fileinfo as fi
+from . import report as rep
 
 class Checker:
     """
@@ -28,6 +29,7 @@ class Checker:
             'problems': 0,
             'starttime': 0
         } # Information about the previous check
+        self.reporter = rep.ReportWriter(self)
 
     def register(self, func):
         """
@@ -77,9 +79,11 @@ class Checker:
         self.build_checklist(path)
         self.status['starttime'] = time.time()
         for finfo in self.checklist:
-            self.check_file(finfo)
+            self.check_file(finfo, status=verbose)
 
-    def check_file(self, finfo, status=True):
+        self.print_summary()
+
+    def check_file(self, finfo, status=False):
         """
         Check a file against all checkers, write status to stdout if status
         is True
@@ -104,7 +108,7 @@ class Checker:
         print('[{0}] {1:.0%}\r'.format(filllen * '#' + (barlen - filllen) * '-', perc), end='')
         sys.stdout.flush()
 
-    def pretty_print_issues(self, verbose):
+    def print_summary(self):
         """
         Print a list of issues with their fixes. Only print issues which
         are in problist, unless verbose is true, in which case print
