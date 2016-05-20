@@ -3,8 +3,9 @@
 import stat
 import os
 import time
+import sys
 
-from botbot import problems
+from botbot import problist as pl
 
 class Checker:
     """
@@ -17,7 +18,7 @@ class Checker:
     # file specified in the path.
     def __init__(self):
         self.checks = set() # All checks to perform
-        self.all_problems = list() # List of files with their issues
+        self.probs = pl.ProblemList() # List of files with their issues
         self.info = {
             'files': 0,
             'problems': 0,
@@ -25,14 +26,18 @@ class Checker:
         } # Information about the previous check
 
     def register(self, func):
-        """Add a new checking function to the set, or a list/tuple of functions."""
+        """
+        Add a new checking function to the set, or a list/tuple of
+        functions.
+        """
         if hasattr(func, '__call__'):
+
             self.checks.add(func)
         else:
             for f in list(func):
                 self.checks.add(f)
 
-    def check_tree(self, path):
+    def check_tree(self, path, link=False, verbose=True):
         """
         Run all the checks on every file in the specified path,
         recursively. Returns a list of tuples. Each tuple contains 2
@@ -41,62 +46,53 @@ class Checker:
         follow symlinks.
         """
         path = os.path.abspath(path)
-        start = path
+        start = path # Currently unused, could be used to judge depth
         to_check = [path]
         extime = time.time()
-        while True:
-            if len(to_check) == 0:
-                self.info['time'] = time.time() - extime
-                return
-            else:
-                chk_path = to_check.pop()
-                try:
-                    if stat.S_ISDIR(os.stat(chk_path).st_mode):
-                        for f in os.listdir(chk_path):
-                            to_check.append(os.path.join(chk_path, f))
-                    else:
-                        self.check_file(chk_path)
 
-                except FileNotFoundError:
-                    self.add_entry(chk_path, ['PROB_BROKEN_LINK'])
-                except PermissionError:
-                    self.add_entry(chk_path, ['PROB_DIR_NOT_WRITABLE'])
+        while len(to_check) > 0:
+            chk_path = to_check.pop()
+            try:
+                if not link and is_link(chk_path):
+                    continue
+                elif stat.S_ISDIR(os.stat(chk_path).st_mode):
+                    new = [os.path.join(chk_path, f) for f in os.listdir(chk_path)]
+                    to_check.extend(new)
+                else:
+                    self.check_file(chk_path)
+
+                self.info['time'] = time.time() - extime
+
+            except FileNotFoundError:
+                self.probs.add_problem(chk_path, 'PROB_BROKEN_LINK')
+            except PermissionError:
+                self.probs.add_problem(chk_path, 'PROB_DIR_NOT_WRITABLE')
+
+            if verbose:
+                self.write_status()
 
     def check_file(self, chk_path):
         """Check a file against all checkers"""
-        curr = set()
         for check in self.checks:
             prob = check(chk_path)
-            if prob != None:
-                curr.add(prob)
-
-        self.add_entry(chk_path, curr)
-
-    def add_entry(self, path, probs):
-        """Add an entry to the problem list"""
-        if len(probs) > 0:
-            self.all_problems.append((path, probs))
-            self.info['problems'] += len(probs)
+            if prob is not None:
+                self.probs.add_problem(chk_path, prob)
+                self.info['problems'] += 1
 
         self.info['files'] += 1
+
+    def write_status(self):
+        infostring = "Found {problems} problems over {files} files in {time:.2f} seconds.\r"
+        print(infostring.format(**self.info), end='')
+        sys.stdout.flush()
 
     def pretty_print_issues(self, verbose):
         """
         Print a list of issues with their fixes. Only print issues which
         are in problist, unless verbose is true, in which case print
         all messages.
-
+        TODO: Move into ReportWriter
         """
-        if verbose:
-            for issue in problems.every_problem.keys():
-                prob = problems.every_problem[issue]
-                files = [f[0] for f in self.all_problems if issue in f[1]]
-
-                if len(files) > 0:
-                    print("{0}:".format(prob.message))
-                    for fi in files:
-                        print(fi)
-
         # Print general statistics
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.info))

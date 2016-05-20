@@ -2,7 +2,6 @@
 import os
 import stat
 
-from botbot import problems
 from botbot.checker import is_link
 
 def is_fastq(path):
@@ -10,15 +9,6 @@ def is_fastq(path):
     if os.path.splitext(path)[1] == ".fastq":
         if not is_link(path):
             return 'PROB_FILE_IS_FASTQ'
-
-def has_permission_issues(path):
-    """Check whether a given path has bad permissons."""
-    mode = os.stat(path).st_mode
-    if stat.S_ISDIR(mode) and not stat.S_IXGRP(mode):
-        return problems.PROB_DIR_NOT_WRITABLE
-    else:
-        if not bool(stat.S_IRGRP & mode):
-            return 'PROB_FILE_NOT_GRPRD'
 
 def sam_should_compress(path):
     """Check if a *.SAM file should be compressed or deleted"""
