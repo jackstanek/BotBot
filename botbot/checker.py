@@ -19,7 +19,7 @@ class Checker:
     def __init__(self):
         self.checks = set() # All checks to perform
         self.probs = pl.ProblemList() # List of files with their issues
-        self.info = {
+        self.status = {
             'files': 0,
             'problems': 0,
             'time': 0
@@ -31,12 +31,11 @@ class Checker:
         functions.
         """
         if hasattr(func, '__call__'):
-
             self.checks.add(func)
         else:
             for f in list(func):
                 self.checks.add(f)
-
+    
     def check_tree(self, path, link=False, verbose=True):
         """
         Run all the checks on every file in the specified path,
@@ -61,7 +60,7 @@ class Checker:
                 else:
                     self.check_file(chk_path)
 
-                self.info['time'] = time.time() - extime
+                self.status['time'] = time.time() - extime
 
             except FileNotFoundError:
                 self.probs.add_problem(chk_path, 'PROB_BROKEN_LINK')
@@ -77,13 +76,13 @@ class Checker:
             prob = check(chk_path)
             if prob is not None:
                 self.probs.add_problem(chk_path, prob)
-                self.info['problems'] += 1
+                self.status['problems'] += 1
 
-        self.info['files'] += 1
+        self.status['files'] += 1
 
     def write_status(self):
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds.\r"
-        print(infostring.format(**self.info), end='')
+        print(infostring.format(**self.status), end='')
         sys.stdout.flush()
 
     def pretty_print_issues(self, verbose):
@@ -95,7 +94,7 @@ class Checker:
         """
         # Print general statistics
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
-        print(infostring.format(**self.info))
+        print(infostring.format(**self.status))
 
 def is_link(path):
     """Check if the given path is a symbolic link"""
