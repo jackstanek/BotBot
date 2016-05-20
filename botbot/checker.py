@@ -3,6 +3,7 @@
 import stat
 import os
 import time
+import sys
 
 from botbot import problist as pl
 
@@ -36,7 +37,7 @@ class Checker:
             for f in list(func):
                 self.checks.add(f)
 
-    def check_tree(self, path, link=False):
+    def check_tree(self, path, link=False, verbose=True):
         """
         Run all the checks on every file in the specified path,
         recursively. Returns a list of tuples. Each tuple contains 2
@@ -60,12 +61,15 @@ class Checker:
                 else:
                     self.check_file(chk_path)
 
+                self.info['time'] = time.time() - extime
+
             except FileNotFoundError:
                 self.probs.add_problem(chk_path, 'PROB_BROKEN_LINK')
             except PermissionError:
                 self.probs.add_problem(chk_path, 'PROB_DIR_NOT_WRITABLE')
 
-        self.info['time'] = time.time() - extime
+            if verbose:
+                self.write_status()
 
     def check_file(self, chk_path):
         """Check a file against all checkers"""
@@ -76,6 +80,11 @@ class Checker:
                 self.info['problems'] += 1
 
         self.info['files'] += 1
+
+    def write_status(self):
+        infostring = "Found {problems} problems over {files} files in {time:.2f} seconds.\r"
+        print(infostring.format(**self.info), end='')
+        sys.stdout.flush()
 
     def pretty_print_issues(self, verbose):
         """
