@@ -1,5 +1,5 @@
 import argparse
-from botbot import checks, schecks, checker
+from . import checks, schecks, checker
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -24,7 +24,8 @@ def main():
     args = parser.parse_args()
 
     c = checker.Checker()
-    clist = [checks.is_fastq,
+    clist = [checks.file_exists,
+             checks.is_fastq,
              checks.sam_should_compress]
 
     if args.shared:
@@ -34,7 +35,7 @@ def main():
     c.register(clist)
 
     # Check the given directory
-    c.check_tree(args.path, args.follow_symlinks)
+    c.check_all(args.path, link=args.follow_symlinks, verbose=args.verbose)
 
     # Print the list of issues
     c.pretty_print_issues(args.verbose)

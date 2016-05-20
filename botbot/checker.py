@@ -5,7 +5,8 @@ import os
 import time
 import sys
 
-from botbot import problist as pl
+from . import problist as pl
+from . import fileinfo as fi
 
 class Checker:
     """
@@ -18,11 +19,13 @@ class Checker:
     # file specified in the path.
     def __init__(self):
         self.checks = set() # All checks to perform
+        self.checklist = list()
         self.probs = pl.ProblemList() # List of files with their issues
         self.status = {
+            'cfiles': 0,
             'files': 0,
             'problems': 0,
-            'time': 0
+            'starttime': 0
         } # Information about the previous check
 
     def register(self, func):
@@ -35,53 +38,64 @@ class Checker:
         else:
             for f in list(func):
                 self.checks.add(f)
-    
-    def check_tree(self, path, link=False, verbose=True):
-        """
-        Run all the checks on every file in the specified path,
-        recursively. Returns a list of tuples. Each tuple contains 2
-        elements: the first is the path of the file, and the second is
-        a list of issues with the file at that path. If link is True,
-        follow symlinks.
-        """
-        path = os.path.abspath(path)
-        start = path # Currently unused, could be used to judge depth
-        to_check = [path]
-        extime = time.time()
 
-        while len(to_check) > 0:
-            chk_path = to_check.pop()
+    """
+    Build a list of files to check. If link is True, follow symlinks.
+
+    """
+    def build_checklist(self, path, link=False, verbose=True):
+        to_add = [os.path.join(path, f) for f in os.listdir(path)]
+        while len(to_add) > 0:
             try:
-                if not link and is_link(chk_path):
-                    continue
-                elif stat.S_ISDIR(os.stat(chk_path).st_mode):
-                    new = [os.path.join(chk_path, f) for f in os.listdir(chk_path)]
-                    to_check.extend(new)
+                apath = fi.FileInfo(to_add.pop())
+                if is_link(apath):
+                    if not link:
+                        continue
+                    else:
+                        # Check if link is broken
+                        with open(apath.path, mode='r') as exists:
+                            self.checklist.append(apath)
+                elif stat.S_ISDIR(os.stat(apath.path).st_mode):
+                    new = [os.path.join(apath.path, f) for f in os.listdir(apath.path)]
+                    to_add.extend(new)
                 else:
-                    self.check_file(chk_path)
-
-                self.status['time'] = time.time() - extime
+                    self.checklist.append(apath)
 
             except FileNotFoundError:
-                self.probs.add_problem(chk_path, 'PROB_BROKEN_LINK')
+                self.probs.add_problem(apath, 'PROB_BROKEN_LINK')
             except PermissionError:
-                self.probs.add_problem(chk_path, 'PROB_DIR_NOT_WRITABLE')
+                self.probs.add_problem(apath, 'PROB_DIR_NOT_WRITABLE')
+            except OSError:
+                self.probs.add_problem(apath, 'PROB_UNKNOWN_ERROR')
 
-            if verbose:
-                self.write_status()
+        self.status['files'] = len(self.checklist)
+        if verbose:
+            print('Located {0} files.'.format(self.status['files']))
 
-    def check_file(self, chk_path):
-        """Check a file against all checkers"""
+    def check_all(self, path, link=False, verbose=False):
+        self.build_checklist(path)
+        self.status['starttime'] = time.time()
+        for finfo in self.checklist:
+            self.check_file(finfo)
+
+    def check_file(self, finfo, status=True):
+        """
+        Check a file against all checkers, write status to stdout if status
+        is True
+        """
         for check in self.checks:
-            prob = check(chk_path)
+            prob = check(finfo.path)
             if prob is not None:
-                self.probs.add_problem(chk_path, prob)
+                self.probs.add_problem(finfo, prob)
                 self.status['problems'] += 1
+        self.status['cfiles'] += 1
+        self.status['time'] = time.time() - self.status['starttime']
 
-        self.status['files'] += 1
+        if status:
+            self.write_status()
 
     def write_status(self):
-        infostring = "Found {problems} problems over {files} files in {time:.2f} seconds.\r"
+        infostring = "Found {problems} problems over {cfiles} files in {time:.2f} seconds.\r"
         print(infostring.format(**self.status), end='')
         sys.stdout.flush()
 
@@ -96,6 +110,6 @@ class Checker:
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.status))
 
-def is_link(path):
+def is_link(finfo):
     """Check if the given path is a symbolic link"""
-    return os.path.islink(path) or os.path.abspath(path) != os.path.realpath(path)
+    return os.path.islink(finfo.path) or os.path.abspath(finfo.path) != os.path.realpath(finfo.path)
