@@ -4,16 +4,6 @@ import stat
 
 from .checker import is_link
 
-def file_exists(path):
-    try:
-        with open(path, mode='r') as test:
-            pass
-    except FileNotFoundError:
-        if is_link(path):
-            return 'PROB_BROKEN_LINK'
-    except OSError:
-        return 'PROB_UNKNOWN_ERROR'
-
 def is_fastq(path):
     """Check whether a given file is a fastq file."""
     if os.path.splitext(path)[1] == ".fastq":
