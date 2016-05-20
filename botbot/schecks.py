@@ -1,29 +1,25 @@
 """Strict shared-folder permission checks"""
 
-import os
 import stat
 
-def file_groupreadable(path):
+def file_groupreadable(fi):
     """Check whether a given path has bad permissons."""
-    mode = os.stat(path).st_mode
-    if not bool(stat.S_IRGRP & mode):
+    if not bool(stat.S_IRGRP & fi.mode):
         return 'PROB_FILE_NOT_GRPRD'
 
-def file_group_executable(path):
+def file_group_executable(fi):
     """Check if a file should be group executable"""
-    mode = os.stat(path).st_mode
-    if stat.S_ISDIR(mode):
+    if stat.S_ISDIR(fi.mode):
         return
-    if bool(stat.S_IXUSR & mode) and not bool(stat.S_IXGRP & mode):
+    if bool(stat.S_IXUSR & fi.mode) and not bool(stat.S_IXGRP & fi.mode):
         return 'PROB_FILE_NOT_GRPEXEC'
 
-def dir_group_readable(path):
+def dir_group_readable(fi):
     """Check if a directory is accessible and readable"""
-    mode = os.stat(path).st_mode
-    if not stat.S_ISDIR(mode):
+    if not stat.S_ISDIR(fi.mode):
         return
     else:
-        if not bool(stat.S_IXGRP & mode):
+        if not bool(stat.S_IXGRP & fi.mode):
             return 'PROB_DIR_NOT_ACCESSIBLE'
-        elif not bool(stat.S_IWGRP & mode):
+        elif not bool(stat.S_IWGRP & fi.mode):
             return 'PROB_DIR_NOT_WRITABLE'

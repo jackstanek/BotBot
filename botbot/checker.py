@@ -85,12 +85,12 @@ class Checker:
         is True
         """
         for check in self.checks:
-            prob = check(finfo.path)
+            prob = check(finfo)
             if prob is not None:
                 self.probs.add_problem(finfo, prob)
                 self.status['problems'] += 1
         self.status['cfiles'] += 1
-        self.status['time'] = time.time() - self.status['starttime']
+        # self.status['time'] = time.time() - self.status['starttime']
 
         if status:
             self.write_status(40)
@@ -112,6 +112,7 @@ class Checker:
         TODO: Move into ReportWriter
         """
         # Print general statistics
+        self.status['time'] = time.time() - self.status['starttime']
         infostring = "Found {problems} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(**self.status))
 
