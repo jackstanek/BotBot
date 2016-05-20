@@ -14,15 +14,21 @@ class ReportWriter():
         """
         self.chkr = chkr
         self.out = out
-        if out is sys.stdout:
-            self.width = shutil.get_terminal_size().columns
-        else:
-            self.width = None
 
     def write(self):
         """Generate a report and write to the stream"""
-        for prob in iter(problems.every_problem.keys()):
-            print(prob)
-            for fileprobs in self.chkr.probs.files_with_problem(prob):
-                owner = pwd.getpwuid(fileprobs.fi.uid).pw_name
-                print('{}, owned by {}'.format(fileprobs.fi.path, owner))
+        outfile = sys.stdout
+        if self.out is not None:
+            outfile = open(self.out, mode='w')
+        else:
+            print('Report:\n')
+            
+        for prob in iter(problems.every_problem):
+            if len(self.chkr.probs.files_with_problem(prob)) > 0:
+                print(prob, file=outfile)
+                for fileprobs in self.chkr.probs.files_with_problem(prob):
+                    owner = pwd.getpwuid(fileprobs.fi.uid).pw_name
+                    print('{}, owned by {}'.format(fileprobs.fi.abspath(), owner), file=outfile)
+
+        if self.out is not None:
+            outfile.close()

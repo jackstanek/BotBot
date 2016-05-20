@@ -9,3 +9,6 @@ class FileInfo():
         stats = os.stat(path)
         self.mode = stats.st_mode
         self.uid = stats.st_uid
+
+    def abspath(self):
+        return os.path.abspath(self.path)

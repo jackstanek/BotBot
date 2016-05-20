@@ -19,7 +19,7 @@ class Checker:
     # checks is a set of all the checking functions this checker knows of.  All
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
-    def __init__(self, out=sys.stdout):
+    def __init__(self, out=None):
         self.checks = set() # All checks to perform
         self.checklist = list()
         self.probs = pl.ProblemList() # List of files with their issues
@@ -83,7 +83,7 @@ class Checker:
 
         self.print_summary()
 
-    def check_file(self, finfo, status=False):
+    def check_file(self, finfo, status=True):
         """
         Check a file against all checkers, write status to stdout if status
         is True

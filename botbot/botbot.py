@@ -1,14 +1,23 @@
+"""Main method"""
 import argparse
+
+import botbot
 from . import checks, schecks, checker
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
 
-    # Verbosity options
+    # Verbosity and output options
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument('-v', '--verbose',
                            help='Print issues and fixes for all files',
                            action='store_true')
+    parser.add_argument('-o', '--output',
+                        help='Print the report to a file',
+                        action='store')
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s {}'.format(botbot.__version__))
 
     # Directory options
     parser.add_argument('path',
@@ -23,7 +32,7 @@ def main():
     # Initialize the checker
     args = parser.parse_args()
 
-    c = checker.Checker()
+    c = checker.Checker(out=args.output)
     clist = [checks.is_fastq,
              checks.sam_should_compress]
 
