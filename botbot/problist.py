@@ -17,7 +17,7 @@ class ProblemList:
     def add_problem(self, fi, prob):
         """Associate an issue with a file"""
         if fi.path in self.problems:
-            self.problems[fi.path].add(fi.uid, prob)
+            self.problems[fi.path].add(prob)
         else:
             self.problems[fi.path] = FileProblems(fi.uid, prob)
 
@@ -28,4 +28,5 @@ class ProblemList:
 
     def files_by_user(self, uid):
         """Get a list of bad files belonging to the given user"""
-        return 
+        i = iter(self.problems.items())
+        return [p[0] for p in i if p[1].uid == uid]

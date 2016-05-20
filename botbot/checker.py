@@ -4,6 +4,7 @@ import stat
 import os
 import time
 import sys
+import math
 
 from . import problist as pl
 from . import fileinfo as fi
@@ -92,11 +93,15 @@ class Checker:
         self.status['time'] = time.time() - self.status['starttime']
 
         if status:
-            self.write_status()
+            self.write_status(40)
 
-    def write_status(self):
-        infostring = "Found {problems} problems over {cfiles} files in {time:.2f} seconds.\r"
-        print(infostring.format(**self.status), end='')
+    def write_status(self, barlen):
+        done = self.status['cfiles']
+        total = self.status['files']
+        perc = done / total
+        filllen = math.ceil(perc * barlen)
+        
+        print('[{0}] {1:.0%}\r'.format(filllen * '#' + (barlen - filllen) * '-', perc), end='')
         sys.stdout.flush()
 
     def pretty_print_issues(self, verbose):
