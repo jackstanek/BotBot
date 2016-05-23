@@ -48,7 +48,7 @@ class Checker:
         to_add = [os.path.join(path, f) for f in os.listdir(path)]
         while len(to_add) > 0:
             try:
-                apath = fi.FileInfo(to_add.pop())
+                apath = fi.FileInfo(to_add.pop(), link=link)
                 if is_link(apath.path):
                     if not link:
                         continue
@@ -61,7 +61,10 @@ class Checker:
                     self.checklist.append(apath)
 
             except FileNotFoundError:
-                self.probs.add_problem(apath, 'PROB_BROKEN_LINK')
+                bl = os.lstat(apath.path)
+                if bl is not None:
+                    self.probs.add_problem(apath, 'PROB_BROKEN_LINK')
+                
             except PermissionError:
                 self.probs.add_problem(apath, 'PROB_DIR_NOT_WRITABLE')
             except OSError:
