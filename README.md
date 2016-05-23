@@ -19,22 +19,36 @@ Pretty simple:
 
 ```pip install botbot```
 
-# Usage
+## Manual
 
-The general usage of BotBot is as follows:
+If you want the latest and greatest development code, go ahead and
+clone this repo:
 
-```botbot [-h] [-v] [-p] [-F] [-s] PATH```
+```
+git clone https://github.com/jackstanek/BotBot.git
+cd BotBot
+python setup.py install
+```
 
-```PATH``` specifies the path to check. Typically, this is the current
-working directory.
+# Configuration
 
-## Command Line Options
+BotBot uses 2 primary configuration files: `~/.botbotignore` and
+`~/.botbot.conf`.
 
-* ```-h```, ```--help```: show this help message and exit
-* ```-v```, ```--verbose```: Print issues and fixes for all files
-* ```-p```: Check for group permissions issues
-* ```-F```: Check for raw FASTQ files
-* ```-s```: Check for *.sam files
+## `.botbotignore`
+
+This is a list of files that BotBot won't check. It is similar in
+structure to a `.gitignore` file, but it's a bit simpler. Instead of
+git's structure, each line is a string which can be handled by the
+Python built-in [`glob`](https://docs.python.org/3/library/glob.html)
+module. Anything after a `#` character will be ignored, so these can
+be used to add comments.
+
+## `.botbot.conf`
+
+Configuration variables are stored here. Note that most of the
+configuration options are very much under development and are not
+ready for production yet. More to come!
 
 # Testing
 
