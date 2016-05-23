@@ -34,7 +34,8 @@ def main():
 
     c = checker.Checker(out=args.output)
     clist = [checks.is_fastq,
-             checks.sam_should_compress]
+             checks.sam_should_compress,
+             checks.is_large_plaintext]
 
     if args.shared:
         clist += [schecks.file_groupreadable,
