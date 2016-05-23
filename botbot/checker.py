@@ -52,7 +52,7 @@ class Checker:
         while len(to_add) > 0:
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
-                if apath.path in ig:
+                if apath.path in ignore:
                     continue # Ignore this file
 
                 if is_link(apath.path):
@@ -70,7 +70,7 @@ class Checker:
                 bl = os.lstat(apath.path)
                 if bl is not None:
                     self.probs.add_problem(apath, 'PROB_BROKEN_LINK')
-                
+
             except PermissionError:
                 self.probs.add_problem(apath, 'PROB_DIR_NOT_WRITABLE')
             except OSError:
