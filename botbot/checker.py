@@ -41,7 +41,7 @@ class Checker:
         else:
             for f in list(func):
                 self.checks.add(f)
-p
+
     def build_checklist(self, path, link=False, verbose=True):
         """
         Build a list of files to check. If link is True, follow symlinks.
