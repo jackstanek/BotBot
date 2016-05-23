@@ -102,7 +102,7 @@ class Checker:
         total = self.status['files']
         perc = done / total
         filllen = math.ceil(perc * barlen)
-        
+
         print('[{0}] {1:.0%}\r'.format(filllen * '#' + (barlen - filllen) * '-', perc), end='')
         sys.stdout.flush()
 
@@ -117,7 +117,7 @@ class Checker:
         self.status['time'] = time.time() - self.status['starttime']
         infostring = "Found {0} problems over {files} files in {time:.2f} seconds."
         print(infostring.format(self.probs.probcount(), **self.status))
-        self.reporter.write()
+        self.reporter.write_generic_report()
 
 def is_link(path):
     """Check if the given path is a symbolic link"""

@@ -1,5 +1,6 @@
 """Generate a report about file errors"""
 
+import os
 import sys
 import shutil
 import pwd
@@ -15,20 +16,25 @@ class ReportWriter():
         self.chkr = chkr
         self.out = out
 
-    def write(self):
-        """Generate a report and write to the stream"""
+    def write_generic_report(self):
+        """Generate a standard report and write to the stream"""
         outfile = sys.stdout
         if self.out is not None:
             outfile = open(self.out, mode='w')
         else:
             print('Report:\n')
-            
+
         for prob in iter(problems.every_problem):
             if len(self.chkr.probs.files_with_problem(prob)) > 0:
-                print(prob, file=outfile)
+                print(problems.every_problem[prob].message, file=outfile)
                 for fileprobs in self.chkr.probs.files_with_problem(prob):
                     owner = pwd.getpwuid(fileprobs.fi.uid).pw_name
-                    print('{}, owned by {}'.format(fileprobs.fi.abspath(), owner), file=outfile)
+
+                    if fileprobs.fi.uid == os.getuid():
+                        start, end = '\t\033[1;37m', '\033[0m'
+                        print('{}{}{}, owned by you'.format(start, fileprobs.fi.path, end))
+                    else:
+                        print('{}'.format(os.path.abspath(fileprobs.fi.path)))
 
         if self.out is not None:
             outfile.close()

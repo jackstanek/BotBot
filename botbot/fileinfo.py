@@ -4,7 +4,7 @@ import os
 class FileInfo():
     """Hold information about a file"""
     def __init__(self, path):
-        self.path = path
+        self.path = os.path.abspath(path)
 
         stats = os.stat(path)
         self.mode = stats.st_mode

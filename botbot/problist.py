@@ -15,7 +15,8 @@ class ProblemList:
         self.problems = dict()
 
     def probcount(self):
-        return len(self.problems.keys())
+        allp = [p for p in list(self.problems.values())]
+        return len(allp)
 
     def add_problem(self, fi, prob):
         """Associate an issue with a file"""
