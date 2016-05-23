@@ -21,12 +21,10 @@ class ReportWriter():
         outfile = sys.stdout
         if self.out is not None:
             outfile = open(self.out, mode='w')
-        else:
-            print('Report:\n')
 
         for prob in iter(problems.every_problem):
             if len(self.chkr.probs.files_with_problem(prob)) > 0:
-                print(problems.every_problem[prob].message, file=outfile)
+                print('\n{}'.format(problems.every_problem[prob].message), file=outfile)
                 for fileprobs in self.chkr.probs.files_with_problem(prob):
                     owner = pwd.getpwuid(fileprobs.fi.uid).pw_name
 
@@ -36,5 +34,4 @@ class ReportWriter():
                     else:
                         print('{}'.format(os.path.abspath(fileprobs.fi.path)))
 
-        if self.out is not None:
-            outfile.close()
+        outfile.close()
