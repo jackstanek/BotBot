@@ -9,6 +9,7 @@ import math
 from . import problist as pl
 from . import fileinfo as fi
 from . import report as rep
+from . import ignore as ig
 
 class Checker:
     """
@@ -40,15 +41,20 @@ class Checker:
         else:
             for f in list(func):
                 self.checks.add(f)
-
+p
     def build_checklist(self, path, link=False, verbose=True):
         """
         Build a list of files to check. If link is True, follow symlinks.
         """
+        ignore = ig.parse_ignore_rules(ig.find_ignore_file())
         to_add = [os.path.join(path, f) for f in os.listdir(path)]
+
         while len(to_add) > 0:
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
+                if apath.path in ig:
+                    continue # Ignore this file
+
                 if is_link(apath.path):
                     if not link:
                         continue
