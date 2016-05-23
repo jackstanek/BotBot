@@ -34,3 +34,10 @@ class ProblemList:
         """Get a list of bad files belonging to the given user"""
         i = iter(self.problems.items())
         return [p for p in i if p[1].uid == uid]
+
+    def problem_users(self):
+        """
+        Kinda mean, but returns a list of users who have bad files, sorted
+        by number of bad files.
+        """
+        i = iter(self.problems.items())

@@ -1,5 +1,6 @@
 """Main method"""
 import argparse
+import sys
 
 import botbot
 from . import checks, schecks, checker
@@ -32,7 +33,13 @@ def main():
     # Initialize the checker
     args = parser.parse_args()
 
-    c = checker.Checker(out=args.output)
+    out = None
+    if args.output is not None:
+        out = args.output
+    else:
+        out = sys.stdout
+
+    c = checker.Checker(out)
     clist = [checks.is_fastq,
              checks.sam_should_compress,
              checks.is_large_plaintext]
@@ -44,4 +51,4 @@ def main():
     c.register(clist)
 
     # Check the given directory
-    c.check_all(args.path, link=args.follow_symlinks, verbose=args.verbose)   
+    c.check_all(args.path, link=args.follow_symlinks, verbose=args.verbose)
