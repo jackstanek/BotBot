@@ -3,8 +3,6 @@
 import stat
 import os
 import time
-import sys
-import math
 
 from . import problist as pl
 from . import fileinfo as fi
@@ -29,7 +27,7 @@ class Checker:
             'files': 0,
             'starttime': 0
         } # Information about the previous check
-        self.reporter = rep.ReportWriter(self, out)
+        self.reporter = rep.Reporter(self, out)
 
     def register(self, func):
         """
@@ -87,7 +85,7 @@ class Checker:
         for finfo in self.checklist:
             self.check_file(finfo, status=verbose)
 
-        self.print_summary()
+        self.reporter.write_report()
 
     def check_file(self, finfo, status=True):
         """
@@ -103,32 +101,7 @@ class Checker:
         # self.status['time'] = time.time() - self.status['starttime']
 
         if status:
-            self.write_status(40)
-
-    def write_status(self, barlen):
-        """Write where we're at"""
-        done = self.status['cfiles']
-        total = self.status['files']
-        perc = done / total
-        filllen = math.ceil(perc * barlen)
-
-        print('[{0}] {1:.0%}\r'.format(filllen * '#' + (barlen - filllen) * '-', perc), end='')
-        sys.stdout.flush()
-
-    def print_summary(self):
-        """
-        Print a list of issues with their fixes. Only print issues which
-        are in problist, unless verbose is true, in which case print
-        all messages.
-        TODO: Move into ReportWriter
-        """
-        # Print general statistics
-        self.status['time'] = time.time() - self.status['starttime']
-        infostring = "Found {0} problems over {files} files in {time:.2f} seconds."
-        print(infostring.format(self.probs.probcount(), **self.status))
-
-        r = self.reporter
-        r.write_report_to_file(r.write_generic_report)
+            self.reporter.write_status(40)
 
 def is_link(path):
     """Check if the given path is a symbolic link"""

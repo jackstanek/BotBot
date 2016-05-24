@@ -13,4 +13,5 @@ setup(name='BotBot',
               'botbot = botbot.botbot:main',
           ]
       },
-      packages=['botbot'])
+      packages=['botbot'],
+      include_package_data=True)
