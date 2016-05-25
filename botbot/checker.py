@@ -29,16 +29,13 @@ class Checker:
         } # Information about the previous check
         self.reporter = rep.Reporter(self, out)
 
-    def register(self, func):
+    def register(self, *funcs):
         """
         Add a new checking function to the set, or a list/tuple of
         functions.
         """
-        if hasattr(func, '__call__'):
-            self.checks.add(func)
-        else:
-            for f in list(func):
-                self.checks.add(f)
+        for fn in funcs:
+            self.checks.add(fn)
 
     def build_checklist(self, path, link=False, verbose=True):
         """

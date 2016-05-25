@@ -48,7 +48,7 @@ def main():
         clist += [schecks.file_groupreadable,
                   schecks.file_group_executable,
                   schecks.dir_group_readable]
-    c.register(clist)
+    c.register(*clist)
 
     # Check the given directory
     c.check_all(args.path, link=args.follow_symlinks, verbose=args.verbose)
