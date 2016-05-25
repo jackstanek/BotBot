@@ -18,7 +18,7 @@ class Checker:
     # checks is a set of all the checking functions this checker knows of.  All
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
-    def __init__(self, out):
+    def __init__(self, outpath):
         self.checks = set() # All checks to perform
         self.checklist = list()
         self.probs = pl.ProblemList() # List of files with their issues
@@ -27,7 +27,7 @@ class Checker:
             'files': 0,
             'starttime': 0
         } # Information about the previous check
-        self.reporter = rep.Reporter(self, out)
+        self.reporter = rep.Reporter(self, out=outpath)
 
     def register(self, *funcs):
         """

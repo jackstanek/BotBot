@@ -13,7 +13,7 @@ def main():
     verbosity.add_argument('-v', '--verbose',
                            help='Print issues and fixes for all files',
                            action='store_true')
-    parser.add_argument('-o', '--output',
+    parser.add_argument('-o', '--out',
                         help='Print the report to a file',
                         action='store')
     parser.add_argument('--version',
@@ -34,8 +34,8 @@ def main():
     args = parser.parse_args()
 
     out = None
-    if args.output is not None:
-        out = args.output
+    if args.out is not None:
+        out = args.out
     else:
         out = sys.stdout
 

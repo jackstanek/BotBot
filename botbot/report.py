@@ -8,9 +8,8 @@ from pkg_resources import resource_exists, resource_filename
 from jinja2 import Template, Environment, FileSystemLoader
 
 class Reporter():
-    def __init__(self, chkr, template, out=sys.stdout):
+    def __init__(self, chkr, out=sys.stdout):
         self.chkr = chkr
-        self.template = template
         self.out = out
 
     def write_status(self, barlen):
@@ -41,7 +40,6 @@ class Reporter():
             )
 
             if self.chkr.probs.probcount() > 0:
-                print('Report:')
                 tempgen = env.get_template(tmpname).generate({
                     'probs': self.chkr.probs.files_by_problem(),
                     'probcount': self.chkr.probs.probcount(),
@@ -49,8 +47,10 @@ class Reporter():
                 })
 
                 if self.out != sys.stdout:
+                    print('Writing report to {}.'.format(self.out))
                     out = open(self.out, mode='w')
                 else:
+                    print('Report:')
                     out = sys.stdout
 
                 for line in tempgen:
