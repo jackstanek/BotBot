@@ -1,4 +1,5 @@
 import os
+import sys
 import stat
 
 import pytest
@@ -7,18 +8,18 @@ from botbot import checker, problems, checks, fileinfo
 
 # Tests for Checker class methods
 def test_checker_register_accept_single_function():
-    c = checker.Checker()
+    c = checker.Checker(sys.stdout)
     c.register(lambda: print("Hello world!"))
     assert len(c.checks) == 1
 
 def test_checker_register_accept_function_list():
-    c = checker.Checker()
+    c = checker.Checker(sys.stdout)
 
     # Function list
     f = list()
     f.append(lambda : print("Hello world!"))
     f.append(lambda i : i + i)
-    c.register(f)
+    c.register(*f)
 
 # Tests for checking functions
 
@@ -79,11 +80,11 @@ def test_sam_and_bam_detection(tmpdir):
     sami = fileinfo.FileInfo('bad.sam')
 
     assert checks.sam_should_compress(sami) == 'PROB_SAM_SHOULD_COMPRESS'
-    
+
     bam = tmpdir.join('bad.bam')
     bam.write('')
     bami = fileinfo.FileInfo('bad.sam')
-    
+
     assert checks.sam_should_compress(bami) is 'PROB_SAM_AND_BAM_EXIST'
 
     prev.chdir()
