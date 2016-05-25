@@ -20,6 +20,7 @@ def test_checker_register_accept_function_list():
     f.append(lambda : print("Hello world!"))
     f.append(lambda i : i + i)
     c.register(*f)
+    assert len(c.checks) == 2
 
 # Tests for checking functions
 
@@ -31,8 +32,8 @@ def test_symlink_checker_same_directory(tmpdir):
     fi = fileinfo.FileInfo('file.txt')
     lin = fileinfo.FileInfo('link')
 
-    assert not checker.is_link(fi.path)
-    assert checker.is_link(lin.path)
+    assert not checker.is_link(fi['path'])
+    assert checker.is_link(lin['path'])
     prev.chdir()
 
 def test_symlink_checker_link_in_lower_directory(tmpdir):
@@ -46,8 +47,8 @@ def test_symlink_checker_link_in_lower_directory(tmpdir):
                os.path.join('newdir', 'link'))
     lin = fileinfo.FileInfo(os.path.join('newdir', 'link'))
 
-    assert checker.is_link(lin.path)
-    assert not checker.is_link(fi.path)
+    assert checker.is_link(lin['path'])
+    assert not checker.is_link(fi['path'])
 
     prev.chdir()
 

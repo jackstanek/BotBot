@@ -29,10 +29,11 @@ class ProblemList:
 
     def add_problem(self, fi, prob):
         """Associate an issue with a file"""
-        if fi.path in self.problems:
-            self.problems[fi.path].add(prob)
+        path = fi['path']
+        if path in self.problems:
+            self.problems[path].add(prob)
         else:
-            self.problems[fi.path] = FileProblems(fi, prob)
+            self.problems[path] = FileProblems(fi, prob)
 
     def files_by_problem(self):
         """

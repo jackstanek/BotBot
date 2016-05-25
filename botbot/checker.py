@@ -47,16 +47,16 @@ class Checker:
         while len(to_add) > 0:
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
-                if apath.path in ignore:
+                if apath['path'] in ignore:
                     continue # Ignore this file
 
-                if is_link(apath.path):
+                if is_link(apath['path']):
                     if not link:
                         continue
                     else:
-                        to_add.append(apath.path)
-                elif stat.S_ISDIR(apath.mode):
-                    new = [os.path.join(apath.path, f) for f in os.listdir(apath.path)]
+                        to_add.append(apath['path'])
+                elif stat.S_ISDIR(apath['mode']):
+                    new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
                     to_add.extend(new)
                 else:
                     self.checklist.append(apath)

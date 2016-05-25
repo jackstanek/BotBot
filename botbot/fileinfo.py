@@ -3,17 +3,16 @@ import os
 import time
 import pwd
 
-class FileInfo():
+
+def FileInfo(fd, link=False, important=False):
     """Hold information about a file"""
-    def __init__(self, path, link=False):
-        self.path = os.path.abspath(path)
-
-        stats = os.stat(path, follow_symlinks=link)
-        self.mode = stats.st_mode
-        self.uid = stats.st_uid
-        self.username = pwd.getpwuid(self.uid).pw_name
-        self.size = stats.st_size
-        self.lastmod = int(time.time()) - stats.st_mtime # seconds since last modification
-
-    def abspath(self):
-        return os.path.abspath(self.path)
+    stats = os.stat(fd, follow_symlinks=link)
+    return {
+        'path': os.path.abspath(fd),
+        'mode': stats.st_mode,
+        'uid': stats.st_uid,
+        'username': pwd.getpwuid(stats.st_uid).pw_name,
+        'size': stats.st_size,
+        'important': important,
+        'lastmod': int(time.time()) - stats.st_mtime # seconds since last modification
+    }
