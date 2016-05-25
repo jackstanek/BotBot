@@ -81,11 +81,13 @@ class Checker:
     def check_all(self, path, link=False, verbose=False):
         """Check the file list generated before."""
         self.build_checklist(path)
-        self.status['starttime'] = time.time()
+        starttime = time.time()
+
         for finfo in self.checklist:
             self.check_file(finfo, status=verbose)
 
-        self.reporter.write_report()
+        self.status['time'] = time.time() - starttime
+        self.reporter.write_report('generic')
 
     def check_file(self, finfo, status=True):
         """
