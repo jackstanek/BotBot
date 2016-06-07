@@ -16,7 +16,7 @@ class Reporter():
 
     def write_status(self, barlen):
         """Write where we're at"""
-        done = self.chkr.status['cfiles']
+        done = self.chkr.status['checked']
         total = self.chkr.status['files']
         perc = done / total
         filllen = math.ceil(perc * barlen)
@@ -42,11 +42,12 @@ class Reporter():
                 loader=FileSystemLoader(resource_filename(__package__, tmp_respath))
             )
 
-            if len(self.chkr.checked) > 0:
-                fl = self.chkr.db.get_files_by_attribute(attr),
+            '''
+            if self.chkr.status['probcount'] > 0:
+                filelist = self.chkr.db.get_files_by_attribute(attr),
                 tempgen = env.get_template(tmpname).generate({
                     'attr': attr,
-                    'values': fl,
+                    'values': None,
                     'status': self.chkr.status
                 })
 
@@ -65,6 +66,7 @@ class Reporter():
 
             else:
                 print('No problems here!')
+            '''
 
         else:
             raise FileNotFoundError('No such report format')

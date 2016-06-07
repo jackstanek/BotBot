@@ -21,10 +21,11 @@ class Checker:
     def __init__(self, outpath, dbpath):
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
-        self.checked = list() # List of FileInfos with associated problems
         self.status = {
             'files': 0,
-            'time': 0
+            'checked': 0,
+            'time': 0,
+            'probcount': 0
         } # Information about the previous check
         self.db = sql.FileDatabase(dbpath)
         self.reporter = rep.Reporter(self, out=outpath)
@@ -37,12 +38,14 @@ class Checker:
         for fn in funcs:
             self.checks.add(fn)
 
-    def build_checklist(self, path, link=False, verbose=True):
+    def build_new_checklist(self, path, link=False, verbose=True):
         """
         Build a list of files to check. If link is True, follow symlinks.
         """
         ignore = ig.parse_ignore_rules(ig.find_ignore_file())
         to_add = [os.path.join(path, f) for f in os.listdir(path)]
+
+        checklist = []
 
         while len(to_add) > 0:
             try:
@@ -58,10 +61,10 @@ class Checker:
                 elif stat.S_ISDIR(apath['mode']):
                     new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
                     to_add.extend(new)
-                else:
-                    self.checklist.append(apath)
 
-            # TODO: Fix these pls...
+                checklist.append(apath)
+
+            # TODO: Fix these...
             except FileNotFoundError:
                 pass
             except PermissionError:
@@ -69,21 +72,49 @@ class Checker:
             except OSError:
                 pass
 
+        self.checklist = checklist
         self.status['files'] = len(self.checklist)
+
         if verbose:
             print('Located {0} files.'.format(self.status['files']))
 
+    def update_checklist(self, cached, link=False, verbose=True):
+        """
+        Take a cached list of files to check and make a list of directories
+        and files that need to be rechecked. A file is rechecked if its
+        """
+        if verbose:
+            print('Found {} cached paths.'.format(len(cached)))
+
+        checklist = []
+        for finfo in cached:
+            recent = fi.FileInfo(finfo['path'])
+            if recent['lastmod'] > finfo['lastcheck']:
+                checklist.append(recent)
+
+        self.status['files'] = len(self.checklist)
+        self.checklist = checklist
+        if verbose:
+            print('Found {} paths to recheck.'.format(len(checklist)))
+
     def check_all(self, path, link=False, verbose=False):
         """Check the file list generated before."""
-        self.checklist = self.db.get_cached_filelist(path)
-        if len(self.checklist) == 0:
-            self.build_checklist(path)
+        path = os.path.abspath(path)
+        path = os.path.expanduser(path)
+
+        checklist = self.db.get_cached_filelist(path)
+        if len(checklist) == 0:
+            self.build_new_checklist(path)
+        else:
+            self.update_checklist(checklist)
 
         starttime = time.time()
         for finfo in self.checklist:
-            self.check_file(finfo, status=verbose)
+            if finfo['isfile']:
+                self.check_file(finfo, status=verbose)
+
         self.status['time'] = time.time() - starttime
-        self.db.store_file_problems(self.checked)
+        self.db.store_file_problems(self.checklist)
 
         self.reporter.write_report('generic')
 
@@ -99,9 +130,10 @@ class Checker:
                     finfo['problems'] = {prob}
                 else:
                     finfo['problems'].add(prob)
+            self.status['probcount'] += 1
 
         finfo['lastcheck'] = int(time.time())
-        self.checked.append(finfo)
+        self.status['checked'] += 1
 
         if status:
             self.reporter.write_status(40)

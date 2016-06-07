@@ -6,3 +6,5 @@ Files sorted by {{ attr }}
    - {{fi}}: owned by {{fi.owner}}
 
 Checked {{ status.files }} files in {{ '%1f' | format(status.time) }} seconds
+{% endfor %}
+{% endfor %}

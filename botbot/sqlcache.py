@@ -43,8 +43,8 @@ class FileDatabase:
                                  # database# as comma-separated
                                  # problem identifier strings. yee
             )
-        except sqlite3.OperationalError as e:
-            print(e)
+        except sqlite3.OperationalError:
+            pass
 
         self.conn.commit()
 
@@ -95,12 +95,11 @@ class FileDatabase:
     def get_cached_filelist(self, path):
         """Get a list of FileInfo dictionaries from the database"""
         self.curs.execute(
-            'select * from files where path like \':path%\'',
-            {
-                'path': path
-            }
+            'select * from files where path like ?',
+            (path + '%',)
         )
-        return [dict(zip(self.fi_keys, d)) for d in self.curs.fetchall()]
+        files = self.curs.fetchall()
+        return [dict(zip(self.fi_keys, d)) for d in files]
 
     def get_files_by_attribute(self, attr):
         """

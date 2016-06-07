@@ -13,7 +13,7 @@ def FileInfo(fd, link=False, important=False):
         'uid': stats.st_uid,
         'username': pwd.getpwuid(stats.st_uid).pw_name,
         'size': stats.st_size,
-        'lastmod': int(stats.st_mtime),
+        'lastmod': int(stats.st_ctime),
         'lastcheck': 0,
         'isfile': os.path.isfile(fd),
         'isdir': not os.path.isfile(fd),
