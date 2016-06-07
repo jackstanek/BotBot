@@ -114,6 +114,14 @@ class FileDatabase:
 
         return dict(zip(attrvals, [f for f in filelist if f[attr] == attr]))
 
+    def prune(self, old):
+        """Remove db entries based on the FileInfos supplied in old"""
+        for f in old:
+            self.curs.execute(
+                'delete from files where path=?',
+                (f['path'],)
+            )
+
     def __del__(self):
         """Close everything before ya die"""
         self.conn.commit()

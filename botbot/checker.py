@@ -87,6 +87,7 @@ class Checker:
             print('Found {} cached paths.'.format(len(cached)))
 
         checklist = []
+        prunelist = []
         for finfo in cached:
             try:
                 recent = fi.FileInfo(finfo['path'])
@@ -94,10 +95,12 @@ class Checker:
                     checklist.append(recent)
             except FileNotFoundError:
                 # Cached path no longer exists
-                pass
+                prunelist.append(finfo)
 
-        self.status['files'] = len(self.checklist)
+        self.db.prune(prunelist)
+
         self.checklist = checklist
+        self.status['files'] = len(self.checklist)
         if verbose:
             print('Found {} paths to recheck.'.format(len(checklist)))
 
