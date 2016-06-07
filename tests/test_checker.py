@@ -7,13 +7,13 @@ import pytest
 from botbot import checker, problems, checks, fileinfo
 
 # Tests for Checker class methods
-def test_checker_register_accept_single_function():
-    c = checker.Checker(sys.stdout)
+def test_checker_register_accept_single_function(tmpdir):
+    c = checker.Checker(sys.stdout, tmpdir.join('test.db').strpath)
     c.register(lambda: print("Hello world!"))
     assert len(c.checks) == 1
 
-def test_checker_register_accept_function_list():
-    c = checker.Checker(sys.stdout)
+def test_checker_register_accept_function_list(tmpdir):
+    c = checker.Checker(sys.stdout, tmpdir.join('test.db').strpath)
 
     # Function list
     f = list()

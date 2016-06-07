@@ -18,7 +18,7 @@ class Checker:
     # checks is a set of all the checking functions this checker knows of.  All
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
-    def __init__(self, outpath):
+    def __init__(self, outpath, dbpath):
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
         self.checked = list() # List of FileInfos with associated problems
@@ -26,7 +26,7 @@ class Checker:
             'files': 0,
             'time': 0
         } # Information about the previous check
-        self.db = sql.FileDatabase(sql.get_dbpath())
+        self.db = sql.FileDatabase(dbpath)
         self.reporter = rep.Reporter(self, out=outpath)
 
     def register(self, *funcs):
