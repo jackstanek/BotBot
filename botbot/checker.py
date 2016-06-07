@@ -100,8 +100,8 @@ class Checker:
                 else:
                     finfo['problems'].add(prob)
 
+        finfo['lastcheck'] = int(time.time())
         self.checked.append(finfo)
-        # self.status['time'] = time.time() - self.status['starttime']
 
         if status:
             self.reporter.write_status(40)

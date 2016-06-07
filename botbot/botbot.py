@@ -3,7 +3,7 @@ import argparse
 import sys
 
 import botbot
-from . import checks, schecks, checker, config
+from . import checks, schecks, checker, config, sqlcache
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -39,7 +39,7 @@ def main():
     else:
         out = sys.stdout
 
-    c = checker.Checker(out)
+    c = checker.Checker(out, sqlcache.get_dbpath())
     clist = [checks.is_fastq,
              checks.sam_should_compress,
              checks.is_large_plaintext]

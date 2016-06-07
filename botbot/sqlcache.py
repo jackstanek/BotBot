@@ -60,17 +60,17 @@ class FileDatabase:
 
         self.curs.executemany(
             'insert or replace into files values (\
-            path=:path,\
-            mode=:mode,\
-            uid=:uid,\
-            username=:username,\
-            size=:size,\
-            lastmod=:lastmod,\
-            lastcheck=:lastcheck,\
-            isfile=:isfile,\
-            isdir=:isdir,\
-            important=:important,\
-            problems=:problems\
+            :path,\
+            :mode,\
+            :uid,\
+            :username,\
+            :size,\
+            :lastmod,\
+            :lastcheck,\
+            :isfile,\
+            :isdir,\
+            :important,\
+            \':problems\'\
             )',
             mod
         )

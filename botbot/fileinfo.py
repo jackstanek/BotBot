@@ -13,10 +13,10 @@ def FileInfo(fd, link=False, important=False):
         'uid': stats.st_uid,
         'username': pwd.getpwuid(stats.st_uid).pw_name,
         'size': stats.st_size,
-        'lastmod': stats.st_mtime,
+        'lastmod': int(stats.st_mtime),
         'lastcheck': 0,
         'isfile': os.path.isfile(fd),
         'isdir': not os.path.isfile(fd),
         'important': important,
-        'lastmod': int(time.time()) - stats.st_mtime # seconds since last modification
+        'problems': set()
     }
