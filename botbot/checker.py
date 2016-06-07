@@ -88,9 +88,13 @@ class Checker:
 
         checklist = []
         for finfo in cached:
-            recent = fi.FileInfo(finfo['path'])
-            if recent['lastmod'] > finfo['lastcheck']:
-                checklist.append(recent)
+            try:
+                recent = fi.FileInfo(finfo['path'])
+                if recent['lastmod'] > finfo['lastcheck']:
+                    checklist.append(recent)
+            except FileNotFoundError:
+                # Cached path no longer exists
+                pass
 
         self.status['files'] = len(self.checklist)
         self.checklist = checklist

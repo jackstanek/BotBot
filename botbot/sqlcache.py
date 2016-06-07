@@ -114,7 +114,6 @@ class FileDatabase:
 
         return dict(zip(attrvals, [f for f in filelist if f[attr] == attr]))
 
-
     def __del__(self):
         """Close everything before ya die"""
         self.conn.commit()
