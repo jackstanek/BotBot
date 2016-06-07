@@ -3,7 +3,7 @@ import argparse
 import sys
 
 import botbot
-from . import checks, schecks, checker
+from . import checks, schecks, checker, config
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -49,6 +49,8 @@ def main():
                   schecks.file_group_executable,
                   schecks.dir_group_readable]
     c.register(*clist)
+
+    conf = config.read_config()
 
     # Check the given directory
     c.check_all(args.path, link=args.follow_symlinks, verbose=args.verbose)

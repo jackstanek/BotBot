@@ -1,0 +1,112 @@
+
+botbot.py,254
+import argparseargparse2,18
+import syssys3,34
+import botbotbotbot5,46
+from . import checks, schecks, checkerchecks6,60
+from . import checks, schecks, checkerschecks6,60
+from . import checks, schecks, checkerchecker6,60
+def main():main8,100
+
+checker.py,603
+import statstat3,42
+import osos4,54
+import timetime5,64
+from . import problist as plpl7,77
+from . import fileinfo as fifi8,106
+from . import report as reprep9,135
+from . import ignore as igig10,163
+class Checker:Checker12,191
+    def __init__(self, outpath):__init__21,565
+    def register(self, *funcs):register32,960
+    def build_checklist(self, path, link=False, verbose=True):build_checklist40,1160
+    def check_all(self, path, link=False, verbose=False):check_all78,2627
+    def check_file(self, finfo, status=True):check_file89,2995
+def is_link(path):is_link105,3479
+
+checks.py,257
+import osos2,35
+import statstat3,45
+import mimetypesmimetypes4,57
+from .checker import is_linkis_link6,75
+def is_fastq(fi):is_fastq8,105
+def sam_should_compress(fi):sam_should_compress15,316
+def is_large_plaintext(fi):is_large_plaintext25,649
+
+config.py,427
+import osos3,34
+from shutil import copy2copy25,45
+from pkg_resources import resource_filenameresource_filename6,70
+CONFIG_DIR_PATH = os.path.expanduser('~/.botbot')CONFIG_DIR_PATH9,166
+CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, 'botbot.conf')CONFIG_FILE_PATH10,216
+def init_config_dir():init_config_dir12,281
+def read_config():read_config19,559
+    from configparser import ConfigParserConfigParser23,628
+
+fileinfo.py,121
+import osos2,23
+import timetime3,33
+import pwdpwd4,45
+def FileInfo(fd, link=False, important=False):FileInfo7,58
+
+ignore.py,200
+import osos3,66
+from glob import globglob4,76
+def find_ignore_file():find_ignore_file6,99
+def parse_ignore_rules(path):parse_ignore_rules11,206
+def strip_comments(line):strip_comments20,424
+
+__init__.py,38
+__version__ = '0.0.1'__version__1,0
+
+problems.py,125
+class Problem:Problem3,32
+    def __init__(self, code, message, fix):__init__5,99
+every_problem = {every_problem10,223
+
+problist.py,517
+class FileProblems:FileProblems3,38
+    def __init__(self, fi, prob):__init__4,58
+    def add(self, prob):add8,148
+class ProblemList:ProblemList12,244
+    def __init__(self):__init__14,312
+    def probcount(self):probcount17,368
+    def current_problems(self):current_problems22,523
+    def add_problem(self, fi, prob):add_problem30,770
+    def files_by_problem(self):files_by_problem38,1026
+    def files_by_user(self, uid):files_by_user49,1381
+    def problem_users(self):problem_users54,1565
+
+report.py,642
+import osos3,43
+import syssys4,53
+import mathmath5,64
+from pkg_resources import resource_exists, resource_filenameresource_exists6,76
+from pkg_resources import resource_exists, resource_filenameresource_filename6,76
+from jinja2 import Environment, FileSystemLoaderEnvironment8,138
+from jinja2 import Environment, FileSystemLoaderFileSystemLoader8,138
+class Reporter():Reporter10,188
+    def __init__(self, chkr, out=sys.stdout):__init__11,206
+    def write_status(self, barlen):write_status15,301
+    def get_template_filename(self, name):get_template_filename27,706
+    def write_report(self, fmt):write_report34,913
+
+schecks.py,188
+import statstat3,46
+def file_groupreadable(fi):file_groupreadable5,59
+def file_group_executable(fi):file_group_executable10,226
+def dir_group_readable(fi):dir_group_readable18,482
+
+sqlcache.py,526
+import osos3,65
+import sqlite3sqlite34,75
+from . import fileinfofileinfo6,91
+def get_dbpath():get_dbpath8,115
+def db_exists():db_exists15,358
+class FileDatabase:FileDatabase19,463
+    def __init__(self, dbpath):__init__21,537
+    def get_stored_problems(self, path):get_stored_problems43,1310
+    def get_fileinfo(self, path):get_fileinfo52,1620
+    def get_filelist(self):get_filelist62,2039
+    def get_files_by_attribute(self, key):get_files_by_attribute71,2442
+    def __del__(self):__del__76,2551

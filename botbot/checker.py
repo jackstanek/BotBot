@@ -4,10 +4,10 @@ import stat
 import os
 import time
 
-from . import problist as pl
 from . import fileinfo as fi
 from . import report as rep
 from . import ignore as ig
+from . import sqlcache as sql
 
 class Checker:
     """
@@ -20,13 +20,13 @@ class Checker:
     # file specified in the path.
     def __init__(self, outpath):
         self.checks = set() # All checks to perform
-        self.checklist = list()
-        self.probs = pl.ProblemList() # List of files with their issues
+        self.checklist = list() # List of FileInfos to check at some point
+        self.checked = list() # List of FileInfos with associated problems
         self.status = {
-            'cfiles': 0,
             'files': 0,
-            'starttime': 0
+            'time': 0
         } # Information about the previous check
+        self.db = sql.FileDatabase(sql.get_dbpath())
         self.reporter = rep.Reporter(self, out=outpath)
 
     def register(self, *funcs):
@@ -61,15 +61,13 @@ class Checker:
                 else:
                     self.checklist.append(apath)
 
+            # TODO: Fix these pls...
             except FileNotFoundError:
-                bl = os.lstat(apath.path)
-                if bl is not None:
-                    self.probs.add_problem(apath, 'PROB_BROKEN_LINK')
-
+                pass
             except PermissionError:
-                self.probs.add_problem(apath, 'PROB_DIR_NOT_WRITABLE')
+                pass
             except OSError:
-                self.probs.add_problem(apath, 'PROB_UNKNOWN_ERROR')
+                pass
 
         self.status['files'] = len(self.checklist)
         if verbose:
@@ -77,13 +75,16 @@ class Checker:
 
     def check_all(self, path, link=False, verbose=False):
         """Check the file list generated before."""
-        self.build_checklist(path)
-        starttime = time.time()
+        self.checklist = self.db.get_cached_filelist(path)
+        if len(self.checklist) == 0:
+            self.build_checklist(path)
 
+        starttime = time.time()
         for finfo in self.checklist:
             self.check_file(finfo, status=verbose)
-
         self.status['time'] = time.time() - starttime
+        self.db.store_file_problems(self.checked)
+
         self.reporter.write_report('generic')
 
     def check_file(self, finfo, status=True):
@@ -94,9 +95,12 @@ class Checker:
         for check in self.checks:
             prob = check(finfo)
             if prob is not None:
-                self.probs.add_problem(finfo, prob)
+                if finfo['problems'] is None:
+                    finfo['problems'] = {prob}
+                else:
+                    finfo['problems'].add(prob)
 
-        self.status['cfiles'] += 1
+        self.checked.append(finfo)
         # self.status['time'] = time.time() - self.status['starttime']
 
         if status:

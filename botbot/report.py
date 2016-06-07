@@ -5,7 +5,9 @@ import sys
 import math
 from pkg_resources import resource_exists, resource_filename
 
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
+
+from . import problems
 
 class Reporter():
     def __init__(self, chkr, out=sys.stdout):
@@ -31,19 +33,21 @@ class Reporter():
         else:
             return '.'.join(parts + ['txt'])
 
-    def write_report(self, fmt):
+    def write_report(self, fmt, attr='problems'):
         """Write the summary of what transpired."""
         tmpname = self.get_template_filename(fmt)
-        if resource_exists(__package__, os.path.join('templates', tmpname)):
+        tmp_respath = os.path.join('resources', 'templates')
+        if resource_exists(__package__, tmp_respath):
             env = Environment(
-                loader=FileSystemLoader(resource_filename(__package__, 'templates'))
+                loader=FileSystemLoader(resource_filename(__package__, tmp_respath))
             )
 
-            if self.chkr.probs.probcount() > 0:
+            if len(self.chkr.checked) > 0:
+                fl = self.chkr.db.get_files_by_attribute(attr),
                 tempgen = env.get_template(tmpname).generate({
-                    'probs': self.chkr.probs.files_by_problem(),
-                    'probcount': self.chkr.probs.probcount(),
-                    'time': self.chkr.status['time']
+                    'attr': attr,
+                    'values': fl,
+                    'status': self.chkr.status
                 })
 
                 if self.out != sys.stdout:
@@ -56,7 +60,7 @@ class Reporter():
                 for line in tempgen:
                     print(line, file=out, end='')
 
-                print('', file=out)
+                print('\n', file=out, end='')
                 out.close()
 
             else:

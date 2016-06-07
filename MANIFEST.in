@@ -1,2 +1,2 @@
 include README.md
-include botbot/templates/*.txt
+include botbot/resources

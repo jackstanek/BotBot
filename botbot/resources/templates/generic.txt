@@ -1,0 +1,8 @@
+Files sorted by {{ attr }}
+
+{% for key in values.values() %}
+{{key}}:
+{% for fi in values.key %}
+   - {{fi}}: owned by {{fi.owner}}
+
+Checked {{ status.files }} files in {{ '%1f' | format(status.time) }} seconds

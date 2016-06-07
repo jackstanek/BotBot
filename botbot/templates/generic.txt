@@ -1,4 +1,0 @@
-{% for prob, fis in probs.items() %}
-{{ prob }}:{% for fi in fis %}
-   - {{ fi.path }} (owner: {{ fi.username }}){% endfor %}{% endfor %}
-Found {{ probcount }} problems in {{ "%.2f" | format(time)}} seconds.

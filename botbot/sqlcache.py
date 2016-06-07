@@ -4,6 +4,7 @@ import os
 import sqlite3
 
 from . import fileinfo
+from .problems import every_problem
 
 def get_dbpath():
     """Get the path to the SQLite database"""
@@ -19,13 +20,16 @@ def db_exists():
 class FileDatabase:
     """Database of files and associate information"""
     def __init__(self, dbpath):
+        self.fi_keys = ['path', 'mode', 'uid', 'username',
+                        'size', 'lastmod', 'lastcheck', 'isfile',
+                        'isdir', 'important', 'problemse']
+
         self.conn = sqlite3.connect(dbpath)
         self.curs = self.conn.cursor()
-        if not db_exists():
-            # Create the table
-            self.conn.cursor().execute(
+        try:
+            self.curs.execute(
                 'create table files\
-                (path text,\
+                (path text primary key,\
                 mode integer,\
                 uid integer,\
                 username text,\
@@ -33,16 +37,43 @@ class FileDatabase:
                 lastmod float,\
                 lastcheck float,\
                 isfile integer,\
+                isdir integer,\
                 important integer,\
                 problems text)'  # Problems are stored in the
                                  # database# as comma-separated
                                  # problem identifier strings. yee
-                )
-            self.conn.commit()
+            )
+        except sqlite3.OperationalError as e:
+            print(e)
 
-    def prune(self):
-        """Prune old entries from the database"""
-        pass
+        self.conn.commit()
+
+    def store_file_problems(self, checked):
+        """Store a list of FileInfos with their problems in the database"""
+        mod = list(checked)
+        for fi in mod:
+            try:
+                problemstr = ','.join(fi['problems'])
+                fi['problems'] = problemstr
+            except KeyError:
+                pass
+
+        self.curs.executemany(
+            'insert or replace into files values (\
+            path=:path,\
+            mode=:mode,\
+            uid=:uid,\
+            username=:username,\
+            size=:size,\
+            lastmod=:lastmod,\
+            lastcheck=:lastcheck,\
+            isfile=:isfile,\
+            isdir=:isdir,\
+            important=:important,\
+            problems=:problems\
+            )',
+            mod
+        )
 
     def get_stored_problems(self, path):
         """Get a set of problems associated with a path at the last last check"""
@@ -50,32 +81,40 @@ class FileDatabase:
             'select problems from files where path=?',
             path
         )
-        probs = self.curs.fetchone()[0].split(',')
+        probs = self.curs.fetchone()['problems'].split(',')
         return set(probs)
 
     def get_fileinfo(self, path):
         """Get a FileInfo object from the database for a given path"""
-        db_keys = ['path', 'mode', 'uid', 'username', 'size',
-                   'lastmod', 'lastcheck', 'isfile', 'important']
         self.curs.execute(
-            'select {} from files where path=?'.format(','.join(db_keys)),
+            'select {} from files where path=?'.format(','.join(self.db_keys)),
             path
         )
         return dict(zip(db_keys, self.curs.fetchone()))
 
-    def get_filelist(self):
+    def get_cached_filelist(self, path):
         """Get a list of FileInfo dictionaries from the database"""
-        db_keys = ['path', 'mode', 'uid', 'username', 'size',
-                   'lastmod', 'lastcheck', 'isfile', 'important'] # NOT ALL OF THE KEYS!
         self.curs.execute(
-            'select {} from files'.join(db_keys)
+            'select * from files where path like \':path%\'',
+            {
+                'path': path
+            }
         )
-        return [dict(zip(db_keys), d) for d in self.curs.fetchall()]
+        return [dict(zip(self.fi_keys, d)) for d in self.curs.fetchall()]
 
-    def get_files_by_attribute(self, key):
-        self.curs.execute(
-            'select ? from'
-        )
+    def get_files_by_attribute(self, attr):
+        """
+        Get a dictionary where keys are values of attr and values are lists
+        of files with that attribute
+        """
+        filelist = self.get_cached_filelist('/')
+        if attr != 'problems':
+            attrvals = list(set([f[attr] for f in filelist]))
+        else:
+            attrvals = list(every_problem.keys())
+
+        return dict(zip(attrvals, [f for f in filelist if f[attr] == attr]))
+
 
     def __del__(self):
         """Close everything before ya die"""
