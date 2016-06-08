@@ -100,18 +100,22 @@ class FileDatabase:
         files = self.curs.fetchall()
         return [dict(zip(self.fi_keys, d)) for d in files]
 
-    def get_files_by_attribute(self, attr):
+    def get_files_by_attribute(self, path, attr):
         """
         Get a dictionary where keys are values of attr and values are lists
         of files with that attribute
         """
-        filelist = self.get_cached_filelist('/')
+        filelist = self.get_cached_filelist(path)
         if attr != 'problems':
             attrvals = list(set([f[attr] for f in filelist]))
         else:
             attrvals = list(every_problem.keys())
 
-        return dict(zip(attrvals, [f for f in filelist if f[attr] == attr]))
+        attrlists = []
+        for val in attrvals:
+            attrlists.append([f for f in filelist if f[attr] == val])
+
+        return dict(zip(attrvals, attrlists))
 
     def prune(self, old):
         """Remove db entries based on the FileInfos supplied in old"""
