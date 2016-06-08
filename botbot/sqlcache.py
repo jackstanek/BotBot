@@ -84,14 +84,6 @@ class FileDatabase:
         probs = self.curs.fetchone()['problems'].split(',')
         return set(probs)
 
-    def get_fileinfo(self, path):
-        """Get a FileInfo object from the database for a given path"""
-        self.curs.execute(
-            'select {} from files where path=?'.format(','.join(self.db_keys)),
-            path
-        )
-        return dict(zip(db_keys, self.curs.fetchone()))
-
     def get_cached_filelist(self, path):
         """Get a list of FileInfo dictionaries from the database"""
         self.curs.execute(
