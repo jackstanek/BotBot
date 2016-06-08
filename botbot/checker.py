@@ -118,6 +118,7 @@ class Checker:
         if len(checklist) == 0:
             self.build_new_checklist(path)
         else:
+            self.status['probcount'] = len(checklist)
             self.update_checklist(checklist)
 
         starttime = time.time()

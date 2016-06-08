@@ -43,7 +43,7 @@ class Reporter():
                 trim_blocks=True
             )
 
-            if len(self.chkr.checklist) > 0:
+            if self.chkr.status['probcount'] > 0:
                 filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr)
                 tempgen = env.get_template(tmpname).generate({
                     'attr': attr,
