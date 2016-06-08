@@ -80,8 +80,9 @@ class Checker:
 
     def update_checklist(self, cached, link=False, verbose=True):
         """
-        Take a cached list of files to check and make a list of directories
-        and files that need to be rechecked. A file is rechecked if its
+        Take a cached list of files to check and make a list of
+        directories and files that need to be rechecked. A file is
+        rechecked if its last check time is earlier than its last change.
         """
         if verbose:
             print('Found {} cached paths.'.format(len(cached)))
@@ -97,12 +98,14 @@ class Checker:
                 # Cached path no longer exists
                 prunelist.append(finfo)
 
+        if verbose:
+            print('Pruning {} files.'.format(len(prunelist)))
         self.db.prune(prunelist)
 
         self.checklist = checklist
         self.status['files'] = len(self.checklist)
         if verbose:
-            print('Found {} paths to recheck.'.format(len(checklist)))
+            print('Found {} paths to recheck.'.format(self.status['files']))
 
     def check_all(self, path, link=False, verbose=False):
         """Check the file list generated before."""
@@ -119,6 +122,7 @@ class Checker:
         for finfo in self.checklist:
             if finfo['isfile']:
                 self.check_file(finfo, status=verbose)
+            finfo['lastcheck'] = int(time.time())
 
         self.status['time'] = time.time() - starttime
         self.db.store_file_problems(self.checklist)
@@ -137,9 +141,8 @@ class Checker:
                     finfo['problems'] = {prob}
                 else:
                     finfo['problems'].add(prob)
-            self.status['probcount'] += 1
+                    self.status['probcount'] += 1
 
-        finfo['lastcheck'] = int(time.time())
         self.status['checked'] += 1
 
         if status:

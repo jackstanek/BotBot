@@ -3,14 +3,13 @@
 import os
 import sqlite3
 
-from . import fileinfo
 from .problems import every_problem
 
 def get_dbpath():
     """Get the path to the SQLite database"""
     # Hardcoding paths is kinda bad practice, I guess... RIP
     home = os.path.expanduser('~')
-    dbpath = os.path.join(home , '.botbot', 'filecache.sqlite')
+    dbpath = os.path.join(home, '.botbot', 'filecache.sqlite')
     return dbpath
 
 def db_exists():
