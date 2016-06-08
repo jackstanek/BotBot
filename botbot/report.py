@@ -39,15 +39,15 @@ class Reporter():
         tmp_respath = os.path.join('resources', 'templates')
         if resource_exists(__package__, tmp_respath):
             env = Environment(
-                loader=FileSystemLoader(resource_filename(__package__, tmp_respath))
+                loader=FileSystemLoader(resource_filename(__package__, tmp_respath)),
+                trim_blocks=True
             )
 
-            '''
             if self.chkr.status['probcount'] > 0:
-                filelist = self.chkr.db.get_files_by_attribute(attr),
+                filelist = self.chkr.db.get_files_by_attribute(attr, self.chkr.path)
                 tempgen = env.get_template(tmpname).generate({
                     'attr': attr,
-                    'values': None,
+                    'values': filelist,
                     'status': self.chkr.status
                 })
 
@@ -66,7 +66,6 @@ class Reporter():
 
             else:
                 print('No problems here!')
-            '''
 
         else:
             raise FileNotFoundError('No such report format')

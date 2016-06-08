@@ -29,6 +29,7 @@ class Checker:
         } # Information about the previous check
         self.db = sql.FileDatabase(dbpath)
         self.reporter = rep.Reporter(self, out=outpath)
+        self.path = ''
 
     def register(self, *funcs):
         """
@@ -111,6 +112,7 @@ class Checker:
         """Check the file list generated before."""
         path = os.path.abspath(path)
         path = os.path.expanduser(path)
+        self.path = path
 
         checklist = self.db.get_cached_filelist(path)
         if len(checklist) == 0:

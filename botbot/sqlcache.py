@@ -73,6 +73,7 @@ class FileDatabase:
             )',
             mod
         )
+        self.conn.commit()
 
     def get_stored_problems(self, path):
         """Get a set of problems associated with a path at the last last check"""
@@ -107,7 +108,7 @@ class FileDatabase:
         """
         filelist = self.get_cached_filelist(path)
         if attr != 'problems':
-            attrvals = list(set([f[attr] for f in filelist]))
+            attrvals = list(set(f[attr] for f in filelist))
         else:
             attrvals = list(every_problem.keys())
 
