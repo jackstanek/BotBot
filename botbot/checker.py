@@ -110,6 +110,9 @@ class Checker:
 
     def check_all(self, path, link=False, verbose=False):
         """Check the file list generated before."""
+        # Start timing
+        starttime = time.time()
+
         path = os.path.abspath(path)
         path = os.path.expanduser(path)
         self.path = path
@@ -121,15 +124,14 @@ class Checker:
             self.status['probcount'] = len(checklist)
             self.update_checklist(checklist)
 
-        starttime = time.time()
         for finfo in self.checklist:
             if finfo['isfile']:
                 self.check_file(finfo, status=verbose)
             finfo['lastcheck'] = int(time.time())
 
-        self.status['time'] = time.time() - starttime
         self.db.store_file_problems(self.checklist)
 
+        self.status['time'] = time.time() - starttime
         self.reporter.write_report('generic')
 
     def check_file(self, finfo, status=True):
