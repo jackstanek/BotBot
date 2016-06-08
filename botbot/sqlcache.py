@@ -21,7 +21,7 @@ class FileDatabase:
     def __init__(self, dbpath):
         self.fi_keys = ['path', 'mode', 'uid', 'username',
                         'size', 'lastmod', 'lastcheck', 'isfile',
-                        'isdir', 'important', 'problemse']
+                        'isdir', 'important', 'problems']
 
         self.conn = sqlite3.connect(dbpath)
         self.curs = self.conn.cursor()
@@ -69,7 +69,7 @@ class FileDatabase:
             :isfile,\
             :isdir,\
             :important,\
-            \':problems\'\
+            :problems\
             )',
             mod
         )
