@@ -44,7 +44,7 @@ class Checker:
         Build a list of files to check. If link is True, follow symlinks.
         """
         ignore = ig.parse_ignore_rules(ig.find_ignore_file())
-        to_add = [os.path.join(path, f) for f in os.listdir(path)]
+        to_add = [path]
 
         checklist = []
 
@@ -59,7 +59,7 @@ class Checker:
                         continue
                     else:
                         to_add.append(apath['path'])
-                elif stat.S_ISDIR(apath['mode']):
+                elif apath['isdir']:
                     new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
                     to_add.extend(new)
 

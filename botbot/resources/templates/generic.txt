@@ -3,10 +3,7 @@ Files sorted by {{ attr }}
 {% for key, value in values.items() %}
 {{ key }}:
 {% for fi in value %}
-   - {{ fi }}: owned by {{ fi.owner }}
-   {% for prob in fi.problems %}
-     {{ prob }}
-   {% endfor %}
+   - {{ fi.path }}: owned by {{ fi.username }}
 {% endfor %}
 {% endfor %}
 
