@@ -51,4 +51,4 @@ def main():
     c.register(*clist)
 
     # Check the given directory
-    c.check_all(args.path, link=args.follow_symlinks, verbose=args.verbose)
+    c.check_all(args.path, shared=args.shared, link=args.follow_symlinks, verbose=args.verbose)
