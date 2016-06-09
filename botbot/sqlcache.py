@@ -16,24 +16,14 @@ def db_exists():
     """Check if the database already exists"""
     return os.path.isfile(get_dbpath())
 
-def serialize_problems(fi):
-    """Turn a set of problems in a FileInfo dict into a string"""
-    probset = fi['problems']
-    fi['problems'] = ','.join(probset)
-
-def decode_problems(fi):
-    """Turn a string of problems in a fresh SQL fileinfo to a set"""
-    probstr = fi['problems']
-    fi['problems'] = set(probstr.split(','))
-
 class FileDatabase:
     """Database of files and associate information"""
     def __init__(self, dbpath):
         self.fi_keys = ['path', 'mode', 'uid', 'username',
                         'size', 'lastmod', 'lastcheck', 'isfile',
                         'isdir', 'important', 'problems']
-
         self.conn = sqlite3.connect(dbpath)
+        self.conn.row_factory = sqlite3.Row
         self.curs = self.conn.cursor()
         try:
             self.curs.execute(
@@ -59,6 +49,15 @@ class FileDatabase:
 
     def store_file_problems(self, checked):
         """Store a list of FileInfos with their problems in the database"""
+
+        def serialize_problems(fi):
+            """Turn a set of problems in a FileInfo dict into a string"""
+            probset = fi['problems']
+            if probset is not None:
+                fi['problems'] = ','.join(probset)
+            else:
+                fi['problems'] = ''
+
         mod = list(checked)
         for fi in mod:
             try:
@@ -96,13 +95,19 @@ class FileDatabase:
     def get_cached_filelist(self, path):
         """Get a list of FileInfo dictionaries from the database"""
 
+        def decode_problems(fi):
+            """Turn a string of problems in a fresh SQL fileinfo to a set"""
+            fi = dict(fi)
+            probstr = fi['problems']
+            fi['problems'] = set(probstr.split(','))
+
         self.curs.execute(
             'select * from files where path like ?',
             (path + '%',)
         )
         files = self.curs.fetchall()
         for fi in files:
-            serialize_problems(fi)
+            decode_problems(fi)
 
         return [dict(zip(self.fi_keys, d)) for d in files]
 

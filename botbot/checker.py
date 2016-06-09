@@ -21,6 +21,7 @@ class Checker:
     def __init__(self, outpath, dbpath):
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
+        self.checked = list()
         self.status = {
             'files': 0,
             'checked': 0,
@@ -88,13 +89,26 @@ class Checker:
         if verbose:
             print('Found {} cached paths.'.format(len(cached)))
 
-        checklist = []
         prunelist = []
+        recheck = []
         for finfo in cached:
             try:
                 recent = fi.FileInfo(finfo['path'])
                 if recent['lastmod'] > finfo['lastcheck']:
-                    checklist.append(recent)
+                    if recent['isfile']:
+                        recent['problems'] = None
+                        recheck.append(recent)
+                    else:
+                        path = recent['path']
+                        new = [
+                            fi.FileInfo(p) for p in os.listdir(path)
+                            if p not in (f['path'] for f in self.checked)
+                        ] # Try to remove duplicates
+
+                        recheck.extend(new)
+                else:
+                    self.checked.append(finfo)
+
             except FileNotFoundError:
                 # Cached path no longer exists
                 prunelist.append(finfo)
@@ -103,7 +117,7 @@ class Checker:
             print('Pruning {} files.'.format(len(prunelist)))
         self.db.prune(prunelist)
 
-        self.checklist = checklist
+        self.checklist = list(recheck)
         self.status['files'] = len(self.checklist)
         if verbose:
             print('Found {} paths to recheck.'.format(self.status['files']))
@@ -129,25 +143,28 @@ class Checker:
                 self.check_file(finfo, status=verbose)
             finfo['lastcheck'] = int(time.time())
 
-        self.db.store_file_problems(self.checklist)
+        self.db.store_file_problems(self.checked)
 
         self.status['time'] = time.time() - starttime
-        self.reporter.write_report('generic')
+        # self.reporter.write_report('generic')
+        print(self.checked)
 
     def check_file(self, finfo, status=True):
         """
         Check a file against all checkers, write status to stdout if status
         is True
         """
+        result = dict(finfo)
         for check in self.checks:
             prob = check(finfo)
             if prob is not None:
-                if finfo['problems'] is None:
-                    finfo['problems'] = {prob}
+                if result['problems'] is None:
+                    result['problems'] = {prob}
                 else:
-                    finfo['problems'].add(prob)
+                    result['problems'].add(prob)
                     self.status['probcount'] += 1
 
+        self.checked.append(result)
         self.status['checked'] += 1
 
         if status:
