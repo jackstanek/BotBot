@@ -100,12 +100,7 @@ class Checker:
                         recheck.append(recent)
                     else:
                         path = recent['path']
-                        new = [
-                            fi.FileInfo(p) for p in os.listdir(path)
-                            if p not in (f['path'] for f in self.checked)
-                        ] # Try to remove duplicates
-
-                        recheck.extend(new)
+                        recheck.extend(fi.FileInfo(p) for p in os.listdir(path))
                 else:
                     self.checked.append(finfo)
 
@@ -146,8 +141,7 @@ class Checker:
         self.db.store_file_problems(self.checked)
 
         self.status['time'] = time.time() - starttime
-        # self.reporter.write_report('generic')
-        print(self.checked)
+        self.reporter.write_report('generic')
 
     def check_file(self, finfo, status=True):
         """

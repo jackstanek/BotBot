@@ -52,7 +52,8 @@ class Reporter():
 
             if self.chkr.status['probcount'] > 0:
                 filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
-
+                for key, value in filelist.items():
+                    print('{}: {}'.format(key, len(value)))
 
                 tempgen = env.get_template(tmpname).generate({
                     'attr': attr,
