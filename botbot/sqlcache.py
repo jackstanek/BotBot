@@ -97,7 +97,6 @@ class FileDatabase:
 
         def decode_problems(fi):
             """Turn a string of problems in a fresh SQL fileinfo to a set"""
-            fi = dict(fi)
             probstr = fi['problems']
             fi['problems'] = set(probstr.split(','))
 
@@ -105,11 +104,11 @@ class FileDatabase:
             'select * from files where path like ?',
             (path + '%',)
         )
-        files = self.curs.fetchall()
+        files = [dict(r) for r in self.curs.fetchall()]
         for fi in files:
             decode_problems(fi)
 
-        return [dict(zip(self.fi_keys, d)) for d in files]
+        return files
 
     def get_files_by_attribute(self, path, attr, shared=True):
         """
