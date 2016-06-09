@@ -16,6 +16,16 @@ def db_exists():
     """Check if the database already exists"""
     return os.path.isfile(get_dbpath())
 
+def serialize_problems(fi):
+    """Turn a set of problems in a FileInfo dict into a string"""
+    probset = fi['problems']
+    fi['problems'] = ','.join(probset)
+
+def decode_problems(fi):
+    """Turn a string of problems in a fresh SQL fileinfo to a set"""
+    probstr = fi['problems']
+    fi['problems'] = set(probstr.split(','))
+
 class FileDatabase:
     """Database of files and associate information"""
     def __init__(self, dbpath):
@@ -52,8 +62,7 @@ class FileDatabase:
         mod = list(checked)
         for fi in mod:
             try:
-                problemstr = ','.join(fi['problems'])
-                fi['problems'] = problemstr
+                serialize_problems(fi)
             except KeyError:
                 pass
 
@@ -86,14 +95,18 @@ class FileDatabase:
 
     def get_cached_filelist(self, path):
         """Get a list of FileInfo dictionaries from the database"""
+
         self.curs.execute(
             'select * from files where path like ?',
             (path + '%',)
         )
         files = self.curs.fetchall()
+        for fi in files:
+            serialize_problems(fi)
+
         return [dict(zip(self.fi_keys, d)) for d in files]
 
-    def get_files_by_attribute(self, path, attr):
+    def get_files_by_attribute(self, path, attr, shared=True):
         """
         Get a dictionary where keys are values of attr and values are lists
         of files with that attribute
@@ -103,10 +116,9 @@ class FileDatabase:
             attrvals = list(set(f[attr] for f in filelist))
         else:
             attrvals = list(every_problem.keys())
-
         attrlists = []
         for val in attrvals:
-            attrlists.append([f for f in filelist if f[attr] == val])
+            attrlists.append([f for f in filelist if f[attr] in val])
 
         return dict(zip(attrvals, attrlists))
 

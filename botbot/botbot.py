@@ -43,12 +43,11 @@ def main():
     c = checker.Checker(out, sqlcache.get_dbpath())
     clist = [checks.is_fastq,
              checks.sam_should_compress,
-             checks.is_large_plaintext]
+             checks.is_large_plaintext
+             schecks.file_groupreadable,
+             schecks.file_group_executable,
+             schecks.dir_group_readable]
 
-    if args.shared:
-        clist += [schecks.file_groupreadable,
-                  schecks.file_group_executable,
-                  schecks.dir_group_readable]
     c.register(*clist)
 
     # Check the given directory

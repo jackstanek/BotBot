@@ -33,7 +33,14 @@ class Reporter():
         else:
             return '.'.join(parts + ['txt'])
 
-    def write_report(self, fmt, attr='problems'):
+    def write_report(self, fmt, attr='problems', shared=True):
+        def is_shared_prob(fi):
+            shared_probs = {'PROB_DIR_NOT_WRITABLE',
+                            'PROB_FILE_NOT_GRPRD',
+                            'PROB_FILE_NOT_GRPEXEC',
+                            'PROB_DIR_NOT_WRITABLE',
+                            'PROB_DIR_NOT_ACCESSIBLE'}
+
         """Write the summary of what transpired."""
         tmpname = self.get_template_filename(fmt)
         tmp_respath = os.path.join('resources', 'templates')
@@ -44,7 +51,9 @@ class Reporter():
             )
 
             if self.chkr.status['probcount'] > 0:
-                filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr)
+                filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
+
+
                 tempgen = env.get_template(tmpname).generate({
                     'attr': attr,
                     'values': filelist,
