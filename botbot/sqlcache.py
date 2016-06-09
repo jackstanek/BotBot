@@ -121,9 +121,13 @@ class FileDatabase:
             attrvals = list(set(f[attr] for f in filelist))
         else:
             attrvals = list(every_problem.keys())
+
         attrlists = []
         for val in attrvals:
-            attrlists.append([f for f in filelist if f[attr] in val])
+            if attr == 'problems':
+                attrlists.append([f for f in filelist if val in f[attr]])
+            else:
+                attrlists.append([f for f in filelist if f[attr] == val])
 
         return dict(zip(attrvals, attrlists))
 
