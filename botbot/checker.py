@@ -135,8 +135,8 @@ class Checker:
 
         for finfo in self.checklist:
             if finfo['isfile']:
+                finfo['lastcheck'] = int(time.time())
                 self.check_file(finfo, status=verbose)
-            finfo['lastcheck'] = int(time.time())
 
         self.db.store_file_problems(self.checked)
 
