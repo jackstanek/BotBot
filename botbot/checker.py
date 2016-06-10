@@ -117,7 +117,7 @@ class Checker:
         if verbose:
             print('Found {} paths to recheck.'.format(self.status['files']))
 
-    def check_all(self, path, shared=False, link=False, verbose=False):
+    def check_all(self, path, shared=False, link=False, verbose=False, fmt='generic'):
         """Check the file list generated before."""
         # Start timing
         starttime = time.time()
@@ -141,7 +141,7 @@ class Checker:
         self.db.store_file_problems(self.checked)
 
         self.status['time'] = time.time() - starttime
-        self.reporter.write_report('generic', shared)
+        self.reporter.write_report(fmt, shared)
 
     def check_file(self, finfo, status=True):
         """
