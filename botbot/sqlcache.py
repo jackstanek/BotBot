@@ -98,7 +98,10 @@ class FileDatabase:
         def decode_problems(fi):
             """Turn a string of problems in a fresh SQL fileinfo to a set"""
             probstr = fi['problems']
-            fi['problems'] = set(probstr.split(','))
+            if len(probstr) > 0:
+                fi['problems'] = set(probstr.split(','))
+            else:
+                fi['problems'] = set()
 
         self.curs.execute(
             'select * from files where path like ?',
