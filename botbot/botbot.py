@@ -7,7 +7,7 @@ from . import checks, schecks, checker, config, sqlcache
 from . import ignore as ig
 
 def main():
-    conf = config.read_config()
+    conf = config.CONFIG
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
 
     # Verbosity and output options

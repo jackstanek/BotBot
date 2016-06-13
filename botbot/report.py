@@ -33,7 +33,7 @@ class Reporter():
         else:
             return '.'.join(parts + ['txt'])
 
-    def write_report(self, fmt, shared, attr='username'):
+    def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
         def prune_shared_probs(fl, attr):
             """Remove shared problem listings"""

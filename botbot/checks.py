@@ -4,6 +4,7 @@ import stat
 import mimetypes
 
 from .checker import is_link
+from .config import CONFIG
 
 def is_fastq(fi):
     """Check whether a given file is a fastq file."""
@@ -27,5 +28,6 @@ def is_large_plaintext(fi):
     guess = mimetypes.guess_type(fi['path'])
     mod_days = fi['lastmod'] / (24 * 60 * 60) # Days since last modification
 
-    if guess == 'text/plain' and fi['size'] > 100000 and mod_days >= 30:
+    large = CONFIG['checks']['largesize']
+    if guess == 'text/plain' and fi['size'] > large and mod_days >= 30:
         return 'PROB_OLD_LARGE_PLAINTEXT'

@@ -24,3 +24,5 @@ def read_config():
     cfg = ConfigParser()
     cfg.read(CONFIG_FILE_PATH)
     return dict(cfg)
+
+CONFIG = read_config()
