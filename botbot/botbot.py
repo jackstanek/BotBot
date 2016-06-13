@@ -4,6 +4,7 @@ import sys
 
 import botbot
 from . import checks, schecks, checker, config, sqlcache
+from . import ignore as ig
 
 def main():
     conf = config.read_config()
@@ -54,9 +55,14 @@ def main():
 
     c.register(*clist)
 
+    # Get ignore rules
+    ignore = ig.parse_ignore_rules(ig.find_ignore_file())
+
+
     # Check the given directory
     c.check_all(args.path,
                 shared=args.shared,
                 link=args.follow_symlinks,
                 verbose=args.verbose,
-                fmt=args.format)
+                fmt=args.format,
+                ignore=ignore)

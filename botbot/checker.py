@@ -3,6 +3,7 @@
 import stat
 import os
 import time
+from fnmatch import fnmatch
 
 from . import fileinfo as fi
 from . import report as rep
@@ -44,7 +45,6 @@ class Checker:
         """
         Build a list of files to check. If link is True, follow symlinks.
         """
-        ignore = ig.parse_ignore_rules(ig.find_ignore_file())
         to_add = [path]
 
         checklist = []
@@ -52,9 +52,6 @@ class Checker:
         while len(to_add) > 0:
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
-                if apath['path'] in ignore:
-                    continue # Ignore this file
-
                 if is_link(apath['path']):
                     if not link:
                         continue
@@ -77,17 +74,12 @@ class Checker:
         self.checklist = checklist
         self.status['files'] = len(self.checklist)
 
-        if verbose:
-            print('Located {0} files.'.format(self.status['files']))
-
     def update_checklist(self, cached, link=False, verbose=True):
         """
         Take a cached list of files to check and make a list of
         directories and files that need to be rechecked. A file is
         rechecked if its last check time is earlier than its last change.
         """
-        if verbose:
-            print('Found {} cached paths.'.format(len(cached)))
 
         prunelist = []
         recheck = []
@@ -108,30 +100,42 @@ class Checker:
                 # Cached path no longer exists
                 prunelist.append(finfo)
 
-        if verbose:
-            print('Pruning {} files.'.format(len(prunelist)))
         self.db.prune(prunelist)
 
         self.checklist = list(recheck)
         self.status['files'] = len(self.checklist)
-        if verbose:
-            print('Found {} paths to recheck.'.format(self.status['files']))
 
-    def check_all(self, path, shared=False, link=False, verbose=False, fmt='generic'):
+    def check_all(self, path, shared=False, link=False, verbose=False, fmt='generic', ignore=[]):
+        def remove_ignored(fi, ignore):
+            fn = os.path.basename(fi['path'])
+            for rule in ignore:
+                if fnmatch(fn, rule):
+                    print('Ignoring {}...'.format(fn))
+                    return False
+            return True
+
         """Check the file list generated before."""
         # Start timing
         starttime = time.time()
 
+        # Munge that path boys!
         path = os.path.abspath(path)
         path = os.path.expanduser(path)
         self.path = path
 
+        # Get a list of files
         checklist = self.db.get_cached_filelist(path)
+
+        # If no cached tree exists, build one
         if len(checklist) == 0:
             self.build_new_checklist(path)
         else:
+            # Otherwise, see if we need to recheck any files
             self.status['probcount'] = len(checklist)
             self.update_checklist(checklist)
+
+        # Remove ignored files
+        checklist = [fi for fi in checklist if remove_ignored(fi, ignore)]
 
         for finfo in self.checklist:
             if finfo['isfile']:

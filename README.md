@@ -33,7 +33,7 @@ python setup.py install
 # Configuration
 
 BotBot uses 2 primary configuration files: `~/.botbotignore` and
-`~/.botbot.conf`.
+`~/.botbot/botbot.conf`.
 
 ## `.botbotignore`
 
@@ -44,7 +44,7 @@ Python built-in [`glob`](https://docs.python.org/3/library/glob.html)
 module. Anything after a `#` character will be ignored, so these can
 be used to add comments.
 
-## `.botbot.conf`
+## `.botbot/botbot.conf`
 
 Configuration variables are stored here. Note that most of the
 configuration options are very much under development and are not
