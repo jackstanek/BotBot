@@ -46,9 +46,16 @@ be used to add comments.
 
 ## `.botbot/botbot.conf`
 
-Configuration variables are stored here. Note that most of the
-configuration options are very much under development and are not
-ready for production yet. More to come!
+Configuration variables are stored here. The file is an .ini-style
+configuration formatted file. The variables are stored in sections as
+follows:
+
+- `[checks]`
+    - `oldage`: defines how many days old a file must be to be
+      considered "old".
+
+    - `largesize`: defines how many bytes large a file must be to be
+      considered "large".
 
 # Testing
 
