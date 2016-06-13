@@ -29,5 +29,6 @@ def is_large_plaintext(fi):
     mod_days = fi['lastmod'] / (24 * 60 * 60) # Days since last modification
 
     large = CONFIG['checks']['largesize']
-    if guess == 'text/plain' and fi['size'] > large and mod_days >= 30:
+    old = CONFIG['checks']['oldage']
+    if guess == 'text/plain' and fi['size'] > large and mod_days >= old:
         return 'PROB_OLD_LARGE_PLAINTEXT'
