@@ -106,9 +106,11 @@ class Checker:
         self.status['files'] = len(self.checklist)
 
     def check_all(self, path, shared=False, link=False,
-                  verbose=False, fmt='generic', ignore=[],
-                  cached=False):
+                  verbose=False, fmt='generic', ignore=None,
+                  cached=False, force=False):
+        """Pretty much do everything."""
         def remove_ignored(fi, ignore):
+            """Remove files if they're in the ignore file"""
             fn = os.path.basename(fi['path'])
             for rule in ignore:
                 if fnmatch(fn, rule):
@@ -130,7 +132,7 @@ class Checker:
 
         # If no cached tree exists, build one if we need one
         if not cached:
-            if len(checklist) == 0:
+            if force or len(checklist) == 0:
                 self.build_new_checklist(path)
             else:
                 # Otherwise, see if we need to recheck any files

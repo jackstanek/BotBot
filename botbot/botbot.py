@@ -24,9 +24,15 @@ def main():
     parser.add_argument('--version',
                         action='version',
                         version='%(prog)s {}'.format(__version__))
-    parser.add_argument('-c', '--cached',
+
+    # Recheck options
+    recheck = parser.add_mutually_exclusive_group()
+    recheck.add_argument('-c', '--cached',
                         action='store_true',
                         help='Only return cached issues (no recheck)')
+    recheck.add_argument('-k', '--force-recheck',
+                        action='store_true',
+                        help='Force a recheck of the tree')
 
     # Directory options
     parser.add_argument('path',
@@ -64,6 +70,7 @@ def main():
     # Check the given directory
     c.check_all(args.path,
                 cached=args.cached,
+                force=args.force_recheck,
                 shared=args.shared,
                 link=args.follow_symlinks,
                 verbose=args.verbose,
