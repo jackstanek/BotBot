@@ -2,12 +2,11 @@
 import argparse
 import sys
 
-import botbot
-from . import checks, schecks, checker, config, sqlcache
+from botbot import __version__
+from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
 
 def main():
-    conf = config.CONFIG
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
 
     # Verbosity and output options
@@ -24,7 +23,10 @@ def main():
                         default='generic')
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s {}'.format(botbot.__version__))
+                        version='%(prog)s {}'.format(__version__))
+    parser.add_argument('-c', '--cached',
+                        action='store_true',
+                        help='Only return cached issues (no recheck)')
 
     # Directory options
     parser.add_argument('path',
@@ -61,6 +63,7 @@ def main():
 
     # Check the given directory
     c.check_all(args.path,
+                cached=args.cached,
                 shared=args.shared,
                 link=args.follow_symlinks,
                 verbose=args.verbose,

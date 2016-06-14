@@ -105,7 +105,9 @@ class Checker:
         self.checklist = list(recheck)
         self.status['files'] = len(self.checklist)
 
-    def check_all(self, path, shared=False, link=False, verbose=False, fmt='generic', ignore=[]):
+    def check_all(self, path, shared=False, link=False,
+                  verbose=False, fmt='generic', ignore=[],
+                  cached=False):
         def remove_ignored(fi, ignore):
             fn = os.path.basename(fi['path'])
             for rule in ignore:
@@ -126,23 +128,24 @@ class Checker:
         # Get a list of files
         checklist = self.db.get_cached_filelist(path)
 
-        # If no cached tree exists, build one
-        if len(checklist) == 0:
-            self.build_new_checklist(path)
-        else:
-            # Otherwise, see if we need to recheck any files
-            self.status['probcount'] = len(checklist)
-            self.update_checklist(checklist)
+        # If no cached tree exists, build one if we need one
+        if not cached:
+            if len(checklist) == 0:
+                self.build_new_checklist(path)
+            else:
+                # Otherwise, see if we need to recheck any files
+                self.status['probcount'] = len(checklist)
+                self.update_checklist(checklist)
 
         # Remove ignored files
         checklist = [fi for fi in checklist if remove_ignored(fi, ignore)]
 
-        for finfo in self.checklist:
-            if finfo['isfile']:
-                finfo['lastcheck'] = int(time.time())
-                self.check_file(finfo, status=verbose)
-
-        self.db.store_file_problems(self.checked)
+        if not cached:
+            for finfo in self.checklist:
+                if finfo['isfile']:
+                    finfo['lastcheck'] = int(time.time())
+                    self.check_file(finfo, status=verbose)
+            self.db.store_file_problems(self.checked)
 
         self.status['time'] = time.time() - starttime
         self.reporter.write_report(fmt, shared)
