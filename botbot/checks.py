@@ -28,7 +28,9 @@ def is_large_plaintext(fi):
     guess = mimetypes.guess_type(fi['path'])
     mod_days = fi['lastmod'] / (24 * 60 * 60) # Days since last modification
 
-    large = CONFIG['checks']['largesize']
-    old = CONFIG['checks']['oldage']
+    large = CONFIG.get('checks', 'largesize',
+                       fallback=100000000) # Default to 100MB
+    old = CONFIG.get('checks', 'oldage',
+                     fallback=30) # Default to one month
     if guess == 'text/plain' and fi['size'] > large and mod_days >= old:
         return 'PROB_OLD_LARGE_PLAINTEXT'
