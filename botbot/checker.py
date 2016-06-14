@@ -52,24 +52,21 @@ class Checker:
         while len(to_add) > 0:
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
-                if is_link(apath['path']):
-                    if not link:
-                        continue
-                    else:
-                        to_add.append(apath['path'])
-                elif apath['isdir']:
+                if apath['isdir']:
                     new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
                     to_add.extend(new)
+                else:
+                    checklist.append(apath)
 
-                checklist.append(apath)
-
-            # TODO: Fix these...
-            except FileNotFoundError:
-                pass
-            except PermissionError:
-                pass
-            except OSError:
-                pass
+            except FileNotFoundError as err:
+                apath['problems'] = {'PROB_BROKEN_LINK'}
+                self.checked.append(apath)
+            except PermissionError as err:
+                apath['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
+                self.checked.append(apath)
+            except OSError as err:
+                apath['problems'] = {'PROB_BROKEN_LINK'}
+                self.checked.append(apath)
 
         self.checklist = checklist
         self.status['files'] = len(self.checklist)
@@ -152,7 +149,7 @@ class Checker:
         self.status['time'] = time.time() - starttime
         self.reporter.write_report(fmt, shared)
 
-    def check_file(self, finfo, status=True):
+    def check_file(self, finfo, status=False):
         """
         Check a file against all checkers, write status to stdout if status
         is True
