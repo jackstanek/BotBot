@@ -140,7 +140,7 @@ class Checker:
                 self.update_checklist(checklist)
 
         # Remove ignored files
-        checklist = [fi for fi in checklist if remove_ignored(fi, ignore)]
+        self.checklist = [fi for fi in self.checklist if remove_ignored(fi, ignore)]
 
         if not cached:
             for finfo in self.checklist:
