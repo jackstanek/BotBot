@@ -102,7 +102,7 @@ class Checker:
 
         self.db.prune(prunelist)
 
-        self.checklist = list(recheck)
+        self.checklist = recheck
         self.status['files'] = len(self.checklist)
 
     def check_all(self, path, shared=False, link=False,

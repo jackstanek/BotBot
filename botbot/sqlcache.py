@@ -38,6 +38,7 @@ class FileDatabase:
                 isfile integer,\
                 isdir integer,\
                 important integer,\
+                md5sum text,\
                 problems text)'  # Problems are stored in the
                                  # database# as comma-separated
                                  # problem identifier strings. yee
@@ -77,6 +78,7 @@ class FileDatabase:
             :isfile,\
             :isdir,\
             :important,\
+            :md5sum,\
             :problems\
             )',
             mod
