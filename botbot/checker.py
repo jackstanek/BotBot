@@ -89,7 +89,14 @@ class Checker:
                         recheck.append(recent)
                     else:
                         path = recent['path']
-                        recheck.extend(fi.FileInfo(p) for p in os.listdir(path))
+
+                        # Add all the paths to recheck
+                        try:
+                            for f in os.listdir(path):
+                                self.checklist.append(fi.FileInfo(f))
+                        except PermissionError:
+                            recent['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
+                            self.checked.append(recent)
                 else:
                     self.checked.append(finfo)
 
