@@ -21,12 +21,15 @@ def get_file_hash(path):
     if os.path.isdir(path):
         return
     else:
-        with open(path, mode='br') as infile:
-            for b in reader(infile):
-                hasher.update(b)
+        try:
+            with open(path, mode='br') as infile:
+                for b in reader(infile):
+                    hasher.update(b)
 
-        digest = hasher.hexdigest()
-        return digest
+            digest = hasher.hexdigest()
+            return digest
+        except PermissionError:
+            return ''
 
 def FileInfo(fd, link=False, important=False):
     """Hold information about a file"""
