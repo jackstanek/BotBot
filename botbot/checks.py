@@ -22,6 +22,9 @@ def sam_should_compress(fi):
             return 'PROB_SAM_AND_BAM_EXIST'
         else:
             return 'PROB_SAM_SHOULD_COMPRESS'
+    elif ext == '.bam':
+        if os.path.isfile('.'.join((name, 'sam'))):
+            return 'PROB_SAM_SHOULD_COMPRESS'
 
 def is_large_plaintext(fi):
     """Detect if a file plaintext and >100MB"""
