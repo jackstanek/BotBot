@@ -23,7 +23,7 @@ def find_version(*file_paths):
 
 setup(
     name='BotBot',
-    version=find_version(),
+    version=find_version('botbot', '__init__.py'),
     description='Laboratory computational resource management',
     author='Jack Stanek',
     author_email='stane064@umn.edu',
