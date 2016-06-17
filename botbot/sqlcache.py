@@ -48,7 +48,7 @@ class FileDatabase:
 
         self.conn.commit()
 
-    def store_file_problems(self, checked):
+    def store_file_problems(self, *checked):
         """Store a list of FileInfos with their problems in the database"""
 
         def serialize_problems(fi):

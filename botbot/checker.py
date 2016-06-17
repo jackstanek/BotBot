@@ -151,7 +151,7 @@ class Checker:
                     finfo['lastcheck'] = int(time.time())
                     result = self.check_file(finfo, status=verbose)
                     self.process_checked_file(result)
-            self.db.store_file_problems(self.checked)
+            self.db.store_file_problems(*self.checked)
 
         self.status['time'] = time.time() - starttime
         self.reporter.write_report(fmt, shared)
