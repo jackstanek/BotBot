@@ -149,7 +149,8 @@ class Checker:
             for finfo in self.checklist:
                 if finfo['isfile']:
                     finfo['lastcheck'] = int(time.time())
-                    self.check_file(finfo, status=verbose)
+                    result = self.check_file(finfo, status=verbose)
+                    self.process_checked_file(result)
             self.db.store_file_problems(self.checked)
 
         self.status['time'] = time.time() - starttime
@@ -170,11 +171,14 @@ class Checker:
                     result['problems'].add(prob)
                     self.status['probcount'] += 1
 
-        self.checked.append(result)
-        self.status['checked'] += 1
-
         if status:
             self.reporter.write_status(40)
+
+        return result
+
+    def process_checked_file(self, result):
+        self.checked.append(result)
+        self.status['checked'] += 1
 
 def is_link(path):
     """Check if the given path is a symbolic link"""
