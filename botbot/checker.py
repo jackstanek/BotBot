@@ -103,7 +103,7 @@ class Checker:
                 # Cached path no longer exists
                 prunelist.append(finfo)
 
-        self.db.prune(prunelist)
+        self.db.prune(*prunelist)
 
         self.checklist = recheck
         self.status['files'] = len(self.checklist)

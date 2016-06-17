@@ -135,7 +135,7 @@ class FileDatabase:
 
         return dict(zip(attrvals, attrlists))
 
-    def prune(self, old):
+    def prune(self, *old):
         """Remove db entries based on the FileInfos supplied in old"""
         for f in old:
             self.curs.execute(
