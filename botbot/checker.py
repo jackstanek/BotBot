@@ -7,7 +7,6 @@ from fnmatch import fnmatch
 
 from . import fileinfo as fi
 from . import report as rep
-from . import ignore as ig
 from . import sqlcache as sql
 
 class Checker:
