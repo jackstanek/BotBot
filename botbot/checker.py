@@ -108,14 +108,20 @@ class Checker:
         self.checklist = recheck
         self.status['files'] = len(self.checklist)
 
-    def populate_checklist(self):
+    def populate_checklist(self, force=False):
         """Populate the list of files to check"""
+        # Get a list of files
+        checklist = self.db.get_cached_filelist(self.path)
+
         if force or len(checklist) == 0:
-            self.build_new_checklist(path)
+            self.build_new_checklist(self.path)
         else:
             # Otherwise, see if we need to recheck any files
             self.status['probcount'] = len(checklist)
             self.update_checklist(checklist)
+
+        # Remove ignored files and move to object
+        self.checklist = [fi for fi in self.checklist if remove_ignored(fi, ignore)]
 
     def check_all(self, path, shared=False, link=False,
                   verbose=False, fmt='generic', ignore=None,
@@ -139,14 +145,9 @@ class Checker:
         path = os.path.expanduser(path)
         self.path = path
 
-        # Get a list of files
-        checklist = self.db.get_cached_filelist(path)
-
         # If no cached tree exists, build one if we need one
         if not cached:
-
-        # Remove ignored files
-        self.checklist = [fi for fi in self.checklist if remove_ignored(fi, ignore)]
+            self.populate_checklist(force=force)
 
         if not cached:
             for finfo in self.checklist:
