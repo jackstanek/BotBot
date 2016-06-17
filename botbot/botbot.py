@@ -5,6 +5,7 @@ import sys
 from botbot import __version__
 from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
+from .daemon import DaemonizedChecker
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -44,6 +45,12 @@ def main():
     parser.add_argument('-l', '--follow-symlinks',
                         help='Follow symlinks',
                         action='store_true')
+
+    # Daemon options
+    parser.add_argument('-d', '--daemon',
+                        help='Run as a daemon',
+                        action='store_true')
+
     # Initialize the checker
     args = parser.parse_args()
 
