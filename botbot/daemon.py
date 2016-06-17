@@ -4,11 +4,10 @@ import os
 import errno
 
 import inotify.adapters
-from inotify.constants import IN_CREATE, IN_MODIFY, IN_DELETE
-
+from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
 from .checker import Checker
 
-_ACTIONABLE_EVENTS = (IN_CREATE, IN_MODIFY, IN_DELETE)
+_ACTIONABLE_EVENTS = (IN_CREATE, IN_ATTRIB, IN_DELETE)
 
 class DaemonizedChecker(Checker):
     """Checker that runs in a daemon"""
