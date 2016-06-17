@@ -138,10 +138,17 @@ class FileDatabase:
     def prune(self, *old):
         """Remove db entries based on the FileInfos supplied in old"""
         for f in old:
-            self.curs.execute(
-                'delete from files where path=?',
-                (f['path'],)
-            )
+            try:
+                self.curs.execute(
+                    'delete from files where path=?',
+                    (f['path'],)
+                )
+            except TypeError:
+                # Handle raw paths too
+                self.curs.execute(
+                    'delete from files where path=? or path=?/',
+                    (f,)
+                )
 
     def __del__(self):
         """Close everything before ya die"""
