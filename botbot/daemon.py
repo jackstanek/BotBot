@@ -1,23 +1,22 @@
 """Botbot daemon mode!"""
 
 import os
+import sys
 import errno
 
 import inotify.adapters
 from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
 from .checker import Checker
+from .sqlcache import get_dbpath
 
 _ACTIONABLE_EVENTS = (IN_CREATE, IN_ATTRIB, IN_DELETE)
 
 class DaemonizedChecker(Checker):
     """Checker that runs in a daemon"""
     def __init__(self, path):
-        super().__init__()
+        super().__init__(sys.stdout, get_dbpath())
         self.rootpath = path
         self.watch = None
-
-        del self.check_all
-        del self.checklist, self.checked
 
     def init(self):
         """Attempt to get an inotify watch on the specified path"""
@@ -31,13 +30,13 @@ class DaemonizedChecker(Checker):
 
     def handle(self, event):
         """Recheck the file given in this event"""
-        path, filename = event[2:3] # wew lad, magic numbers
+        path, filename = event[2:4] # wew lad, magic numbers
         chkpath = os.path.join(path, filename)
 
-        if is_inevent(event, 'IN_CREATE') or is_inevent(event, 'IN_MODIFY'):
+        if is_inevent(event, IN_CREATE) or is_inevent(event, IN_MODIFY):
             result = self.check_file(chkpath)
             self.db.store_file_problems(result)
-        elif is_inevent(event, 'IN_DELETE'):
+        elif is_inevent(event, IN_DELETE):
             self.db.prune(chkpath)
 
     def run(self):
