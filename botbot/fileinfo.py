@@ -10,12 +10,13 @@ from .config import CONFIG
 def get_file_hash(path):
     """Get md5 hash of a file"""
     def reader(fo):
-        """Get part of a file"""
-        b = fo.read(128)
-        if len(b) > 0:
-            yield b
-        else:
-            raise StopIteration()
+        """Generator which feeds bytes to the md5 hasher"""
+        while True:
+            b = fo.read(128)
+            if len(b) > 0:
+                yield b
+            else:
+                raise StopIteration()
 
     hasher = hashlib.new('md5')
     if os.path.isdir(path):
