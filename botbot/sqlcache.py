@@ -19,6 +19,7 @@ def db_exists():
 class FileDatabase:
     """Database of files and associate information"""
     def __init__(self, dbpath):
+        # Dict keys that are the column names
         self.fi_keys = ['path', 'mode', 'uid', 'username',
                         'size', 'lastmod', 'lastcheck', 'isfile',
                         'isdir', 'important', 'problems']
@@ -26,6 +27,7 @@ class FileDatabase:
         self.conn.row_factory = sqlite3.Row
         self.curs = self.conn.cursor()
         try:
+            # Create the file table
             self.curs.execute(
                 'create table files\
                 (path text primary key,\
@@ -44,6 +46,7 @@ class FileDatabase:
                                  # problem identifier strings. yee
             )
         except sqlite3.OperationalError:
+            # Table already exists, ya goof
             pass
 
         self.conn.commit()
@@ -59,6 +62,7 @@ class FileDatabase:
             else:
                 fi['problems'] = ''
 
+        # Copy the list
         mod = list(checked)
         for fi in mod:
             try:
