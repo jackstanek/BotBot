@@ -57,6 +57,11 @@ follows:
     - `largesize`: defines how many bytes large a file must be to be
       considered "large".
 
+- `[fileinfo]`
+    - `important`: defines which file extensions are considered
+      "important." By default, *.sam and *.bam files are denoted as
+      important.
+
 # Testing
 
 BotBot uses pytest as its test suite. To run the tests, run

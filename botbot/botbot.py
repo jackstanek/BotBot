@@ -54,25 +54,29 @@ def main():
     # Initialize the checker
     args = parser.parse_args()
 
+    # Determine if we should write to a file or to stdout. If a file
+    # argument isn't given, default to stdout.
     out = None
     if args.out is not None:
         out = args.out
     else:
         out = sys.stdout
 
+
+    # Give a list of checking functions to the Checker object so we
+    # can go hog-wild with checks.
     c = checker.Checker(out, sqlcache.get_dbpath())
-    clist = [checks.is_fastq,
+    clist = (checks.is_fastq,
              checks.sam_should_compress,
              checks.is_large_plaintext,
              schecks.file_groupreadable,
              schecks.file_group_executable,
-             schecks.dir_group_readable]
+             schecks.dir_group_readable)
 
     c.register(*clist)
 
-    # Get ignore rules
+    # Get ignore rules from ~/.botbotignore
     ignore = ig.parse_ignore_rules(ig.find_ignore_file())
-
 
     # Check the given directory
     c.check_all(args.path,
