@@ -6,13 +6,13 @@ import errno
 
 import inotify.adapters
 from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
-from .checker import Checker
+from .checker import CheckerBase
 from .sqlcache import get_dbpath
 from .fileinfo import FileInfo
 
 _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
 
-class DaemonizedChecker(Checker):
+class DaemonizedChecker(CheckerBase):
     """Checker that runs in a daemon"""
     def __init__(self, path):
         super().__init__(sys.stdout, get_dbpath())

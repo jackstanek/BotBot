@@ -62,7 +62,6 @@ def main():
     else:
         out = sys.stdout
 
-
     # Give a list of checking functions to the Checker object so we
     # can go hog-wild with checks.
     c = checker.Checker(out, sqlcache.get_dbpath())
