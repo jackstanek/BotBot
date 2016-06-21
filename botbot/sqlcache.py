@@ -151,7 +151,7 @@ class FileDatabase:
                 # Handle raw paths too
                 self.curs.execute(
                     'delete from files where path=? or path=?/',
-                    (f,)
+                    (f, f)
                 )
 
     def __del__(self):

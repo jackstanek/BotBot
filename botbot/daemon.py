@@ -8,8 +8,9 @@ import inotify.adapters
 from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
 from .checker import Checker
 from .sqlcache import get_dbpath
+from .fileinfo import FileInfo
 
-_ACTIONABLE_EVENTS = (IN_CREATE, IN_ATTRIB, IN_DELETE)
+_EVENT_MASK = IN_CREATE| IN_ATTRIB | IN_DELETE
 
 class DaemonizedChecker(Checker):
     """Checker that runs in a daemon"""
@@ -21,7 +22,8 @@ class DaemonizedChecker(Checker):
     def init(self):
         """Attempt to get an inotify watch on the specified path"""
         try:
-            self.watch = inotify.adapters.InotifyTree(self.rootpath)
+            self.watch = inotify.adapters.InotifyTree(self.rootpath,
+                                                      mask=_EVENT_MASK)
         except inotify.calls.InotifyError as err:
             raise OSError('Could not initialize inotify API: {} ({})'.format(
                 errno.errorcode[err.errno],
@@ -33,8 +35,9 @@ class DaemonizedChecker(Checker):
         path, filename = event[2:4] # wew lad, magic numbers
         chkpath = os.path.join(path, filename)
 
-        if is_inevent(event, IN_CREATE) or is_inevent(event, IN_MODIFY):
-            result = self.check_file(chkpath)
+        if is_inevent(event, IN_CREATE, IN_ATTRIB):
+            result = FileInfo(chkpath)
+            self.check_file(result)
             self.db.store_file_problems(result)
         elif is_inevent(event, IN_DELETE):
             self.db.prune(chkpath)
@@ -45,10 +48,13 @@ class DaemonizedChecker(Checker):
             if event is not None:
                 self.handle(event)
 
-def is_inevent(event, inevent):
+def is_inevent(event, *inevent):
     """
     Helper function to determine if event is the type of inotify event
     inevent
     """
     header = event[0]
-    return bool(header.mask & inevent)
+    for ie in inevent:
+        if bool(header.mask & ie):
+            return True
+    return False
