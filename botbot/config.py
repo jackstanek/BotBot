@@ -18,11 +18,12 @@ def init_config_dir():
 
 def read_config():
     """Get a dictionary"""
-    init_config_dir()
+    # init_config_dir()
 
     from configparser import ConfigParser
     cfg = ConfigParser()
-    cfg.read(CONFIG_FILE_PATH)
+    if os.path.exists(CONFIG_FILE_PATH):
+        cfg.read(CONFIG_FILE_PATH)
     return cfg
 
 CONFIG = read_config()
