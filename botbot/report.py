@@ -9,10 +9,9 @@ from jinja2 import Environment, FileSystemLoader
 
 from . import problems
 
-class Reporter():
-    def __init__(self, chkr, out=sys.stdout):
+class ReporterBase():
+    def __init__(self, chkr):
         self.chkr = chkr
-        self.out = out
 
     def write_status(self, barlen):
         """Write where we're at"""
@@ -27,11 +26,22 @@ class Reporter():
         sys.stdout.flush()
 
     def get_template_filename(self, name):
+        """Find the filename of a template. Can be a filename or just a name."""
         parts = str(name).split('.')
         if parts[len(parts) - 1] == 'txt':
             return name
         else:
             return '.'.join(parts + ['txt'])
+
+    def write_report(self, fmt, shared, attr='problems'):
+        """Write a report. This base is just a stub."""
+        pass
+
+class OneshotReporter(ReporterBase):
+    """Does one-off reports after one-off checks"""
+    def __init__(self, chkr, out=sys.stdout):
+        super().__init__()
+        self.out = out
 
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
