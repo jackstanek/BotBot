@@ -9,31 +9,16 @@ from . import fileinfo as fi
 from . import report as rep
 from . import sqlcache as sql
 
-class Checker:
+class CheckerBase:
     """
-    Holds a set of checks that can be run on a file to make sure that
-    it's suitable for the shared directory. Runs checks recursively on a
-    given path.
+    Defines a foundation for other checker objects. Allows for
+    checking individual files against a list of check functions.
     """
-    # checks is a set of all the checking functions this checker knows of.  All
-    # checkers return a number signifying a specific problem with the
-    # file specified in the path.
-    def __init__(self, outpath, dbpath):
-        self.checks = set() # All checks to perform
-        self.checklist = list() # List of FileInfos to check at some point
-        self.checked = list() # Files that have been checked
-        self.status = {
-            'files': 0,
-            'checked': 0,
-            'time': 0,
-            'probcount': 0
-        } # Information about the previous check
+    def __init__(self, dbpath):
+        self.checks = set()
         self.db = sql.FileDatabase(dbpath) # Information about
                                            # previous check, updated
                                            # after every check
-        self.reporter = rep.Reporter(self, out=outpath) # Formats and
-                                                        # writes
-                                                        # information
         self.path = '' # Base path we're checking
 
     def register(self, *funcs):
@@ -43,6 +28,44 @@ class Checker:
         """
         for fn in funcs:
             self.checks.add(fn)
+
+    def check_file(self, finfo):
+        """
+        Check a file against all checkers, write status to stdout if status
+        is True
+        """
+        for check in self.checks:
+            prob = check(finfo)
+            if prob is not None:
+                if finfo['problems'] is None:
+                    finfo['problems'] = {prob}
+                else:
+                    finfo['problems'].add(prob)
+
+        finfo['lastcheck'] = int(time.time())
+
+class OneshotChecker(CheckerBase):
+    """
+    Intended to run checks recursively on a given path, once. Useful
+    for one-off check runs, not for daemon mode.
+    """
+    # checks is a set of all the checking functions this checker knows of.  All
+    # checkers return a number signifying a specific problem with the
+    # file specified in the path.
+    def __init__(self, outpath, dbpath):
+        super().__init__()
+        self.checks = set() # All checks to perform
+        self.checklist = list() # List of FileInfos to check at some point
+        self.checked = list() # Files that have been checked
+        self.status = {
+            'files': 0,
+            'checked': 0,
+            'time': 0,
+            'probcount': 0
+        } # Information about the previous check
+        self.reporter = rep.Reporter(self, out=outpath) # Formats and
+                                                        # writes
+                                                        # information
 
     def build_new_checklist(self, path, link=False, verbose=True):
         """
@@ -144,13 +167,6 @@ class Checker:
             self.status['probcount'] = len(checklist)
             self.update_checklist(checklist)
 
-        # Remove ignored files and move to object
-        self.checklist = [fi for fi in self.checklist if remove_ignored(fi, ignore)]
-
-    def check_all(self, path, shared=False, link=False,
-                  verbose=False, fmt='generic', ignore=None,
-                  cached=False, force=False):
-        """Pretty much do everything."""
         def remove_ignored(fi, ignore):
             """Check if a file matches a pattern from the ignore file"""
             fn = os.path.basename(fi['path'])
@@ -161,8 +177,14 @@ class Checker:
                     print('Ignoring {}...'.format(fn))
                     return False
             return True
+        # Remove ignored files and move to object
+        self.checklist = [fi for fi in self.checklist if remove_ignored(fi, ignore)]
 
-        """Check the file list generated before."""
+    def check_all(self, path, shared=False, link=False,
+                  verbose=False, fmt='generic', ignore=None,
+                  cached=False, force=False):
+        """Pretty much do everything."""
+
         # Start timing
         starttime = time.time()
 
@@ -180,32 +202,15 @@ class Checker:
             # Check all the files against every check.
             for finfo in self.checklist:
                 if finfo['isfile']:
-                    self.check_file(finfo, status=verbose)
+                    self.check_file(finfo)
                     self.process_checked_file(finfo)
+                    if verbose:
+                        pass
             self.db.store_file_problems(*self.checked)
 
         # Record stats and write the report. We out!
         self.status['time'] = time.time() - starttime
         self.reporter.write_report(fmt, shared)
-
-    def check_file(self, finfo, status=False):
-        """
-        Check a file against all checkers, write status to stdout if status
-        is True
-        """
-        for check in self.checks:
-            prob = check(finfo)
-            if prob is not None:
-                if finfo['problems'] is None:
-                    finfo['problems'] = {prob}
-                else:
-                    finfo['problems'].add(prob)
-                    self.status['probcount'] += 1
-
-        if status:
-            self.reporter.write_status(40)
-
-        finfo['lastcheck'] = int(time.time())
 
     def process_checked_file(self, result):
         """
@@ -213,6 +218,7 @@ class Checker:
         the counter.
         """
         self.checked.append(result)
+        self.status['probcout'] += len(result['problems'])
         self.status['checked'] += 1
 
 def is_link(path):
