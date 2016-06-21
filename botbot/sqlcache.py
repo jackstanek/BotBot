@@ -150,8 +150,8 @@ class FileDatabase:
             except TypeError:
                 # Handle raw paths too
                 self.curs.execute(
-                    'delete from files where path=? or path=?/',
-                    (f, f)
+                    'delete from files where path=?',
+                    (f,)
                 )
 
     def __del__(self):

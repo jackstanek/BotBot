@@ -10,7 +10,7 @@ from .checker import Checker
 from .sqlcache import get_dbpath
 from .fileinfo import FileInfo
 
-_EVENT_MASK = IN_CREATE| IN_ATTRIB | IN_DELETE
+_EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
 
 class DaemonizedChecker(Checker):
     """Checker that runs in a daemon"""
@@ -54,7 +54,7 @@ def is_inevent(event, *inevent):
     inevent
     """
     header = event[0]
+    mask = 0
     for ie in inevent:
-        if bool(header.mask & ie):
-            return True
-    return False
+        mask |= ie
+    return bool(mask & header.mask)
