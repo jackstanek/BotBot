@@ -38,10 +38,7 @@ class CheckerBase:
         for check in self.checks:
             prob = check(finfo)
             if prob is not None:
-                if finfo['problems'] is None:
-                    finfo['problems'] = {prob}
-                else:
-                    finfo['problems'].add(prob)
+                finfo['problems'].add(prob)
 
         finfo['lastcheck'] = int(time.time())
 
@@ -124,8 +121,8 @@ class OneshotChecker(CheckerBase):
                 recent = fi.FileInfo(finfo['path'])
                 if recent['lastmod'] > finfo['lastcheck']:
                     if recent['isfile']:
-                        recent['problems'] = None # We'll regenerate
-                                                  # the list later.
+                        recent['problems'] = set() # We'll regenerate
+                                                   # the list later.
                         recheck.append(recent)
                     else:
                         path = recent['path']
@@ -220,7 +217,7 @@ class OneshotChecker(CheckerBase):
         the counter.
         """
         self.checked.append(result)
-        self.status['probcout'] += len(result['problems'])
+        self.status['probcount'] += len(result['problems'])
         self.status['checked'] += 1
 
 def is_link(path):
