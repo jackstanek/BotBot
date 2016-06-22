@@ -15,11 +15,16 @@ _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
 class DaemonizedChecker(CheckerBase):
     """Checker that runs in a daemon"""
     def __init__(self, path):
-        super().__init__(sys.stdout, get_dbpath())
+        super().__init__(get_dbpath())
         self.rootpath = path
         self.watch = None
+        self.handle_hook = [] # Callbacks for event handling
 
-    def init(self):
+    def add_event_handler(self, func, mask):
+        """Helper function to add an event handler callback"""
+        self.handle_hook.append((func, mask))
+
+    def init(self, *event_handlers):
         """Attempt to get an inotify watch on the specified path"""
         try:
             self.watch = inotify.adapters.InotifyTree(self.rootpath,
@@ -30,17 +35,20 @@ class DaemonizedChecker(CheckerBase):
                 err.errno
             ))
 
+        for h in event_handlers:
+            func, mask = h
+            self.add_event_handler(func, mask)
+
     def handle(self, event):
         """Recheck the file given in this event"""
         path, filename = event[2:4] # wew lad, magic numbers
+        mask = event[0].mask
         chkpath = os.path.join(path, filename)
 
-        if is_inevent(event, IN_CREATE, IN_ATTRIB):
-            result = FileInfo(chkpath)
-            self.check_file(result)
-            self.db.store_file_problems(result)
-        elif is_inevent(event, IN_DELETE):
-            self.db.prune(chkpath)
+        for handler in self.handle_hook:
+            func, hmask = handler
+            if bool(hmask & mask):
+                func(event)
 
     def run(self):
         """Event loop which runs forever"""
