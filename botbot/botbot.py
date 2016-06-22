@@ -64,7 +64,7 @@ def main():
 
     # Give a list of checking functions to the Checker object so we
     # can go hog-wild with checks.
-    c = checker.Checker(out, sqlcache.get_dbpath())
+    c = checker.OneshotChecker(out, sqlcache.get_dbpath())
     clist = (checks.is_fastq,
              checks.sam_should_compress,
              checks.is_large_plaintext,

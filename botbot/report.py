@@ -40,7 +40,7 @@ class ReporterBase():
 class OneshotReporter(ReporterBase):
     """Does one-off reports after one-off checks"""
     def __init__(self, chkr, out=sys.stdout):
-        super().__init__()
+        super().__init__(chkr)
         self.out = out
 
     def write_report(self, fmt, shared, attr='problems'):

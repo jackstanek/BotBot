@@ -8,6 +8,7 @@ from fnmatch import fnmatch
 from . import fileinfo as fi
 from . import report as rep
 from . import sqlcache as sql
+from . import ignore as ig
 
 class CheckerBase:
     """
@@ -53,7 +54,7 @@ class OneshotChecker(CheckerBase):
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
     def __init__(self, outpath, dbpath):
-        super().__init__()
+        super().__init__(dbpath)
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
         self.checked = list() # Files that have been checked
@@ -63,7 +64,7 @@ class OneshotChecker(CheckerBase):
             'time': 0,
             'probcount': 0
         } # Information about the previous check
-        self.reporter = rep.Reporter(self, out=outpath) # Formats and
+        self.reporter = rep.OneshotReporter(self, out=outpath) # Formats and
                                                         # writes
                                                         # information
 
@@ -178,6 +179,7 @@ class OneshotChecker(CheckerBase):
                     return False
             return True
         # Remove ignored files and move to object
+        ignore = ig.parse_ignore_rules(ig.find_ignore_file())
         self.checklist = [fi for fi in self.checklist if remove_ignored(fi, ignore)]
 
     def check_all(self, path, shared=False, link=False,
