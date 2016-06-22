@@ -3,8 +3,9 @@
 import os
 from glob import glob
 
-def find_ignore_file():
-    path = os.path.expanduser('~/.botbotignore')
+def find_ignore_file(path='~'):
+    path = os.path.join(path, '.botbotignore')
+    path = os.path.expanduser(path)
     if os.path.isfile(path):
         return path
 
@@ -17,4 +18,4 @@ def parse_ignore_rules(path):
     return ig
 
 def strip_comments(line):
-    return line.split('#')[0]
+    return line.split('#')[0].strip()
