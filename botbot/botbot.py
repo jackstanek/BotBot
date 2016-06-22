@@ -5,7 +5,7 @@ import sys
 from botbot import __version__
 from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
-from .daemon import DaemonizedChecker
+from . import daemon
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
@@ -64,10 +64,6 @@ def main():
 
     # Give a list of checking functions to the Checker object so we
     # can go hog-wild with checks.
-    if args.daemon:
-        c = DaemonizedChecker(out, sqlcache.get_dbpath())
-    else:
-        c = checker.OneshotChecker(out, sqlcache.get_dbpath())
     clist = (checks.is_fastq,
              checks.sam_should_compress,
              checks.is_large_plaintext,
@@ -75,7 +71,14 @@ def main():
              schecks.file_group_executable,
              schecks.dir_group_readable)
 
-    c.register(*clist)
+    if args.daemon:
+        c = daemon.DaemonizedChecker(args.path)
+        c.register(*clist)
+        c.init((c.check_file, daemon._EVENT_MASK))
+        c.run()
+    else:
+        c = checker.OneshotChecker(out, sqlcache.get_dbpath())
+        c.register(*clist)
 
     # Get ignore rules from ~/.botbotignore
     ignore = ig.parse_ignore_rules(ig.find_ignore_file())

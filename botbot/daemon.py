@@ -8,7 +8,7 @@ import inotify.adapters
 from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
 from .checker import CheckerBase
 from .sqlcache import get_dbpath
-from .fileinfo import FileInfo
+from . import fileinfo
 
 _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
 
@@ -48,13 +48,21 @@ class DaemonizedChecker(CheckerBase):
         for handler in self.handle_hook:
             func, hmask = handler
             if bool(hmask & mask):
-                func(event)
+                func(chkpath)
 
     def run(self):
         """Event loop which runs forever"""
         for event in self.watch.event_gen():
             if event is not None:
                 self.handle(event)
+
+    def check_all(self):
+        self.run()
+
+    def check_file(self, path):
+        f = fileinfo.FileInfo(path)
+        print(f)
+        super().check_file(f)
 
 def is_inevent(event, *inevent):
     """
