@@ -45,53 +45,6 @@ class OneshotReporter(ReporterBase):
 
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
-        def prune_shared_probs(fl, attr):
-            """Remove shared problem listings"""
-            shared_probs = ('PROB_DIR_NOT_WRITABLE',
-                            'PROB_FILE_NOT_GRPRD',
-                            'PROB_FILE_NOT_GRPEXEC',
-                            'PROB_DIR_NOT_WRITABLE',
-                            'PROB_DIR_NOT_ACCESSIBLE')
-            pruned = dict()
-            if attr == 'problems':
-                for key, val in fl.items():
-                    if key not in shared_probs:
-                        pruned[key] = val
-            else:
-                for key, val in fl.items():
-                    pruned[key] = []
-                    for fi in val:
-                        sps, fips = set(shared_probs), set(fi['problems'])
-
-                        spc = len(set.intersection(sps, fips))
-                        if spc != len(fips):
-                            pruned[key].append(fi)
-
-            return pruned
-
-        def prune_empty_listings(fl, attr):
-            """Return a new dictionary with empty listings removed"""
-
-            new = dict()
-            if attr == 'problems':
-                for key, value in fl.items():
-                    if len(value) > 0:
-                        new[key] = value
-            else:
-                for key, val in fl.items():
-                    new[key] = []
-                    for fi in val:
-                        if len(fi['problems']) > 0:
-                            new[key].append(fi)
-
-            return new
-
-        def should_print_report(filelist):
-            for values in filelist.values():
-                if len(values) > 0:
-                    return True
-            return False
-
         # Find the template
         tmpname = self.get_template_filename(fmt)
         tmp_respath = os.path.join('resources', 'templates')
@@ -134,3 +87,50 @@ class OneshotReporter(ReporterBase):
 
         else:
             raise FileNotFoundError('No such report format')
+
+def prune_shared_probs(fl, attr):
+    """Remove shared problem listings"""
+    shared_probs = ('PROB_DIR_NOT_WRITABLE',
+                    'PROB_FILE_NOT_GRPRD',
+                    'PROB_FILE_NOT_GRPEXEC',
+                    'PROB_DIR_NOT_WRITABLE',
+                    'PROB_DIR_NOT_ACCESSIBLE')
+    pruned = dict()
+    if attr == 'problems':
+        for key, val in fl.items():
+            if key not in shared_probs:
+                pruned[key] = val
+    else:
+        for key, val in fl.items():
+            pruned[key] = []
+            for fi in val:
+                sps, fips = set(shared_probs), set(fi['problems'])
+
+                spc = len(set.intersection(sps, fips))
+                if spc != len(fips):
+                    pruned[key].append(fi)
+
+    return pruned
+
+def prune_empty_listings(fl, attr):
+    """Return a new dictionary with empty listings removed"""
+
+    new = dict()
+    if attr == 'problems':
+        for key, value in fl.items():
+            if len(value) > 0:
+                new[key] = value
+    else:
+        for key, val in fl.items():
+            new[key] = []
+            for fi in val:
+                if len(fi['problems']) > 0:
+                    new[key].append(fi)
+
+    return new
+
+def should_print_report(filelist):
+    for values in filelist.values():
+        if len(values) > 0:
+            return True
+    return False
