@@ -14,7 +14,7 @@ def parse_ignore_rules(path):
     if path is not None:
         with open(path, mode='r') as ignore:
             for line in ignore:
-                ig.append(strip_comments(line).strip())
+                ig.append(strip_comments(line))
     return ig
 
 def strip_comments(line):
