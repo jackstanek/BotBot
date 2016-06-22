@@ -109,7 +109,6 @@ def prune_shared_probs(fl, attr):
                 spc = len(set.intersection(sps, fips))
                 if spc != len(fips):
                     pruned[key].append(fi)
-
     return pruned
 
 def prune_empty_listings(fl, attr):
@@ -122,10 +121,12 @@ def prune_empty_listings(fl, attr):
                 new[key] = value
     else:
         for key, val in fl.items():
-            new[key] = []
             for fi in val:
                 if len(fi['problems']) > 0:
-                    new[key].append(fi)
+                    if key in new:
+                        new[key].append(fi)
+                    else:
+                        new[key] = [fi]
 
     return new
 
