@@ -64,7 +64,10 @@ def main():
 
     # Give a list of checking functions to the Checker object so we
     # can go hog-wild with checks.
-    c = checker.OneshotChecker(out, sqlcache.get_dbpath())
+    if args.daemon:
+        c = DaemonizedChecker(out, sqlcache.get_dbpath())
+    else:
+        c = checker.OneshotChecker(out, sqlcache.get_dbpath())
     clist = (checks.is_fastq,
              checks.sam_should_compress,
              checks.is_large_plaintext,
