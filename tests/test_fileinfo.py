@@ -43,3 +43,12 @@ def test_importance_detection(tmpdir):
     assert fi.FileInfo(samtestfile.basename)['important']
     assert fi.FileInfo(bamtestfile.basename)['important']
     assert not fi.FileInfo(regtestfile.basename)['important']
+
+def test_reader_reads_correct_number_of_bytes():
+    # Test both below and above 128 bytes
+    for i in range(1, 2 ** 10):
+        b = io.BytesIO(('a' * i).encode())
+        tb = 0
+        for r in fi._reader(b):
+            tb += len(r)
+        assert tb == i
