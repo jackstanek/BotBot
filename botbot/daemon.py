@@ -11,6 +11,7 @@ from .sqlcache import get_dbpath
 from . import fileinfo
 
 _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
+_RECHECK_MASK = IN_CREATE | IN_ATTRIB
 
 class DaemonizedChecker(CheckerBase):
     """Checker that runs in a daemon"""
@@ -21,11 +22,17 @@ class DaemonizedChecker(CheckerBase):
         self.handle_hook = [] # Callbacks for event handling
 
     def add_event_handler(self, func, mask):
-        """Helper function to add an event handler callback"""
+        """
+        Helper function to add an event handler callback. The function
+        runs if the event mask matches the mask given in mask.
+        """
         self.handle_hook.append((func, mask))
 
     def init(self, *event_handlers):
-        """Attempt to get an inotify watch on the specified path"""
+        """
+        Attempt to get an inotify watch on the specified path. Add event
+        handler callbacks to the inotify hook
+        """
         try:
             self.watch = inotify.adapters.InotifyTree(self.rootpath,
                                                       mask=_EVENT_MASK)
