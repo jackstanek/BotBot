@@ -8,6 +8,7 @@ import inotify.adapters
 from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
 from .checker import CheckerBase
 from .sqlcache import get_dbpath
+from .report import DaemonReporter
 from . import fileinfo
 
 _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
@@ -20,6 +21,7 @@ class DaemonizedChecker(CheckerBase):
         self.rootpath = path
         self.watch = None
         self.handle_hook = [] # Callbacks for event handling
+        self.reporter = DaemonReporter(self)
 
     def add_event_handler(self, func, mask):
         """

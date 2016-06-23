@@ -135,3 +135,10 @@ def should_print_report(filelist):
         if len(values) > 0:
             return True
     return False
+
+class DaemonReporter(ReporterBase):
+    def __init__(self, chkr):
+        super().__init__(chkr)
+
+    def write_report():
+        pass
