@@ -21,6 +21,7 @@ class CheckerBase:
                                            # previous check, updated
                                            # after every check
         self.path = '' # Base path we're checking
+        self.checked = [] # List of checked files
 
     def register(self, *funcs):
         """
@@ -42,6 +43,13 @@ class CheckerBase:
 
         finfo['lastcheck'] = int(time.time())
 
+    def process_checked_file(self, result):
+        """
+        Helper function to record that a file was checked and to increment
+        the counter.
+        """
+        self.checked.append(result)
+
 class OneshotChecker(CheckerBase):
     """
     Intended to run checks recursively on a given path, once. Useful
@@ -54,7 +62,6 @@ class OneshotChecker(CheckerBase):
         super().__init__(dbpath)
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
-        self.checked = list() # Files that have been checked
         self.status = {
             'files': 0,
             'checked': 0,
@@ -211,12 +218,8 @@ class OneshotChecker(CheckerBase):
         self.status['time'] = time.time() - starttime
         self.reporter.write_report(fmt, shared)
 
-    def process_checked_file(self, result):
-        """
-        Helper function to record that a file was checked and to increment
-        the counter.
-        """
-        self.checked.append(result)
+    def process_checked_file(self, finfo):
+        super().process_checked_file(finfo)
         self.status['probcount'] += len(result['problems'])
         self.status['checked'] += 1
 
