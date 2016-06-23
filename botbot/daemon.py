@@ -70,8 +70,12 @@ class DaemonizedChecker(CheckerBase):
 
     def check_file(self, path):
         f = fileinfo.FileInfo(path)
-        print(f)
         super().check_file(f)
+        self.process_checked_file(f)
+
+    def process_checked_file(self, result):
+        super().process_checked_file(result)
+        self.reporter.write_report()
 
 def is_inevent(event, *inevent):
     """

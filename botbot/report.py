@@ -137,8 +137,12 @@ def should_print_report(filelist):
     return False
 
 class DaemonReporter(ReporterBase):
+    """Reports issues in daemon mode"""
     def __init__(self, chkr):
         super().__init__(chkr)
 
-    def write_report():
-        pass
+    def write_report(self):
+        queue = self.chkr.checked
+        while queue:
+            finfo = queue.pop()
+            print("{} -- {}".format(finfo['path'], finfo['problems']))
