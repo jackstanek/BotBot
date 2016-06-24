@@ -38,6 +38,7 @@ setup(
     install_requires=[
         'jinja2',
         'pytest',
+        'inotify'
     ],
     dependency_links=[
         'https://github.com/jackstanek/PyInotify/archive/master.zip'
