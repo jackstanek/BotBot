@@ -1,4 +1,3 @@
-import inotify
 import pytest
 
 import os
