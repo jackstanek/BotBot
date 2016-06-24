@@ -39,8 +39,5 @@ setup(
         'jinja2',
         'pytest',
         'inotify>=0.2.7'
-    ],
-    dependency_links=[
-        'https://github.com/jackstanek/PyInotify/tarball/master#egg=inotify-0.2.7'
     ]
 )
