@@ -98,3 +98,12 @@ def test_is_large_plaintext_affirmative():
     }
     result = checks.is_large_plaintext(fi)
     assert result == 'PROB_OLD_LARGE_PLAINTEXT'
+
+def test_is_large_plaintext_negatory():
+    fi = {
+        'path': 'bad.sam',
+        'lastmod': 2 ** 32, # This test will work until 2038
+        'size': 100
+    }
+    result = checks.is_large_plaintext(fi)
+    assert not result
