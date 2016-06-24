@@ -14,4 +14,4 @@ function install-botbot {
     pip install -e $SOURCE_DIR
 }
 
-install-inotify-wrapper && install-botbot
+install-inotify-wrapper && install-requirements && install-botbot
