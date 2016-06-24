@@ -1,5 +1,6 @@
 # BotBot
 [![Build Status](https://travis-ci.org/jackstanek/BotBot.svg?branch=master)](https://travis-ci.org/jackstanek/BotBot)
+[![Coverage Status](https://coveralls.io/repos/github/jackstanek/BotBot/badge.svg?branch=master)](https://coveralls.io/github/jackstanek/BotBot?branch=master)
 
 A manager for lab computational resources.
 
