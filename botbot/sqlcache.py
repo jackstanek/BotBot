@@ -16,6 +16,23 @@ def db_exists():
     """Check if the database already exists"""
     return os.path.isfile(get_dbpath())
 
+
+def serialize_problems(fi):
+    """Turn a set of problems in a FileInfo dict into a string"""
+    probset = fi['problems']
+    if probset is not None:
+        fi['problems'] = ','.join(probset)
+    else:
+        fi['problems'] = ''
+
+def decode_problems(fi):
+    """Turn a string of problems in a fresh SQL fileinfo to a set"""
+    probstr = fi['problems']
+    if len(probstr) > 0:
+        fi['problems'] = set(probstr.split(','))
+    else:
+        fi['problems'] = set()
+
 class FileDatabase:
     """Database of files and associate information"""
     def __init__(self, dbpath):
@@ -53,14 +70,6 @@ class FileDatabase:
 
     def store_file_problems(self, *checked):
         """Store a list of FileInfos with their problems in the database"""
-
-        def serialize_problems(fi):
-            """Turn a set of problems in a FileInfo dict into a string"""
-            probset = fi['problems']
-            if probset is not None:
-                fi['problems'] = ','.join(probset)
-            else:
-                fi['problems'] = ''
 
         # Copy the list
         mod = list(checked)
@@ -100,15 +109,6 @@ class FileDatabase:
 
     def get_cached_filelist(self, path):
         """Get a list of FileInfo dictionaries from the database"""
-
-        def decode_problems(fi):
-            """Turn a string of problems in a fresh SQL fileinfo to a set"""
-            probstr = fi['problems']
-            if len(probstr) > 0:
-                fi['problems'] = set(probstr.split(','))
-            else:
-                fi['problems'] = set()
-
         self.curs.execute(
             'select * from files where path like ?',
             (path + '%',)
