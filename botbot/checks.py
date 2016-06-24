@@ -2,6 +2,7 @@
 import os
 import stat
 import mimetypes
+import time
 
 from .checker import is_link
 from .config import CONFIG
@@ -35,12 +36,13 @@ def sam_should_compress(fi):
 def is_large_plaintext(fi):
     """Detect if a file plaintext and >100MB"""
     # Try to figure out if we're dealing with a text file
-    guess = mimetypes.guess_type(fi['path'])
-    mod_days = fi['lastmod'] / (24 * 60 * 60) # Days since last modification
+    guess = mimetypes.guess_type(fi['path'])[0]
+    mod_days = int(time.time() - fi['lastmod'] / (24 * 60 * 60))
+    # Days since last modification
 
     large = CONFIG.get('checks', 'largesize',
                        fallback=100000000) # Default to 100MB
     old = CONFIG.get('checks', 'oldage',
                      fallback=30) # Default to one month
-    if guess == 'text/plain' and fi['size'] > large and mod_days >= old:
+    if guess == 'text/plain' and fi['size'] > int(large) and mod_days >= int(old):
         return 'PROB_OLD_LARGE_PLAINTEXT'

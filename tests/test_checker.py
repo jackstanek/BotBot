@@ -89,3 +89,12 @@ def test_sam_and_bam_detection(tmpdir):
     assert checks.sam_should_compress(bami) is 'PROB_SAM_AND_BAM_EXIST'
 
     prev.chdir()
+
+def test_is_large_plaintext_affirmative():
+    fi = {
+        'path': 'test.txt',
+        'lastmod': 0,
+        'size': 1000000000000000,
+    }
+    result = checks.is_large_plaintext(fi)
+    assert result == 'PROB_OLD_LARGE_PLAINTEXT'
