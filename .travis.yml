@@ -5,7 +5,7 @@ python:
   - "3.5"
 
 install:
-  -./install.sh
+  - ./install.sh
 
 script: py.test -v --cov=botbot/
 
