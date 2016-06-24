@@ -145,4 +145,4 @@ class DaemonReporter(ReporterBase):
         queue = self.chkr.checked
         while queue:
             finfo = queue.pop()
-            print("{} -- {}".format(finfo['path'], finfo['problems']))
+            print("{} -- {}".format(finfo['path'], ', '.join(finfo['problems'])))
