@@ -23,7 +23,7 @@ class DaemonizedChecker(CheckerBase):
         self.handle_hook = [] # Callbacks for event handling
         self.reporter = DaemonReporter(self)
 
-    def add_event_handler(self, func, mask):
+    def add_event_handler(self, func, mask=(IN_ATTRIB | IN_CREATE)):
         """
         Helper function to add an event handler callback. The function
         runs if the event mask matches the mask given in mask.
