@@ -13,12 +13,6 @@ A manager for lab computational resources.
 
 # Installation
 
-## Automatic
-
-Pretty simple:
-
-```pip install botbot```
-
 ## Manual
 
 If you want the latest and greatest development code, go ahead and
@@ -29,6 +23,14 @@ git clone https://github.com/jackstanek/BotBot.git
 cd BotBot
 python setup.py install
 ```
+
+then run
+
+```
+./install.sh
+```
+
+to install.
 
 # Configuration
 

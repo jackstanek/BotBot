@@ -1,13 +1,11 @@
-udo: false
+sudo: false
 
 language: python
 python:
   - "3.5"
 
 install:
-  - ./install-inotify-wrapper.sh
-  - pip install .
-  - pip install -r requirements.txt
+  -./install.sh
 
 script: py.test -v --cov=botbot/
 
