@@ -37,8 +37,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'jinja2',
-        'pytest',
-        'pytest-cov',
         'inotify>=0.2.7'
     ]
 )
