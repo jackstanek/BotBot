@@ -1,10 +1,23 @@
 import os
 import sys
 import stat
+from random import randint, choice
+from string import ascii_letters
 
 import pytest
 
 from botbot import checker, problems, checks, fileinfo
+
+def create_random_directory_tree(ic, directory):
+    """Create a directory tree with ic files in it (files and directories)"""
+    dp = directory
+    while ic:
+        name = ''.join(choice(ascii_letters) for _ in range(10))
+        if randint(0, 1): # Make a file
+            dp.ensure(name)
+            ic -= 1
+        else:
+            dp = dp.mkdir(name)
 
 # Tests for Checker class methods
 def test_checker_register_accept_single_function(tmpdir):
@@ -21,6 +34,24 @@ def test_checker_register_accept_function_list(tmpdir):
     f.append(lambda i : i + i)
     c.register(*f)
     assert len(c.checks) == 2
+
+def test_oneshotchecker_checked_file_processing(tmpdir):
+    c = checker.OneshotChecker(sys.stdout, tmpdir.join('test.db').strpath)
+    assert len(c.checked) == 0
+
+    c.process_checked_file({
+        "problems": {}
+    })
+    assert len(c.checked) == 1
+
+def test_oneshotchecker_finds_all_files(tmpdir):
+    c = checker.OneshotChecker(sys.stdout, tmpdir.join('test.db').strpath)
+
+    for i in range(10, 20):
+        tdir = tmpdir.mkdir(str(i))
+        create_random_directory_tree(i, tdir)
+        c.build_new_checklist(tdir.strpath, verbose=False)
+        assert len(c.checklist) == i
 
 # Tests for checking functions
 
