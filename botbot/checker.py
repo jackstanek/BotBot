@@ -220,7 +220,7 @@ class OneshotChecker(CheckerBase):
 
     def process_checked_file(self, finfo):
         super().process_checked_file(finfo)
-        self.status['probcount'] += len(result['problems'])
+        self.status['probcount'] += len(finfo['problems'])
         self.status['checked'] += 1
 
 def is_link(path):
