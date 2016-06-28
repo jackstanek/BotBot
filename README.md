@@ -22,7 +22,6 @@ clone this repo:
 ```
 git clone https://github.com/jackstanek/BotBot.git
 cd BotBot
-python setup.py install
 ```
 
 then run
@@ -37,7 +36,7 @@ If you want to run the test suite as well, you'll need to run
 pip install -r test_requirements.txt
 ```
 
-to install.
+To run the test suite just run `py.test` in the project directory.
 
 # Configuration
 
