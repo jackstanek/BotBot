@@ -74,7 +74,8 @@ def main():
     if args.daemon:
         c = daemon.DaemonizedChecker(args.path)
         c.register(*clist)
-        c.init((c.check_file, daemon._RECHECK_MASK))
+        c.init((c.check_file, daemon._RECHECK_MASK),
+               (c.db.prune, daemon._PRUNE_MASK))
         c.run()
     else:
         c = checker.OneshotChecker(out, sqlcache.get_dbpath())

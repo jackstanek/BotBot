@@ -5,14 +5,15 @@ import sys
 import errno
 
 import inotify.adapters
-from inotify.constants import IN_CREATE, IN_ATTRIB, IN_DELETE
+from inotify.constants import *
 from .checker import CheckerBase
 from .sqlcache import get_dbpath
 from .report import DaemonReporter
 from . import fileinfo
 
-_EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE
-_RECHECK_MASK = IN_CREATE | IN_ATTRIB
+_EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO
+_RECHECK_MASK = IN_CREATE | IN_ATTRIB | IN_MOVED_TO
+_PRUNE_MASK = IN_MOVED_FROM | IN_DELETE
 
 class DaemonizedChecker(CheckerBase):
     """Checker that runs in a daemon"""
@@ -71,10 +72,12 @@ class DaemonizedChecker(CheckerBase):
     def check_file(self, path):
         f = fileinfo.FileInfo(path)
         super().check_file(f)
+
         self.process_checked_file(f)
 
     def process_checked_file(self, result):
         super().process_checked_file(result)
+        self.db.store_file_problems(result)
         self.reporter.write_report()
 
 def is_inevent(event, *inevent):
@@ -82,6 +85,7 @@ def is_inevent(event, *inevent):
     Helper function to determine if event is the type of inotify event
     inevent
     """
+
     header = event[0]
     mask = 0
     for ie in inevent:
