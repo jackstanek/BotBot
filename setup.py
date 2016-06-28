@@ -34,9 +34,5 @@ setup(
         ]
     },
     packages=['botbot'],
-    include_package_data=True,
-    install_requires=[
-        'jinja2',
-        'inotify>=0.2.7'
-    ]
+    include_package_data=True
 )
