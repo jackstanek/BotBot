@@ -28,7 +28,13 @@ python setup.py install
 then run
 
 ```
-./install.sh
+pip install -r requirements.txt
+```
+
+If you want to run the test suite as well, you'll need to run
+
+```
+pip install -r test_requirements.txt
 ```
 
 to install.

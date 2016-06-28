@@ -3,3 +3,5 @@ pytest>=2.9.1
 pytest-cov
 jinja2>=2.8
 coveralls
+
+-e .
