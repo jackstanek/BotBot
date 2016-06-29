@@ -13,7 +13,7 @@ def create_random_directory_tree(ic, directory):
     dp = directory
     while ic:
         name = ''.join(choice(ascii_letters) for _ in range(10))
-        if randint(): # Make a file
+        if not randint(0, 3): # Make a file
             dp.ensure(name)
             ic -= 1
         else:
