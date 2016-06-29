@@ -13,13 +13,13 @@ def create_random_directory_tree(ic, directory):
     dp = directory
     while ic:
         name = ''.join(choice(ascii_letters) for _ in range(10))
-        if randint(0, 1): # Make a file
+        if randint(): # Make a file
             dp.ensure(name)
             ic -= 1
         else:
             dp = dp.mkdir(name)
 
-# Tests for Checker class methods
+# Tests for Checkern class methods
 def test_checker_register_accept_single_function(tmpdir):
     c = checker.OneshotChecker(sys.stdout, tmpdir.join('test.db').strpath)
     c.register(lambda: print("Hello world!"))
@@ -53,13 +53,15 @@ def test_oneshotchecker_finds_all_files(tmpdir):
         c.build_new_checklist(tdir.strpath, verbose=False)
         assert len(c.checklist) == i
 
-def test_oneshot_checker_populate_list_empty_db(tmpdir):
-    _TMPDIR_CT = 20
-    td = tmpdir.mkdir('doot')
-    create_random_directory_tree(_TMPDIR_CT, td)
+# def test_oneshot_checker_populate_list_empty_db(tmpdir):
+#     _TMPDIR_CT = 20
+#     td = tmpdir.mkdir('doot')
+#     create_random_directory_tree(_TMPDIR_CT, td)
 
-    c = checker.OneshotChecker(sys.stdout, tmpdir.join('test.db').strpath)
-    c.populate_checklist()
+#     c = checker.OneshotChecker(sys.stdout, tmpdir.join('test.db').strpath)
+#     c.populate_checklist()
+
+#     assert c.checklist
 
 # Tests for checking functions
 

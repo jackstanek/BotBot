@@ -156,6 +156,7 @@ class OneshotChecker(CheckerBase):
         # Update that shizznik
         self.checklist = recheck
         self.status['files'] = len(self.checklist)
+        self.status['probcount'] = len(self.checked)
 
     def populate_checklist(self, force=False):
         """Populate the list of files to check"""
@@ -167,7 +168,6 @@ class OneshotChecker(CheckerBase):
             self.build_new_checklist(self.path)
         else:
             # Otherwise, see if we need to recheck any files
-            self.status['probcount'] = len(checklist)
             self.update_checklist(checklist)
 
         def remove_ignored(fi, ignore):
