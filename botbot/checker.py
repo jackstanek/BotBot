@@ -82,6 +82,7 @@ class OneshotChecker(CheckerBase):
         checklist = []
 
         while len(to_add) > 0:
+
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
                 # If this path is a directory, push all files and
@@ -93,18 +94,15 @@ class OneshotChecker(CheckerBase):
                     # Otherwise just add that file to the checklist
                     checklist.append(apath)
 
-            except FileNotFoundError as err:
-                # This likely means that when we tried to stat the
-                # file, the file was actually a dangling symlink
-                apath['problems'] = {'PROB_BROKEN_LINK'}
-                self.checked.append(apath)
             except PermissionError as err:
                 # We couldn't read the file or directory because
                 # permissions were wrong
+                global apath
                 apath['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
                 self.checked.append(apath)
             except OSError as err:
-                # Probably a dangling link again.
+                # Probably a dangling link
+                global apath
                 apath['problems'] = {'PROB_BROKEN_LINK'}
                 self.checked.append(apath)
 
