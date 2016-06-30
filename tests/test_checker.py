@@ -63,6 +63,22 @@ def test_oneshot_checker_populate_list_empty_db(tmpdir):
 
     assert c.checklist
 
+def test_oneshot_checker_update_list_with_entries(tmpdir):
+    _TMPDIR_CT = 20
+    td = tmpdir.mkdir('doot')
+    tf = td.join('test.txt').ensure()
+
+    c = checker.OneshotChecker(sys.stdout, tmpdir.join('test.db').strpath)
+    files = [fileinfo.FileInfo(tf.strpath)]
+    c.db.store_file_problems(*files)
+
+    c.update_checklist(files)
+
+    assert c.checklist
+
+def test_oneshot_checker_populate_list_with_non_empty_db(tmpdir):
+    pass
+
 # Tests for checking functions
 
 def test_symlink_checker_same_directory(tmpdir):
