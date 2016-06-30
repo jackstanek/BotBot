@@ -158,14 +158,14 @@ class OneshotChecker(CheckerBase):
         self.status['files'] = len(self.checklist)
         self.status['probcount'] = len(self.checked)
 
-    def populate_checklist(self, force=False):
+    def populate_checklist(self, path, force=False):
         """Populate the list of files to check"""
         # Get a list of files from last time
-        checklist = self.db.get_cached_filelist(self.path)
+        checklist = self.db.get_cached_filelist(path)
 
         # Recheck if explicitly stated or if we have no cached files
         if force or len(checklist) == 0:
-            self.build_new_checklist(self.path)
+            self.build_new_checklist(path)
         else:
             # Otherwise, see if we need to recheck any files
             self.update_checklist(checklist)
