@@ -94,15 +94,13 @@ class OneshotChecker(CheckerBase):
                     # Otherwise just add that file to the checklist
                     checklist.append(apath)
 
-            except PermissionError as err:
+            except PermissionError:
                 # We couldn't read the file or directory because
                 # permissions were wrong
-                global apath
                 apath['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
                 self.checked.append(apath)
-            except OSError as err:
+            except OSError:
                 # Probably a dangling link
-                global apath
                 apath['problems'] = {'PROB_BROKEN_LINK'}
                 self.checked.append(apath)
 
