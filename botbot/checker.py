@@ -199,7 +199,7 @@ class OneshotChecker(CheckerBase):
         # a new one) build one if we need one
         if not cached:
             # Build the checklist
-            self.populate_checklist(force=force)
+            self.populate_checklist(path, force=force)
 
             # Check all the files against every check.
             for finfo in self.checklist:

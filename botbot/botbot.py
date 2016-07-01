@@ -6,6 +6,7 @@ from botbot import __version__
 from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
 from . import daemon
+from . import config
 
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
