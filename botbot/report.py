@@ -25,7 +25,7 @@ class ReporterBase():
             print('\n', end='')
         sys.stdout.flush()
 
-    def get_template_filename(self, name):
+    def _get_template_filename(self, name):
         """Find the filename of a template. Can be a filename or just a name."""
         parts = str(name).split('.')
         if parts[len(parts) - 1] == 'txt':
@@ -37,6 +37,15 @@ class ReporterBase():
         """Write a report. This base is just a stub."""
         pass
 
+    def _get_template(self, tmp_respath):
+        if resource_exists(__package__, tmp_respath):
+            return Environment(
+                loader=FileSystemLoader(resource_filename(__package__, tmp_respath)),
+                trim_blocks=True
+            )
+        else:
+            raise FileNotFoundError('No such template')
+
 class OneshotReporter(ReporterBase):
     """Does one-off reports after one-off checks"""
     def __init__(self, chkr, out=sys.stdout):
@@ -46,47 +55,40 @@ class OneshotReporter(ReporterBase):
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
         # Find the template
-        tmpname = self.get_template_filename(fmt)
+        tmpname = self._get_template_filename(fmt)
         tmp_respath = os.path.join('resources', 'templates')
 
-        if resource_exists(__package__, tmp_respath):
-            filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
+        filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
 
-            # Prune unwanted listings
-            filelist = prune_empty_listings(filelist, attr)
-            if not shared:
-                filelist = prune_shared_probs(filelist, attr)
+        # Prune unwanted listings
+        filelist = prune_empty_listings(filelist, attr)
+        if not shared:
+            filelist = prune_shared_probs(filelist, attr)
 
-            if should_print_report(filelist):
-                env = Environment(
-                    loader=FileSystemLoader(resource_filename(__package__, tmp_respath)),
-                    trim_blocks=True
-                )
+        if should_print_report(filelist):
+            env = self._get_template(tmp_respath)
 
-                tempgen = env.get_template(tmpname).generate({
-                    'attr': attr,
-                    'values': filelist,
-                    'status': self.chkr.status
-                })
+            tempgen = env.get_template(tmpname).generate({
+                'attr': attr,
+                'values': filelist,
+                'status': self.chkr.status
+            })
 
-                if self.out != sys.stdout:
-                    print('Writing report to {}.'.format(self.out))
-                    out = open(self.out, mode='w')
-                else:
-                    print('Report:')
-                    out = sys.stdout
-
-                for line in tempgen:
-                    print(line, file=out, end='')
-
-                print('\n', file=out, end='')
-                out.close()
-
+            if self.out != sys.stdout:
+                print('Writing report to {}.'.format(self.out))
+                out = open(self.out, mode='w')
             else:
-                print('No problems here!')
+                print('Report:')
+                out = sys.stdout
+
+            for line in tempgen:
+                print(line, file=out, end='')
+
+            print('\n', file=out, end='')
+            out.close()
 
         else:
-            raise FileNotFoundError('No such report format')
+            print('No problems here!')
 
 def prune_shared_probs(fl, attr):
     """Remove shared problem listings"""
