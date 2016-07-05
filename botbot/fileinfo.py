@@ -29,10 +29,14 @@ def get_file_hash(path):
     if os.path.isdir(path):
         return
     else:
-        try:
-            with open(path, mode='br') as infile:
-                return _hash(infile)
-        except PermissionError:
+        ext = os.path.splitext(path)[0]
+        if ext == '.sam' or ext == '.bam':
+            try:
+                with open(path, mode='br') as infile:
+                    return _hash(infile)
+            except PermissionError:
+                return ''
+        else:
             return ''
 
 def FileInfo(fd, link=False, important=False):
