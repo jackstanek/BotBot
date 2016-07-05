@@ -8,7 +8,7 @@ from .config import CONFIG
 def _reader(fo):
     """Generator which feeds bytes to the md5 hasher"""
     while True:
-        b = fo.read(128)
+        b = fo.read(4096)
         if len(b) > 0:
             yield b
         else:
