@@ -26,18 +26,20 @@ def _hash(fo):
 
 def get_file_hash(path):
     """Get md5 hash of a file"""
+    try:
+        with open(path, mode='br') as infile:
+            return _hash(infile)
+    except PermissionError:
+        return ''
+
+def get_important_hash(path):
+    ext = os.path.splitext(path)[0]
     if os.path.isdir(path):
-        return
+        return ''
+    if ext == '.sam' or ext == '.bam':
+        return get_file_hash(path)
     else:
-        ext = os.path.splitext(path)[0]
-        if ext == '.sam' or ext == '.bam':
-            try:
-                with open(path, mode='br') as infile:
-                    return _hash(infile)
-            except PermissionError:
-                return ''
-        else:
-            return ''
+        return ''
 
 def FileInfo(fd, link=False, important=False):
     """Hold information about a file"""
@@ -54,6 +56,6 @@ def FileInfo(fd, link=False, important=False):
         'isdir': not os.path.isfile(fd),
         'important': os.path.splitext(fd)[1].strip('.') in CONFIG.get('fileinfo', 'important',
                                                                       fallback='.sam, .bam'),
-        'md5sum': get_file_hash(fd),
+        'md5sum': get_important_hash(fd),
         'problems': set()
     }
