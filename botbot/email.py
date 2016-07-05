@@ -3,13 +3,15 @@
 import smtplib
 from email.mime.text import MIMEText
 
-from botbot.report import ReporterBase
+from botbot import report
 from botbot.config import CONFIG
 from botbot.problems import every_problem
 
-from jinja2 import Environment
+from jinja2 import Environment, FileSystemLoader
 
-class EmailReporter(ReporterBase):
+_EMAIL_TEMPLATE_NAME = 'email'
+
+class EmailReporter(report.ReporterBase):
     """Sends emails to people if they have bad files"""
     def __init__(self, chkr, smtpprovider=smtplib.SMTP):
         super().__init__(chkr)
@@ -35,9 +37,14 @@ class EmailReporter(ReporterBase):
         ep = every_problem
 
         # Ugly list comprehension coming up
-        return [(ep[prob].message, ep[prob].fix,
-                 [p['path'] for p in fis if prob in p['problems']])
-                for prob in pp]
+        return [
+            {
+                'message': ep[prob].message,
+                'fix': ep[prob].fix,
+                'paths': [p['path'] for p in fis if prob in p['problems']]
+            }
+            for prob in pp
+        ]
         # Wonderful, innit
 
     def write_report(self, fmt, shared, attr='owner'):
@@ -50,8 +57,9 @@ class EmailReporter(ReporterBase):
         allfiles = self.chkr.db.get_files_by_attribute(attr)
 
         for user in allfiles:
-            filelist = allfiles[user]
-            prettylist = self._prettify_problems(filelist)
+            prettylist = self._prettify_problems(allfiles['user'])
 
-            env = self._get_template()
-            msgcontent = env.
+            env = Environment(
+                loader=FileSystemLoader(self._get_template(report._DEFAULT_RES_PATH))
+            )
+            msgcontent = env.get_template(_EMAIL_TEMPLATE_NAME).render(filelist=prettylist)

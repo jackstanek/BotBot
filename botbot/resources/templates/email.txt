@@ -1,2 +1,9 @@
 Hello! This email is being sent automatically to inform you that some
 files that you own on the MSI shared folder have some issues:
+
+{% for problem in filelist %}
+{{ problem.message }} {{ problem.fix }}
+{% for path in problem.paths %}
+   - {{ path }}
+{% endfor %}
+{% endfor %}

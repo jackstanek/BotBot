@@ -9,6 +9,8 @@ from jinja2 import Environment, FileSystemLoader
 
 from . import problems
 
+_DEFAULT_RES_PATH = os.path.join('resources', 'templates')
+
 class ReporterBase():
     def __init__(self, chkr):
         self.chkr = chkr
@@ -56,7 +58,6 @@ class OneshotReporter(ReporterBase):
         """Write the summary of what transpired."""
         # Find the template
         tmpname = self._get_template_filename(fmt)
-        tmp_respath = os.path.join('resources', 'templates')
 
         filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
 
@@ -66,7 +67,7 @@ class OneshotReporter(ReporterBase):
             filelist = prune_shared_probs(filelist, attr)
 
         if should_print_report(filelist):
-            env = self._get_template(tmp_respath)
+            env = self._get_template(_DEFAULT_RES_PATH)
 
             tempgen = env.get_template(tmpname).generate({
                 'attr': attr,
