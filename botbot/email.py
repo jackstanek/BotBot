@@ -9,7 +9,14 @@ from botbot.problems import every_problem
 
 from jinja2 import Environment, FileSystemLoader
 
-_EMAIL_TEMPLATE_NAME = 'email'
+_EMAIL_TEMPLATE_NAME = 'email.txt'
+_EMAIL_SUBJECT_LINE = 'Issues in MSI shared folder'
+
+def _get_user_email_address(username):
+    """Construct an email address from an MSI username"""
+    domain = CONFIG.get('email', 'domain')
+    email = '{}@{}'.format(str(username), str(domain))
+    return email
 
 class EmailReporter(report.ReporterBase):
     """Sends emails to people if they have bad files"""
@@ -18,12 +25,6 @@ class EmailReporter(report.ReporterBase):
         self.email = CONFIG.get('email', 'email') # TODO: Add this to the config
         self.passwd = CONFIG.get('email', 'password')
         self.smtpprovider = smtpprovider # Object that sends emails (can be test dummy)
-
-    def _get_user_email_address(self, username):
-        """Construct an email address from an MSI username"""
-        domain = CONFIG.get('email', 'domain')
-        email = '{}@{}'.format(username, domain)
-        return email
 
     def _prettify_problems(self, fis):
         """
@@ -47,8 +48,8 @@ class EmailReporter(report.ReporterBase):
         ]
         # Wonderful, innit
 
-    def write_report(self, fmt, shared, attr='owner'):
-        """Send an email to every"""
+    def write_report(self, fmt, shared, attr='username'):
+        """Send an email to everyone."""
         send = self.smtpprovider(CONFIG.get('email', 'smtp_server'),
                                  CONFIG.get('email', 'smtp_port'))
 
@@ -57,13 +58,16 @@ class EmailReporter(report.ReporterBase):
         allfiles = self.chkr.db.get_files_by_attribute(self.chkr.path, attr)
 
         for user in allfiles:
-            prettylist = self._prettify_problems(allfiles['user'])
+            prettylist = self._prettify_problems(allfiles[user])
 
-            env = Environment(
-                loader=FileSystemLoader(self._get_template(report._DEFAULT_RES_PATH))
-            )
+            env = self._get_env(_EMAIL_TEMPLATE_NAME)
             msgcontent = env.get_template(_EMAIL_TEMPLATE_NAME).render(filelist=prettylist)
-            send.send_message(msgcontent)
+
+            msg = MIMEText(msgcontent)
+            msg['To'] = _get_user_email_address(user)
+            msg['From'] = self.email
+            msg['Subject'] = _EMAIL_SUBJECT_LINE
+            send.send_message(msg)
 
         send.quit()
 
