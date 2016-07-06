@@ -54,7 +54,7 @@ class EmailReporter(report.ReporterBase):
 
         send.starttls()
         send.login(self.email, self.passwd)
-        allfiles = self.chkr.db.get_files_by_attribute(attr)
+        allfiles = self.chkr.db.get_files_by_attribute(self.chkr.path, attr)
 
         for user in allfiles:
             prettylist = self._prettify_problems(allfiles['user'])
@@ -63,3 +63,30 @@ class EmailReporter(report.ReporterBase):
                 loader=FileSystemLoader(self._get_template(report._DEFAULT_RES_PATH))
             )
             msgcontent = env.get_template(_EMAIL_TEMPLATE_NAME).render(filelist=prettylist)
+            send.send_message(msgcontent)
+
+        send.quit()
+
+class DummySMTP:
+    """
+    A dummy email client that's used for testing. It only prints email
+    content to the stdout. That's it.
+    """
+    def __init__(self, server, port):
+        pass
+
+    def starttls(self):
+        """For compatibility. Does nothing."""
+        pass
+
+    def login(self, email, passwd):
+        """For compatibility. Does nothing."""
+        pass
+
+    def send_message(self, msg):
+        """"""
+        print(msg)
+
+    def quit(self):
+        """For compatibility. Does nothing."""
+        pass
