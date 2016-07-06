@@ -10,6 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 from . import problems
 
 _DEFAULT_RES_PATH = os.path.join('resources', 'templates')
+_GENERIC_REPORT_NAME = 'generic.txt'
 
 class ReporterBase():
     def __init__(self, chkr):
@@ -39,10 +40,12 @@ class ReporterBase():
         """Write a report. This base is just a stub."""
         pass
 
-    def _get_template(self, tmp_respath):
-        if resource_exists(__package__, tmp_respath):
+    def _get_env(self, template):
+        tmppath = os.path.join(_DEFAULT_RES_PATH,
+                               self._get_template_filename(template))
+        if resource_exists(__package__, tmppath):
             return Environment(
-                loader=FileSystemLoader(resource_filename(__package__, tmp_respath)),
+                loader=FileSystemLoader(resource_filename(__package__, _DEFAULT_RES_PATH)),
                 trim_blocks=True
             )
         else:
@@ -56,9 +59,6 @@ class OneshotReporter(ReporterBase):
 
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
-        # Find the template
-        tmpname = self._get_template_filename(fmt)
-
         filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
 
         # Prune unwanted listings
@@ -67,9 +67,9 @@ class OneshotReporter(ReporterBase):
             filelist = prune_shared_probs(filelist, attr)
 
         if should_print_report(filelist):
-            env = self._get_template(_DEFAULT_RES_PATH)
+            env = self._get_env(_GENERIC_REPORT_NAME)
 
-            tempgen = env.get_template(tmpname).generate({
+            tempgen = env.get_template(_GENERIC_REPORT_NAME).generate({
                 'attr': attr,
                 'values': filelist,
                 'status': self.chkr.status
