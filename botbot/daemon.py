@@ -66,6 +66,10 @@ class DaemonizedChecker(CheckerBase):
             if event is not None:
                 self.handle(event)
 
+                if len(self.checked) >= 200: # TODO: Make this configurable
+                    self.reporter.reconcile_changes()
+                    self.reporter.write_report()
+
     def check_all(self):
         self.run()
 

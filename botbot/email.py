@@ -48,7 +48,7 @@ class EmailReporter(report.ReporterBase):
         ]
         # Wonderful, innit
 
-    def write_report(self, fmt, shared, attr='username'):
+    def write_report(self, attr='username'):
         """Send an email to everyone."""
         send = self.smtpprovider(CONFIG.get('email', 'smtp_server'),
                                  CONFIG.get('email', 'smtp_port'))
@@ -72,6 +72,19 @@ class EmailReporter(report.ReporterBase):
                 send.send_message(msg)
 
         send.quit()
+
+class DaemonizedEmailReporter(report.ReporterBase):
+    """Sends emails to offending users in daemon mode"""
+    def __init__(self, dc):
+        self.chkr = dc
+        self.currchanges
+
+    def reconcile_changes(self):
+        self.currchanges = list(self.chkr.checked) # Copy over the list
+        self.chkr.checked.clear() # clear the event queue
+
+    def write_report(self):
+        pass
 
 class DummySMTP:
     """
