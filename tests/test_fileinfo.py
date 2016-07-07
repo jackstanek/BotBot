@@ -52,3 +52,25 @@ def test_reader_reads_correct_number_of_bytes():
         for r in fi._reader(b):
             tb += len(r)
         assert tb == i
+
+def test_correct_files_hashed(tmpdir):
+    prev = tmpdir.chdir()
+
+    a = tmpdir.join('a.bam').ensure()
+    a.write('\n')
+
+    b = tmpdir.join('b.sam').ensure()
+    b.write('\n')
+
+    c = tmpdir.join('c.txt').ensure()
+    c.write('\n')
+
+    af = fi.FileInfo(a.strpath)
+    bf = fi.FileInfo(b.strpath)
+    cf = fi.FileInfo(c.strpath)
+
+    assert af['md5sum']
+    assert bf['md5sum']
+    assert not cf['md5sum']
+
+    prev.chdir()

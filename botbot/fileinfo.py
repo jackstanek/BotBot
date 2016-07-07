@@ -33,7 +33,7 @@ def get_file_hash(path):
         return ''
 
 def get_important_hash(path):
-    ext = os.path.splitext(path)[0]
+    ext = os.path.splitext(path)[1]
     if os.path.isdir(path):
         return ''
     if ext == '.sam' or ext == '.bam':
