@@ -57,17 +57,19 @@ class EmailReporter(report.ReporterBase):
         send.login(self.email, self.passwd)
         allfiles = self.chkr.db.get_files_by_attribute(self.chkr.path, attr)
 
+        env = self._get_env(_EMAIL_TEMPLATE_NAME)
+
         for user in allfiles:
             prettylist = self._prettify_problems(allfiles[user])
 
-            env = self._get_env(_EMAIL_TEMPLATE_NAME)
-            msgcontent = env.get_template(_EMAIL_TEMPLATE_NAME).render(filelist=prettylist)
+            if prettylist:
+                msgcontent = env.get_template(_EMAIL_TEMPLATE_NAME).render(filelist=prettylist)
 
-            msg = MIMEText(msgcontent)
-            msg['To'] = _get_user_email_address(user)
-            msg['From'] = self.email
-            msg['Subject'] = _EMAIL_SUBJECT_LINE
-            send.send_message(msg)
+                msg = MIMEText(msgcontent)
+                msg['To'] = _get_user_email_address(user)
+                msg['From'] = self.email
+                msg['Subject'] = _EMAIL_SUBJECT_LINE
+                send.send_message(msg)
 
         send.quit()
 
