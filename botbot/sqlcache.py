@@ -68,6 +68,13 @@ class FileDatabase:
 
         self.conn.commit()
 
+    def _prep_fileinfos(self, rows):
+        files = [dict(r) for r in rows]
+        for fi in files:
+            decode_problems(fi)
+
+        return files
+
     def store_file_problems(self, *checked):
         """Store a list of FileInfos with their problems in the database"""
 
@@ -113,11 +120,8 @@ class FileDatabase:
             'select * from files where path like ?',
             (path + '%',)
         )
-        files = [dict(r) for r in self.curs.fetchall()]
-        for fi in files:
-            decode_problems(fi)
 
-        return files
+        return self._prep_fileinfos(self.curs.fetchall())
 
     def get_files_by_attribute(self, path, attr, shared=True):
         """
