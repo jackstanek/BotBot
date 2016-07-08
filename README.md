@@ -70,6 +70,14 @@ follows:
       "important." By default, *.sam and *.bam files are denoted as
       important.
 
+- `[email]` <span style='font-size: 0.5em'><span style='color: red'>*</span>(REQUIRED for email mode)</span>
+    - `domain`: the domain that the users' email accounts are on
+    - `email`: your email address (which emails are sent from)
+    - `password`: your email password
+    - `smtp_server`: the SMTP server you will send from
+    - `smtp_port`: the port the SMTP server uses (probably 587, check
+      with your server administrator or documentation)
+
 # Testing
 
 BotBot uses pytest as its test suite. To run the tests, run
