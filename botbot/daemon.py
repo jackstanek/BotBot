@@ -10,6 +10,7 @@ from .checker import CheckerBase
 from .sqlcache import get_dbpath
 from .report import DaemonReporter
 from . import fileinfo
+from .config import CONFIG
 
 _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO
 _RECHECK_MASK = IN_CREATE | IN_ATTRIB | IN_MOVED_TO
@@ -61,16 +62,17 @@ class DaemonizedChecker(CheckerBase):
                 func(chkpath)
 
     def run(self):
-        """Event loop which runs forever"""
+        """Event loop which runs the daemon forever"""
+        # Grace period in minutes
+        graceperiod = CONFIG.get('email', 'grace',
+                                 fallback=10)
+
         for event in self.watch.event_gen():
             if event is not None:
                 self.handle(event)
 
-                if len(self.checked) >= 200: # TODO: Make this configurable
-                    self.reporter.reconcile_changes()
-                    self.reporter.write_report()
-
     def check_all(self):
+        """Alias for DaemonizedChecker.run()"""
         self.run()
 
     def check_file(self, path):
@@ -80,7 +82,6 @@ class DaemonizedChecker(CheckerBase):
         self.process_checked_file(f)
 
     def process_checked_file(self, result):
-        super().process_checked_file(result)
         self.db.store_file_problems(result)
 
 def is_inevent(event, *inevent):

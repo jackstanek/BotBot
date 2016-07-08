@@ -70,13 +70,16 @@ follows:
       "important." By default, *.sam and *.bam files are denoted as
       important.
 
-- `[email]` <span style='font-size: 0.5em'><span style='color: red'>*</span>(REQUIRED for email mode)</span>
+- `[email]` (REQUIRED for email mode)
     - `domain`: the domain that the users' email accounts are on
     - `email`: your email address (which emails are sent from)
     - `password`: your email password
     - `smtp_server`: the SMTP server you will send from
     - `smtp_port`: the port the SMTP server uses (probably 587, check
       with your server administrator or documentation)
+    - `grace_period`: amount of time, in minutes, after changing a
+      file that a user can fix potential issues before receiving an
+      email about said changes
 
 # Testing
 
