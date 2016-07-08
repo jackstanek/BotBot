@@ -82,7 +82,6 @@ class DaemonizedChecker(CheckerBase):
     def process_checked_file(self, result):
         super().process_checked_file(result)
         self.db.store_file_problems(result)
-        self.reporter.write_report()
 
 def is_inevent(event, *inevent):
     """
