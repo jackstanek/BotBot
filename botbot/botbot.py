@@ -46,6 +46,9 @@ def main():
     parser.add_argument('-l', '--follow-symlinks',
                         help='Follow symlinks',
                         action='store_true')
+    parser.add_argument('-m', '--me',
+                        help='Only check files that belong to you',
+                        action='store_true')
 
     # Daemon options
     parser.add_argument('-d', '--daemon',
@@ -93,4 +96,5 @@ def main():
                 link=args.follow_symlinks,
                 verbose=args.verbose,
                 fmt=args.format,
-                ignore=ignore)
+                ignore=ignore,
+                me=args.me)

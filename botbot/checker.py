@@ -4,6 +4,7 @@ import stat
 import os
 import time
 from fnmatch import fnmatch
+from pwd import getpwuid
 
 from . import fileinfo as fi
 from . import report as rep
@@ -72,7 +73,7 @@ class OneshotChecker(CheckerBase):
                                                         # writes
                                                         # information
 
-    def build_new_checklist(self, path, link=False, verbose=True):
+    def build_new_checklist(self, path, link=False, verbose=True, uid=None):
         """
         Build a list of files to check. If link is True, follow symlinks.
         """
@@ -82,17 +83,17 @@ class OneshotChecker(CheckerBase):
         checklist = []
 
         while len(to_add) > 0:
-
             try:
                 apath = fi.FileInfo(to_add.pop(), link=link)
                 # If this path is a directory, push all files and
                 # subdirectories to the stack
-                if apath['isdir']:
-                    new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
-                    to_add.extend(new)
-                else:
-                    # Otherwise just add that file to the checklist
-                    checklist.append(apath)
+                if uid is None or uid == apath['uid']:
+                    if apath['isdir']:
+                        new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
+                        to_add.extend(new)
+                    else:
+                        # Otherwise just add that file to the checklist
+                        checklist.append(apath)
 
             except PermissionError:
                 # We couldn't read the file or directory because
@@ -108,7 +109,7 @@ class OneshotChecker(CheckerBase):
         self.checklist = checklist
         self.status['files'] = len(self.checklist)
 
-    def update_checklist(self, cached, link=False, verbose=True):
+    def update_checklist(self, cached, link=False, verbose=True, uid=None):
         """
         Take a cached list of files to check and make a list of
         directories and files that need to be rechecked. A file is
@@ -122,28 +123,29 @@ class OneshotChecker(CheckerBase):
                 # If the ctime of the given file is later than the
                 # last check, the file needs to be rechecked.
                 recent = fi.FileInfo(finfo['path'])
-                if recent['lastmod'] > finfo['lastcheck']:
-                    if recent['isfile']:
-                        recent['problems'] = set() # We'll regenerate
-                                                   # the list later.
-                        recheck.append(recent)
-                    else:
-                        path = recent['path']
+                if uid is None or uid == recent['uid']:
+                    if recent['lastmod'] > finfo['lastcheck']:
+                        if recent['isfile']:
+                            recent['problems'] = set() # We'll regenerate
+                                                       # the list later.
+                            recheck.append(recent)
+                        else:
+                            path = recent['path']
 
-                        # Add all the paths to the recheck list
-                        try:
-                            for f in os.listdir(path):
-                                self.checklist.append(fi.FileInfo(f))
-                        except PermissionError:
-                            # Probably means we can't execute this
-                            # directory. (although we probably should
-                            # abolish capital punishment anyway)
-                            recent['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
-                            self.checked.append(recent)
-                else:
-                    # The file's in the same condition as its last
-                    # check. Don't recheck it pls
-                    self.checked.append(finfo)
+                            # Add all the paths to the recheck list
+                            try:
+                                for f in os.listdir(path):
+                                    self.checklist.append(fi.FileInfo(f))
+                            except PermissionError:
+                                # Probably means we can't execute this
+                                # directory. (although we probably should
+                                # abolish capital punishment anyway)
+                                recent['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
+                                self.checked.append(recent)
+                    else:
+                        # The file's in the same condition as its last
+                        # check. Don't recheck it pls
+                        self.checked.append(finfo)
 
             except FileNotFoundError:
                 # Cached path no longer exists, prune it bb
@@ -156,17 +158,17 @@ class OneshotChecker(CheckerBase):
         self.status['files'] = len(self.checklist)
         self.status['probcount'] = len(self.checked)
 
-    def populate_checklist(self, path, force=False):
+    def populate_checklist(self, path, force=False, uid=None):
         """Populate the list of files to check"""
         # Get a list of files from last time
         checklist = self.db.get_cached_filelist(path)
 
         # Recheck if explicitly stated or if we have no cached files
         if force or len(checklist) == 0:
-            self.build_new_checklist(path)
+            self.build_new_checklist(path, uid=uid)
         else:
             # Otherwise, see if we need to recheck any files
-            self.update_checklist(checklist)
+            self.update_checklist(checklist, uid=uid)
 
         def remove_ignored(fi, ignore):
             """Check if a file matches a pattern from the ignore file"""
@@ -184,8 +186,14 @@ class OneshotChecker(CheckerBase):
 
     def check_all(self, path, shared=False, link=False,
                   verbose=False, fmt='generic', ignore=None,
-                  cached=False, force=False):
+                  cached=False, force=False, me=False):
         """Pretty much do everything."""
+
+        # Set the the UID, if necessary.
+        if me:
+            me = os.getuid()
+        else:
+            me = None
 
         # Start timing
         starttime = time.time()
@@ -199,7 +207,7 @@ class OneshotChecker(CheckerBase):
         # a new one) build one if we need one
         if not cached:
             # Build the checklist
-            self.populate_checklist(path, force=force)
+            self.populate_checklist(path, force=force, uid=me)
 
             # Check all the files against every check.
             for finfo in self.checklist:
