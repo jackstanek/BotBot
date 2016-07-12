@@ -67,9 +67,15 @@ class DaemonizedChecker(CheckerBase):
         graceperiod = CONFIG.get('email', 'grace',
                                  fallback=10)
 
+        prevreport = 0 # Timestamp of last time an email barrage was
+                       # sent
+
         for event in self.watch.event_gen():
             if event is not None:
                 self.handle(event)
+
+            pastgrace = self.db.get_files_after_grace_period(graceperiod=graceperiod)
+            self.reporter.write_report()
 
     def check_all(self):
         """Alias for DaemonizedChecker.run()"""

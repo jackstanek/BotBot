@@ -8,6 +8,9 @@ from . import ignore as ig
 from . import daemon
 from . import config
 
+def config_sanity_check():
+    pass # TODO: implement
+
 def main():
     parser = argparse.ArgumentParser(description="Manage lab computational resources.")
 

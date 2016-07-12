@@ -18,4 +18,5 @@ every_problem = {
     'PROB_DIR_NOT_ACCESSIBLE': Problem(8, 'Directory is not accessible to the group.', 'Run chmod 0755 on this directory.'),
     'PROB_UNKNOWN_ERROR': Problem(9, 'Unknown error occurred.', 'Not sure what to do.'),
     'PROB_OLD_LARGE_PLAINTEXT': Problem(10, 'File is an old large plaintext file.', 'Consider compressing.')
+    'PROB_PATH_NOT_COMPLETE': Problem(11, 'The PATH environment variable does not contain all necessary paths.', 'Add the path to the PATH environment variable.')
 }

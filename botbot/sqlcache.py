@@ -3,6 +3,8 @@
 import os
 import sqlite3
 
+from time import time
+
 from .problems import every_problem
 
 def get_dbpath():
@@ -142,6 +144,18 @@ class FileDatabase:
                 attrlists.append([f for f in filelist if f[attr] == val])
 
         return dict(zip(attrvals, attrlists))
+
+    def get_files_after_grace_period(self, graceperiod=10):
+        """
+        Get files which have problems and haven't been fixed within the
+        grace period.
+        """
+        self.curs.execute(
+            'select * from files where lastcheck < ? and problems like \'%PROB%\'',
+            (time() - graceperiod * 60,)
+        )
+
+        return self._prep_fileinfos(self.curs.fetchall())
 
     def prune(self, *old):
         """Remove db entries based on the FileInfos supplied in old"""

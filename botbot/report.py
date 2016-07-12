@@ -145,7 +145,19 @@ class DaemonReporter(ReporterBase):
         super().__init__(chkr)
 
     def write_report(self):
+        """
+        Continuously report. (Note: this implementation is temporary until
+        email gets working.)
+        """
         queue = self.chkr.checked
         while queue:
             finfo = queue.pop()
             print("{} -- {}".format(finfo['path'], ', '.join(finfo['problems'])))
+
+class EnvReporter():
+    """Reports environment issues"""
+    def __init__(self, chkr):
+        self.chkr = chkr
+
+    def write_report():
+        pass # TODO: Implement
