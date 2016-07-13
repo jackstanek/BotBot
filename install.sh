@@ -87,7 +87,7 @@ function install-conda-by-hand()
 
     cd $CWD
 
-    echo 'PATH=$PATH:$BASE/conda/bin' > setenv.sh
+    echo "PATH=$PATH:$BASE/conda/bin" > setenv.sh
     source setenv.sh
 
 }
