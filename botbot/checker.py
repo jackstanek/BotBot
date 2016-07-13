@@ -161,7 +161,7 @@ class OneshotChecker(CheckerBase):
     def populate_checklist(self, path, force=False, uid=None):
         """Populate the list of files to check"""
         # Get a list of files from last time
-        checklist = self.db.get_cached_filelist(path)
+        checklist = self.db.get_cached_filelist(path, uid=uid)
 
         # Recheck if explicitly stated or if we have no cached files
         if force or len(checklist) == 0:
