@@ -6,9 +6,11 @@ python:
 
 install:
   - pip install conda
-  - ./install.sh
+  - ./install.sh -t
 
-script: py.test -v --cov=botbot/
+script:
+  - source activate BotBot
+  - py.test -v --cov=botbot/
 
 after_success:
   - coveralls
