@@ -27,14 +27,16 @@ cd BotBot
 then run
 
 ```
-pip install -r requirements.txt
+./install.sh
 ```
 
 If you want to run the test suite as well, you'll need to run
 
 ```
-pip install -r test_requirements.txt
+./install.sh -t
 ```
+
+instead.
 
 To run the test suite just run `py.test` in the project directory.
 

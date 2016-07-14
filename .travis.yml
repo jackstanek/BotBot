@@ -5,10 +5,12 @@ python:
   - "3.5"
 
 install:
-  - pip install -r requirements.txt
-  - pip install -r test_requirements.txt
+  - pip install conda
+  - ./install.sh -t
 
-script: py.test -v --cov=botbot/
+script:
+  - source activate BotBot
+  - py.test -v --cov=botbot/
 
 after_success:
   - coveralls
