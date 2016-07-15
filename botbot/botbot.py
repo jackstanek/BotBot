@@ -12,26 +12,18 @@ def config_sanity_check():
     pass # TODO: implement
 
 def main():
-    parser = argparse.ArgumentParser(description="Manage lab computational resources.")
+    parser = argparse.ArgumentParser()
 
-    # Verbosity and output options
-    verbosity = parser.add_mutually_exclusive_group()
-    verbosity.add_argument('-v', '--verbose',
-                           help='Print issues and fixes for all files',
-                           action='store_true')
-    parser.add_argument('-o', '--out',
-                        help='Print the report to a file',
-                        action='store')
-    parser.add_argument('-f', '--format',
-                        help='Specify the output format',
-                        action='store',
-                        default='generic')
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s {}'.format(__version__))
+    sp = parser.add_subparsers()
 
-    # Recheck options
-    recheck = parser.add_mutually_exclusive_group()
+    fs = sp.add_parser('file', help='Check a file or directory on the fly')
+    daemon = sp.add_parser('daemon', help='Launch in daemon mode')
+    env = sp.add_parser('env', help='Check environment variables')
+
+
+    # Oneshot file checker options
+    ## Recheck options
+    recheck = fs.add_mutually_exclusive_group()
     recheck.add_argument('-c', '--cached',
                         action='store_true',
                         help='Only return cached issues (no recheck)')
@@ -39,65 +31,23 @@ def main():
                         action='store_true',
                         help='Force a recheck of the tree')
 
-    # Directory options
-    parser.add_argument('path',
-                        help='Path to check')
-    parser.add_argument('-s', '--shared',
-                        help='Use the shared folder ruleset',
-                        action='store_true')
+    ## Directory options
+    fs.add_argument('path',
+                    help='Path to check')
+    fs.add_argument('-s', '--shared',
+                    help='Use the shared folder ruleset',
+                    action='store_true')
 
-    parser.add_argument('-l', '--follow-symlinks',
-                        help='Follow symlinks',
-                        action='store_true')
-    parser.add_argument('-m', '--me',
-                        help='Only check files that belong to you',
-                        action='store_true')
+    fs.add_argument('-l', '--follow-symlinks',
+                    help='Follow symlinks',
+                    action='store_true')
+    fs.add_argument('-m', '--me',
+                    help='Only check files that belong to you',
+                    action='store_true')
 
-    # Daemon options
-    parser.add_argument('-d', '--daemon',
-                        help='Run as a daemon',
-                        action='store_true')
+    ## Output options
+    fs.add_argument('-o', '--out',
+                    help='Write report to a file instead of stdout')
 
     # Initialize the checker
     args = parser.parse_args()
-
-    # Determine if we should write to a file or to stdout. If a file
-    # argument isn't given, default to stdout.
-    out = None
-    if args.out is not None:
-        out = args.out
-    else:
-        out = sys.stdout
-
-    # Give a list of checking functions to the Checker object so we
-    # can go hog-wild with checks.
-    clist = (checks.is_fastq,
-             checks.sam_should_compress,
-             checks.is_large_plaintext,
-             schecks.file_groupreadable,
-             schecks.file_group_executable,
-             schecks.dir_group_readable)
-
-    if args.daemon:
-        c = daemon.DaemonizedChecker(args.path)
-        c.register(*clist)
-        c.init((c.check_file, daemon._RECHECK_MASK),
-               (c.db.prune, daemon._PRUNE_MASK))
-        c.run()
-    else:
-        c = checker.OneshotChecker(out, sqlcache.get_dbpath())
-        c.register(*clist)
-
-    # Get ignore rules from ~/.botbotignore
-    ignore = ig.parse_ignore_rules(ig.find_ignore_file())
-
-    # Check the given directory
-    c.check_all(args.path,
-                cached=args.cached,
-                force=args.force_recheck,
-                shared=args.shared,
-                link=args.follow_symlinks,
-                verbose=args.verbose,
-                fmt=args.format,
-                ignore=ignore,
-                me=args.me)
