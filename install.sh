@@ -88,8 +88,8 @@ function install-conda-by-hand()
     cd $CWD
 
     local PATH_PREFIX='PATH=$PATH:'
-    local NEW_PATH=$BASE/conda/bin
-    echo "$PATH_PREFIX" > setenv.sh
+    local NEW_PATH="$BASE/conda/bin"
+    echo "$PATH_PREFIX$NEW_PATH" > setenv.sh
     source setenv.sh
 }
 
