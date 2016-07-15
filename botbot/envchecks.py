@@ -14,3 +14,13 @@ def path_sufficient():
     for path in paths:
         if path not in os.environ['PATH']:
             return ('PROB_PATH_NOT_COMPLETE', path)
+
+def ld_lib_path_sufficient():
+    """
+    Checks whether all of the given paths are in the LD_LIBRARY_PATH
+    einvironment variable
+    """
+    paths = CONFIG.get('important', 'ldlibitems').split(':')
+    for path in paths:
+        if path not in os.environ['LD_LIBRARY_PATH']:
+            return ('PROB_LD_PATH_NOT_COMPLETE', path)
