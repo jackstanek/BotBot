@@ -87,9 +87,10 @@ function install-conda-by-hand()
 
     cd $CWD
 
-    echo "PATH=$PATH:$BASE/conda/bin" > setenv.sh
+    local PATH_PREFIX='PATH=$PATH:'
+    local NEW_PATH=$BASE/conda/bin
+    echo "$PATH_PREFIX" > setenv.sh
     source setenv.sh
-
 }
 
 function check-conda-install()
@@ -173,7 +174,7 @@ function on-success()
         red "However, it appears that conda needed to be installed locally."
         echo "This means you will need to adjust your environment variables."
         echo "To do this, run 'source setenv.sh' in this directory."
-        echo "Or, run '< setenv.sh >> ~/.bashrc && source ~/.bashrc' to set permanently."
+        echo "Or, run '< setenv.sh >> ~/.bash_profile && source ~/.bash_profile' to set permanently."
     fi
 
     echo -n ""
