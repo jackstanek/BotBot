@@ -37,6 +37,10 @@ def is_large_plaintext(fi):
     """Detect if a file plaintext and >100MB"""
     # Try to figure out if we're dealing with a text file
     guess = mimetypes.guess_type(fi['path'])[0]
+    if guess == 'text/plain' and is_old_and_large(fi):
+        return 'PROB_OLD_LARGE_PLAINTEXT'
+
+def is_old_and_large(fi):
     mod_days = int(time.time() - fi['lastmod'] / (24 * 60 * 60))
     # Days since last modification
 
@@ -44,5 +48,6 @@ def is_large_plaintext(fi):
                        fallback=100000000) # Default to 100MB
     old = CONFIG.get('checks', 'oldage',
                      fallback=30) # Default to one month
-    if guess == 'text/plain' and fi['size'] > int(large) and mod_days >= int(old):
-        return 'PROB_OLD_LARGE_PLAINTEXT'
+
+    if fi['size'] > int(large) and mod_days >= int(old):
+        return 'PROB_OLD_LARGE'
