@@ -55,8 +55,6 @@ class DedupeChecker():
 
         for group in filelist:
             if len(group) > 1:
-                hashes = set()
-
                 # Calculate hash of first 4KB of each file
                 for item in group:
                     item['hash'] = md5sum.get_file_hash(item['path'])
