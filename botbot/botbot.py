@@ -14,7 +14,8 @@ def config_sanity_check():
 def main():
     parser = argparse.ArgumentParser()
 
-    sp = parser.add_subparsers()
+    sp = parser.add_subparsers(dest='cmd')
+    sp.required = True
 
     fs = sp.add_parser('file', help='Check a file or directory on the fly')
     daemon = sp.add_parser('daemon', help='Launch in daemon mode')
