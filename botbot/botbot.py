@@ -5,7 +5,6 @@ from botbot import __version__
 from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
 from . import daemon
-from . import config
 
 def config_sanity_check():
     pass # TODO: implement
