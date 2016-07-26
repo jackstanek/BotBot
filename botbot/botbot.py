@@ -5,9 +5,7 @@ from botbot import __version__
 from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
 from . import daemon
-
-def config_sanity_check():
-    pass # TODO: implement
+from . import config
 
 def initialize_parser():
     """Create a big 'ol argument parser"""
@@ -52,7 +50,6 @@ def initialize_parser():
                     help='Write report to a file instead of stdout')
 
     return parser
-
 
 def main():
     # Right off the bat, we want to do a quick sanity check on the
