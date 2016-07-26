@@ -83,27 +83,16 @@ class OneshotChecker(CheckerBase):
         checklist = []
 
         while len(to_add) > 0:
-            try:
-                apath = fi.FileInfo(to_add.pop(), link=link)
-                # If this path is a directory, push all files and
-                # subdirectories to the stack
-                if uid is None or uid == apath['uid']:
-                    if apath['isdir']:
-                        new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
-                        to_add.extend(new)
-                    else:
-                        # Otherwise just add that file to the checklist
-                        checklist.append(apath)
-
-            except PermissionError:
-                # We couldn't read the file or directory because
-                # permissions were wrong
-                apath['problems'] = {'PROB_DIR_NOT_ACCESSIBLE'}
-                self.checked.append(apath)
-            except OSError:
-                # Probably a dangling link
-                apath['problems'] = {'PROB_BROKEN_LINK'}
-                self.checked.append(apath)
+            apath = fi.FileInfo(to_add.pop(), link=link)
+            # If this path is a directory, push all files and
+            # subdirectories to the stack
+            if uid is None or uid == apath['uid']:
+                if apath['isdir']:
+                    new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
+                    to_add.extend(new)
+                else:
+                    # Otherwise just add that file to the checklist
+                    checklist.append(apath)
 
         # Update checker records
         self.checklist = checklist

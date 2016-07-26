@@ -14,15 +14,28 @@ def _hash(fo, bytecount=4096):
     inc = 128
     hasher, reader = hashlib.new('md5'), _reader(fo, inc=inc)
 
-    while bytecount:
-        b = next(reader)
-        hasher.update(b)
-        bytecount -= inc
+    if bytecount:
+        while bytecount:
+            try:
+                b = next(reader)
+                hasher.update(b)
+                bytecount -= inc
 
-    digest = hasher.hexdigest()
-    return digest
+            except StopIteration:
+                break
+
+        digest = hasher.hexdigest()
+        return digest
+
+    else:
+        for b in reader:
+            hasher.update(b)
+            return hasher.hexdigest()
 
 def get_file_hash(path, bytecount=4096):
     """Get md5 hash of a file"""
-    with open(path, mode='br') as infile:
-        return _hash(infile, bytecount=bytecount)
+    try:
+        with open(path, mode='br') as infile:
+            return _hash(infile, bytecount=bytecount)
+    except PermissionError:
+        return ''
