@@ -5,7 +5,7 @@ from botbot import __version__
 from . import checks, schecks, checker, sqlcache
 from . import ignore as ig
 from . import daemon
-from . import config
+from .config import *
 
 def initialize_parser():
     """Create a big 'ol argument parser"""
@@ -56,8 +56,9 @@ def main():
     # configuration file. Basically, make sure we have all the
     # required fields, and that the
     try:
-        config.config_sanity_check()
-    except:
+        config_sanity_check(CONFIG)
+
+    except InvalidConfigurationError:
         #TODO: Implement
         pass
 

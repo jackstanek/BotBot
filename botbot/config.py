@@ -22,4 +22,7 @@ def read_config():
 
     return cfg
 
+class InvalidConfigurationError(Exception):
+    pass
+
 CONFIG = read_config()
