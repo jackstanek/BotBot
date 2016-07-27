@@ -11,7 +11,9 @@ def initialize_parser():
     """Create a big 'ol argument parser"""
 
     from argparse import ArgumentParser
-    parser = ArgumentParser()
+    parser = ArgumentParser(prog='botbot')
+    parser.add_argument('-v', '--verbose', help='Print more output',
+                        action='store_true')
 
     sp = parser.add_subparsers(dest='cmd')
     sp.required = True
