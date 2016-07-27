@@ -25,3 +25,5 @@ def dir_group_readable(fi):
             return 'PROB_DIR_NOT_ACCESSIBLE'
         elif not bool(stat.S_IWGRP & mode):
             return 'PROB_DIR_NOT_WRITABLE'
+
+ALLSCHECKS = [file_groupreadable, file_group_executable, dir_group_readable]

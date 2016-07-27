@@ -75,9 +75,15 @@ def main():
         path = args.path
         outpath = args.out if args.out else sys.stdout
 
+        # Initialize the checker
         chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
+
+        # Add all file checks to the checker
+        all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
+        chkr.register(*all_file_checks)
+
         chkr.check_all(path, shared=args.shared, link=args.follow_symlinks,
-                       verbose=args.verbose)
+                       verbose=args.verbose, force=args.force_recheck)
 
     elif args.cmd == 'daemon':
         pass
