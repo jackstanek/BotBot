@@ -69,3 +69,18 @@ def main():
 
     # Initialize the checker
     args = parser.parse_args()
+
+    # Decide the command we're using
+    if args.cmd == 'file':
+        path = args.path
+        outpath = args.out if args.out else sys.stdout
+
+        chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
+        chkr.check_all(path, shared=args.shared, link=args.follow_symlinks,
+                       verbose=args.verbose)
+
+    elif args.cmd == 'daemon':
+        pass
+
+    elif args.cmd == 'env':
+        pass
