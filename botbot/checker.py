@@ -77,6 +77,10 @@ class OneshotChecker(CheckerBase):
         """
         Build a list of files to check. If link is True, follow symlinks.
         """
+
+        # Try to clear out the FileInfo cache
+        self.db.clear()
+
         self.path = path
         to_add = [path] # Acts like a stack, this does
 

@@ -45,25 +45,10 @@ class FileDatabase:
         self.conn = sqlite3.connect(dbpath)
         self.conn.row_factory = sqlite3.Row
         self.curs = self.conn.cursor()
+
         try:
-            # Create the file table
-            self.curs.execute(
-                'create table files\
-                (path text primary key,\
-                mode integer,\
-                uid integer,\
-                username text,\
-                size integer,\
-                lastmod float,\
-                lastcheck float,\
-                isfile integer,\
-                isdir integer,\
-                important integer,\
-                md5sum text,\
-                problems text)'  # Problems are stored in the
-                                 # database# as comma-separated
-                                 # problem identifier strings. yee
-            )
+            self._create_table()
+
         except sqlite3.OperationalError:
             # Table already exists, ya goof
             pass
@@ -76,6 +61,26 @@ class FileDatabase:
             decode_problems(fi)
 
         return files
+
+    def _create_table(self):
+        # Create the file table
+        self.curs.execute(
+            'create table files\
+            (path text primary key,\
+            mode integer,\
+            uid integer,\
+            username text,\
+            size integer,\
+            lastmod float,\
+            lastcheck float,\
+            isfile integer,\
+            isdir integer,\
+            important integer,\
+            md5sum text,\
+            problems text)'  # Problems are stored in the
+                             # database# as comma-separated
+                             # problem identifier strings. yee
+        )
 
     def store_file_problems(self, *checked):
         """Store a list of FileInfos with their problems in the database"""
@@ -177,6 +182,14 @@ class FileDatabase:
                     'delete from files where path=?',
                     (f,)
                 )
+
+    def clear(self):
+        try:
+            self.curs.execute('drop table files')
+            self._create_table()
+
+        except sqlite3.OperationalError:
+            pass
 
     def __del__(self):
         """Close everything before ya die"""

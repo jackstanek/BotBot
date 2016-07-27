@@ -1,4 +1,5 @@
 """Main method"""
+import os
 import sys
 
 from botbot import __version__
@@ -82,8 +83,12 @@ def main():
         all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
         chkr.register(*all_file_checks)
 
-        chkr.check_all(path, shared=args.shared, link=args.follow_symlinks,
-                       verbose=args.verbose, force=args.force_recheck)
+        chkr.check_all(path, shared=args.shared,
+                       link=args.follow_symlinks,
+                       verbose=args.verbose,
+                       force=args.force_recheck,
+                       me=args.me,
+        )
 
     elif args.cmd == 'daemon':
         pass
