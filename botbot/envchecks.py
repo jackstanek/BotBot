@@ -24,3 +24,5 @@ def ld_lib_path_sufficient():
     for path in paths:
         if path not in os.environ['LD_LIBRARY_PATH']:
             return ('PROB_LD_PATH_NOT_COMPLETE', path)
+
+ALLENVCHECKS = [path_sufficient, ld_lib_path_sufficient]

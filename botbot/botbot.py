@@ -6,7 +6,7 @@ from botbot import __version__
 from . import sqlcache
 from . import ignore as ig
 from . import daemon
-from .config import *
+from .config import CONFIG, config_sanity_check, InvalidConfigurationError
 
 def initialize_parser():
     """Create a big 'ol argument parser"""
@@ -49,8 +49,8 @@ def initialize_parser():
                     action='store_true')
 
     ## Output options
-    fs.add_argument('-o', '--out',
-                    help='Write report to a file instead of stdout')
+    parser.add_argument('-o', '--out',
+                        help='Write report to a file instead of stdout')
 
     return parser
 
@@ -72,7 +72,7 @@ def main():
     args = parser.parse_args()
 
     # Determine where to write the report
-    path = args.path
+    outpath = args.out
 
     # Decide the command we're using
     if args.cmd == 'file':
@@ -97,8 +97,16 @@ def main():
                        me=args.me,
         )
 
-    elif args.cmd == 'daemon':
-        pass
-
+    # Environment variable checker
     elif args.cmd == 'env':
-        pass
+        # Import relevant environment checks
+        from . import env, envchecks
+
+        # Initialize environment checker
+        chkr = env.EnvironmentChecker()
+
+        # Add env checks to the checker
+        chkr.register(*envchecks.ALLENVCHECKS)
+
+        # Run the checks
+        chkr.check_all()
