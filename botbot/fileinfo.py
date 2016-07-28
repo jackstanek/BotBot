@@ -6,7 +6,7 @@ from .config import CONFIG
 from .md5sum import get_file_hash
 
 def is_important(path):
-    return os.path.splitext(path)[1].strip('.') in CONFIG.get('fileinfo', 'important',
+    return os.path.splitext(path)[1].strip('.') in CONFIG.get('important', 'fileinfo',
                                                               fallback='.sam, .bam')
 
 def FileInfo(fd, link=False, important=False):
