@@ -59,7 +59,7 @@ There a handful of options you can use:
 - `-m, --me`: only check files that belong to you.
 
 You can also use BotBot to check if your environment variables are
-configured properly. However, this feature needs a little
+set up correctly. However, this feature needs a little
 configuration to work properly. You must first configure the
 `[important]` section in [`botbot.conf`](#botbotbotbotconf).
 
