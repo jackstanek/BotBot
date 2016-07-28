@@ -40,6 +40,35 @@ instead.
 
 To run the test suite just run `py.test` in the project directory.
 
+# Usage
+
+If you want to use BotBot to check files and directories on demand,
+use the command:
+
+`botbot file [options] PATH`
+
+There a handful of options you can use:
+
+- `-c, --cached`: generate a report based on the results of the most
+  recent check.
+- `-k, --force-recheck`: clears the cached version of the last check
+  and rechecks the file or directory.
+- `-s, --shared`: use a set of checks intended for files and
+  directories in the shared folder.
+- `-l, --follow-symlinks`: force BotBot to follow symbolic links.
+- `-m, --me`: only check files that belong to you.
+
+You can also use BotBot to check if your environment variables are
+configured properly. However, this feature needs a little
+configuration to work properly. You must first configure the
+`[important]` section in [`botbot.conf`](#`.botbot/botbot.conf`).
+
+After that, you can use the command:
+
+`botbot env`
+
+to check that the environment variables are properly configured.
+
 # Configuration
 
 BotBot uses 2 primary configuration files: `~/.botbotignore` and
@@ -67,11 +96,6 @@ follows:
     - `largesize`: defines how many bytes large a file must be to be
       considered "large".
 
-- `[fileinfo]`
-    - `important`: defines which file extensions are considered
-      "important." By default, *.sam and *.bam files are denoted as
-      important.
-
 - `[email]` (REQUIRED for email mode)
     - `domain`: the domain that the users' email accounts are on
     - `email`: your email address (which emails are sent from)
@@ -82,6 +106,15 @@ follows:
     - `grace_period`: amount of time, in minutes, after changing a
       file that a user can fix potential issues before receiving an
       email about said changes
+
+- `[important]`
+    - `fileinfo`: defines which file extensions are considered
+    "important." By default, *.sam and *.bam files are denoted as
+    important.
+    - `pathitems`: defines which paths (separated by colons) should be
+      present in the PATH environment variable.
+    - `ldlibpath`: defines which paths (separated by colons) should be
+      present in the LD_LIBRARY_PATH environment variable.
 
 # Testing
 
