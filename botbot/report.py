@@ -159,5 +159,6 @@ class EnvReporter():
     def __init__(self, chkr):
         self.chkr = chkr
 
-    def write_report():
-        pass # TODO: Implement
+    def write_report(self):
+        for probtup in self.chkr.problems:
+            print('{0}: {1}'.format(*probtup))
