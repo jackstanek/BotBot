@@ -23,10 +23,6 @@ class EnvironmentChecker():
         for check in self.checks:
             rv = check()
             if rv:
-                probid, item = rv
-                if self.problems[probid]:
-                    self.problems[probid].append(item)
-                else:
-                    self.problems[probid] = [item]
+                self.problems.append(rv)
 
         self.reporter.write_report()
