@@ -3,7 +3,7 @@ import os
 import sys
 
 from botbot import __version__
-from . import checks, schecks, checker, sqlcache
+from . import sqlcache
 from . import ignore as ig
 from . import daemon
 from .config import *
@@ -71,10 +71,16 @@ def main():
     # Initialize the checker
     args = parser.parse_args()
 
+    # Determine where to write the report
+    path = args.path
+
     # Decide the command we're using
     if args.cmd == 'file':
+        # Import relevant file-checking checker code
+        from . import checks, schecks, checker
+
+        # Get the path
         path = args.path
-        outpath = args.out if args.out else sys.stdout
 
         # Initialize the checker
         chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
@@ -83,6 +89,7 @@ def main():
         all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
         chkr.register(*all_file_checks)
 
+        # Run the checker!
         chkr.check_all(path, shared=args.shared,
                        link=args.follow_symlinks,
                        verbose=args.verbose,
