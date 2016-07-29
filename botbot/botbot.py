@@ -21,7 +21,7 @@ def initialize_parser():
 
     fs = sp.add_parser('file', help='Check a file or directory on the fly')
     daemon = sp.add_parser('daemon', help='Launch in daemon mode')
-    env = sp.add_parser('env', help='Check environment variables')
+    env = sp.add_parser('env', help='Check environment variable')
 
 
     # Oneshot file checker options
@@ -72,7 +72,7 @@ def main():
     args = parser.parse_args()
 
     # Determine where to write the report
-    outpath = args.out
+    outpath = args.out if args.out else sys.stdout
 
     # Decide the command we're using
     if args.cmd == 'file':
