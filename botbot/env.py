@@ -1,4 +1,4 @@
-import os
+"""Checker object for verifying environment variables"""
 
 from .checker import CheckerBase
 from .report import EnvReporter
