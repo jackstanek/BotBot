@@ -6,8 +6,9 @@ from configparser import NoOptionError
 from .config import CONFIG
 
 def _var_check_builder(var, confitem, probid):
-    def _var_check_base():
-        paths = CONFIG.get('important', confitem).split(':')
+    def _var_check_base(important=None):
+        paths = important if important else CONFIG.get('important', confitem).split(':')
+
         for path in paths:
             try:
                 if path not in os.environ[var]:
