@@ -103,7 +103,7 @@ def main():
         from . import env, envchecks
 
         # Initialize environment checker
-        chkr = env.EnvironmentChecker()
+        chkr = env.EnvironmentChecker(outpath)
 
         # Add env checks to the checker
         chkr.register(*envchecks.ALLENVCHECKS)

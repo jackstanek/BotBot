@@ -11,6 +11,7 @@ from . import problems
 
 _DEFAULT_RES_PATH = os.path.join('resources', 'templates')
 _GENERIC_REPORT_NAME = 'generic.txt'
+_ENV_REPORT_NAME = 'env.txt'
 
 class ReporterBase():
     def __init__(self, chkr):
@@ -56,6 +57,12 @@ class OneshotReporter(ReporterBase):
     def __init__(self, chkr, out=sys.stdout):
         super().__init__(chkr)
         self.out = out
+
+    def should_print_report(self, filelist):
+        for values in filelist.values():
+            if len(values) > 0:
+                return True
+        return False
 
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
@@ -133,12 +140,6 @@ def prune_empty_listings(fl, attr):
 
     return new
 
-def should_print_report(filelist):
-    for values in filelist.values():
-        if len(values) > 0:
-            return True
-    return False
-
 class DaemonReporter(ReporterBase):
     """Reports issues in daemon mode"""
     def __init__(self, chkr):
@@ -154,11 +155,32 @@ class DaemonReporter(ReporterBase):
             finfo = queue.pop()
             print("{} -- {}".format(finfo['path'], ', '.join(finfo['problems'])))
 
-class EnvReporter():
+class EnvReporter(ReporterBase):
     """Reports environment issues"""
-    def __init__(self, chkr):
+    def __init__(self, chkr, out=sys.stdout):
+        self.out = out
         self.chkr = chkr
 
     def write_report(self):
-        for probtup in self.chkr.problems:
-            print('{0}: {1}'.format(*probtup))
+        env = self._get_env(_ENV_REPORT_NAME)
+
+        if self.chkr.problems:
+            tempgen = env.get_template(_ENV_REPORT_NAME).generate(
+                problist=self.chkr.problems
+            )
+
+            if self.out != sys.stdout:
+                print('Writing report to {}.'.format(self.out))
+                out = open(self.out, mode='w')
+            else:
+                print('Report:')
+                out = sys.stdout
+
+            for line in tempgen:
+                print(line, file=out, end='')
+
+            print('\n', file=out, end='')
+            out.close()
+
+        else:
+            print('No problems here!')
