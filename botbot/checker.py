@@ -91,7 +91,7 @@ class OneshotChecker(CheckerBase):
             # If this path is a directory, push all files and
             # subdirectories to the stack
             if uid is None or uid == apath['uid']:
-                if apath['isdir']:
+                if apath['isdir'] and not 'PROB_FILE_NOT_GRPRD' in apath['problems']:
                     new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
                     to_add.extend(new)
                 else:

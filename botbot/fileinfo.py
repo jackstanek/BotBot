@@ -49,4 +49,17 @@ def FileInfo(fd, link=False, important=False):
         fi['problems'].add('PROB_FILE_NOT_GRPRD')
 
     finally:
+        # Do a few more cursory initial checks
+        if not can_access(fi):
+            fi['problems'].add('PROB_FILE_NOT_GRPRD')
+
         return fi
+
+def can_access(fi):
+    if fi['uid'] == os.getuid():
+        return bool(fi['mode'] | 0o700)
+    else:
+        return bool(fi['mode'] | 0o055)
+    # With those masks, we don't really to worry about the difference
+    # in meaning between directory and file permission bits. Thanks,
+    # based bitwise OR operator.
