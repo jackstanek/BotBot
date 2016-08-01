@@ -58,7 +58,7 @@ class OneshotReporter(ReporterBase):
         super().__init__(chkr)
         self.out = out
 
-    def should_print_report(self, filelist):
+    def _should_print_report(self, filelist):
         for values in filelist.values():
             if len(values) > 0:
                 return True
@@ -73,7 +73,7 @@ class OneshotReporter(ReporterBase):
         if not shared:
             filelist = prune_shared_probs(filelist, attr)
 
-        if should_print_report(filelist):
+        if self._should_print_report(filelist):
             env = self._get_env(_GENERIC_REPORT_NAME)
 
             tempgen = env.get_template(_GENERIC_REPORT_NAME).generate({
