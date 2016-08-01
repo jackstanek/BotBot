@@ -37,6 +37,9 @@ class ReporterBase():
         else:
             return '.'.join(parts + ['txt'])
 
+    def _get_supporting_prob_info(self, probid):
+        return problems.every_problem.get(probid)
+
     def write_report(self, fmt, shared, attr='problems'):
         """Write a report. This base is just a stub."""
         pass
@@ -119,6 +122,7 @@ def prune_shared_probs(fl, attr):
                 spc = len(set.intersection(sps, fips))
                 if spc != len(fips):
                     pruned[key].append(fi)
+
     return pruned
 
 def prune_empty_listings(fl, attr):
@@ -150,6 +154,8 @@ class DaemonReporter(ReporterBase):
         Continuously report. (Note: this implementation is temporary until
         email gets working.)
         """
+        #TODO: implement emailing!
+
         queue = self.chkr.checked
         while queue:
             finfo = queue.pop()
@@ -158,15 +164,18 @@ class DaemonReporter(ReporterBase):
 class EnvReporter(ReporterBase):
     """Reports environment issues"""
     def __init__(self, chkr, out=sys.stdout):
+        """Constructor for the EnvReporter"""
         self.out = out
         self.chkr = chkr
 
     def write_report(self):
+        """Write a report on environment variables"""
         env = self._get_env(_ENV_REPORT_NAME)
 
         if self.chkr.problems:
             tempgen = env.get_template(_ENV_REPORT_NAME).generate(
-                problist=self.chkr.problems
+                problist=[(self._get_supporting_prob_info(p[0]), p[1])
+                          for p in self.chkr.problems]
             )
 
             if self.out != sys.stdout:

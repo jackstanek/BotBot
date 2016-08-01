@@ -1,11 +1,8 @@
 """Problems a file can have"""
 
-class Problem:
-    """Defines a problem that a file could have."""
-    def __init__(self, code, message, fix):
-        self.code = code
-        self.message = message
-        self.fix = fix
+from collections import namedtuple
+
+Problem = namedtuple('Problem', ('code', 'message', 'fix'))
 
 every_problem = {
     'PROB_DIR_NOT_WRITABLE': Problem(1,
@@ -50,5 +47,9 @@ every_problem = {
 
     'PROB_PATH_NOT_COMPLETE': Problem(11,
                                       'The PATH environment variable does not contain all necessary paths.',
-                                      'Add the path to the PATH environment variable.')
+                                      'Add the path to the PATH environment variable.'),
+
+    'PROB_VAR_NOT_SET': Problem(12,
+                                'This environment variable is not set',
+                                'Try exporting an appropriate definition in your ~/.bash_profile.')
 }
