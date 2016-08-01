@@ -49,7 +49,11 @@ every_problem = {
                                       'The PATH environment variable does not contain all necessary paths.',
                                       'Add the path to the PATH environment variable.'),
 
-    'PROB_VAR_NOT_SET': Problem(12,
+    'PROB_LD_LIBRARY_PATH_NOT_COMPLETE': Problem(12,
+                                                 'The LD_LIBRARY_PATH environment variable does not contain all necessary paths.',
+                                                 'Add the path the LD_LIBRARY_PATH variable.'),
+
+    'PROB_VAR_NOT_SET': Problem(13,
                                 'This environment variable is not set',
                                 'Try exporting an appropriate definition in your ~/.bash_profile.')
 }
