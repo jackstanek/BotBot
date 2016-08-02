@@ -17,7 +17,6 @@ def initialize_parser():
                         action='store_true')
 
     sp = parser.add_subparsers(dest='cmd')
-    sp.required = True
 
     fs = sp.add_parser('file', help='Check a file or directory on the fly')
     daemon = sp.add_parser('daemon', help='Launch in daemon mode')
@@ -54,6 +53,47 @@ def initialize_parser():
 
     return parser
 
+def run_file_check(args, outpath):
+    # Import relevant file-checking checker code
+    from . import checks, schecks, checker
+
+    if not hasattr(args, 'path'):
+        path = CONFIG.get('important', 'defaultpath',
+                          fallback='~')
+
+    # Initialize the checker
+    chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
+
+    # Add all file checks to the checker
+    all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
+    chkr.register(*all_file_checks)
+
+    # Set up default options
+    opt = {
+        'shared': args.shared if hasattr(args, 'shared') else True,
+        'link': args.follow_symlinks if hasattr(args, 'follow_symlinks') else False,
+        'verbose': args.verbose if hasattr(args, 'verbose') else False,
+        'force': args.force if hasattr(args, 'force') else False,
+        'me': args.me if hasattr(args, 'me') else False
+    }
+
+    # Run the checker!
+    chkr.check_all(path, **opt)
+
+def run_env_check(args, outpath):
+    # Import relevant environment checks
+    from . import env, envchecks
+
+    # Initialize environment checker
+    chkr = env.EnvironmentChecker(outpath)
+
+    # Add env checks to the checker
+    chkr.register(*envchecks.ALLENVCHECKS)
+
+    # Run the checks
+    chkr.check_all()
+
+
 def main():
     # Right off the bat, we want to do a quick sanity check on the
     # configuration file. Basically, make sure we have all the
@@ -75,38 +115,16 @@ def main():
     outpath = args.out if args.out else sys.stdout
 
     # Decide the command we're using
-    if args.cmd == 'file':
-        # Import relevant file-checking checker code
-        from . import checks, schecks, checker
 
-        # Get the path
-        path = args.path
+    cmds = (run_file_check, run_env_check)
 
-        # Initialize the checker
-        chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
+    if args.cmd:
+        if args.cmd == 'file':
+            cmds = (run_file_check,)
 
-        # Add all file checks to the checker
-        all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
-        chkr.register(*all_file_checks)
+        # Environment variable checker
+        elif args.cmd == 'env':
+            cmds = (run_env_check,)
 
-        # Run the checker!
-        chkr.check_all(path, shared=args.shared,
-                       link=args.follow_symlinks,
-                       verbose=args.verbose,
-                       force=args.force_recheck,
-                       me=args.me,
-        )
-
-    # Environment variable checker
-    elif args.cmd == 'env':
-        # Import relevant environment checks
-        from . import env, envchecks
-
-        # Initialize environment checker
-        chkr = env.EnvironmentChecker(outpath)
-
-        # Add env checks to the checker
-        chkr.register(*envchecks.ALLENVCHECKS)
-
-        # Run the checks
-        chkr.check_all()
+    for cmd in cmds:
+        cmd(args, outpath)
