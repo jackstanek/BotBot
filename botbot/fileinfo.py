@@ -13,17 +13,17 @@ def FileInfo(fd, link=False, important=False):
     """Hold information about a file"""
     fi = {
         'path': os.path.abspath(fd),
-        'mode': None,
-        'uid': None,
-        'username': None,
-        'size': None,
-        'lastmod': None,
-        'lastcheck': None,
+        'mode': 0,
+        'uid': 0,
+        'username': '',
+        'size': 0,
+        'lastmod': 0,
+        'lastcheck': 0,
         'isfile': None,
         'isdir': None,
         'md5sum': '',
         'important': None,
-        'problems': set(),
+        'problems': set()
     }
 
     try:
