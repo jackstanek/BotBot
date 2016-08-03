@@ -108,7 +108,7 @@ follows:
       email about said changes
 
 - `[important]`
-    - `fileinfo`: defines which file extensions are considered
+    - `ext`: defines which file extensions are considered
     "important." By default, *.sam and *.bam files are denoted as
     important.
     - `pathitems`: defines which paths (separated by colons) should be
