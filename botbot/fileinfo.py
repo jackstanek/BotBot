@@ -1,7 +1,6 @@
-"""File information"""
-import os
-import pwd
+import py
 
+<<<<<<< HEAD
 from .config import CONFIG
 from .md5sum import get_file_hash
 

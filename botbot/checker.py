@@ -6,7 +6,8 @@ import time
 from fnmatch import fnmatch
 from pwd import getpwuid
 
-from . import fileinfo as fi
+import py
+
 from . import report as rep
 from . import sqlcache as sql
 from . import ignore as ig
@@ -73,7 +74,7 @@ class OneshotChecker(CheckerBase):
                                                         # writes
                                                         # information
 
-    def build_new_checklist(self, path, link=False, verbose=True, uid=None):
+    def build_new_checklist(self, path, link=False, verbose=True, owner=None):
         """
         Build a list of files to check. If link is True, follow symlinks.
         """
@@ -82,17 +83,17 @@ class OneshotChecker(CheckerBase):
         self.db.clear()
 
         self.path = path
-        to_add = [path] # Acts like a stack, this does
+        to_add = [py.path.local(path)] # Acts like a stack, this does
 
         checklist = []
 
-        while len(to_add) > 0:
-            apath = fi.FileInfo(to_add.pop(), link=link)
+        while to_add:
+            apath = py.local.path(to_add.pop())
             # If this path is a directory, push all files and
             # subdirectories to the stack
-            if uid is None or uid == apath['uid']:
+            if owner is None or owner == apath.stat().owner:
                 if apath['isdir'] and not 'PROB_FILE_NOT_GRPRD' in apath['problems']:
-                    new = [os.path.join(apath['path'], f) for f in os.listdir(apath['path'])]
+                    new = apath.listdir()
                     to_add.extend(new)
                 else:
                     # Otherwise just add that file to the checklist
@@ -102,7 +103,7 @@ class OneshotChecker(CheckerBase):
         self.checklist = checklist
         self.status['files'] = len(self.checklist)
 
-    def update_checklist(self, cached, link=False, verbose=True, uid=None):
+    def update_checklist(self, cached, link=False, verbose=True, owner=None):
         """
         Take a cached list of files to check and make a list of
         directories and files that need to be rechecked. A file is
@@ -111,16 +112,16 @@ class OneshotChecker(CheckerBase):
 
         prunelist = []
         recheck = []
-        for finfo in cached:
+        for path in cached:
             try:
                 # If the ctime of the given file is later than the
                 # last check, the file needs to be rechecked.
-                recent = fi.FileInfo(finfo['path'])
-                if uid is None or uid == recent['uid']:
-                    if recent['lastmod'] > finfo['lastcheck']:
+                recent = path.new()
+                if owner is None or owner == recent.stat().owner:
+                    if recent['lastmod'] > path['lastcheck']:
                         if recent['isfile']:
                             recent['problems'] = set() # We'll regenerate
-                                                       # the list later.
+                            # the list later.
                             recheck.append(recent)
                         else:
                             path = recent['path']
