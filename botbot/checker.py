@@ -192,8 +192,8 @@ class OneshotChecker(CheckerBase):
         starttime = time.time()
 
         # Munge that path boys!
-        path = os.path.abspath(path)
         path = os.path.expanduser(path)
+        path = os.path.abspath(path)
         self.path = path
 
         # If no cached tree exists, (or if we explicitly want to build

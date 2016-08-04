@@ -60,6 +60,8 @@ def run_file_check(args, outpath):
     if not hasattr(args, 'path'):
         path = CONFIG.get('important', 'defaultpath',
                           fallback='~')
+    else:
+        path = args.path
 
     # Initialize the checker
     chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
