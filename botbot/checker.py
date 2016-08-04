@@ -11,6 +11,7 @@ import py
 from . import report as rep
 from . import sqlcache as sql
 from . import ignore as ig
+from . import checkinfo as ci
 
 class CheckerBase:
     """
@@ -33,23 +34,14 @@ class CheckerBase:
         for fn in funcs:
             self.checks.add(fn)
 
-    def check_file(self, finfo):
+    def check_file(self, path):
         """
-        Check a file against all checkers, write status to stdout if status
-        is True
+        Check a file against all registered checkers.
         """
+        result = ci.CheckResult(path)
         for check in self.checks:
-            prob = check(finfo)
-            if prob is not None:
-                finfo['problems'].add(prob)
+            check(path, result)
 
-        finfo['lastcheck'] = int(time.time())
-
-    def process_checked_file(self, result):
-        """
-        Helper function to record that a file was checked and to increment
-        the counter.
-        """
         self.checked.append(result)
 
 class OneshotChecker(CheckerBase):
@@ -82,25 +74,38 @@ class OneshotChecker(CheckerBase):
         # Try to clear out the FileInfo cache
         self.db.clear()
 
-        self.path = path
-        to_add = [py.path.local(path)] # Acts like a stack, this does
+        # Make the stored path object
+        if isinstance(path, py.path.local):
+            self.path = path
 
-        checklist = []
+        elif isinstance(path, str):
+            self.path = py.path.local(path)
+
+        else:
+            raise TypeError('Not a valid path type')
+
+        # A stack for paths to add to the to-check-list
+        to_add = [self.path.new()]
 
         while to_add:
-            apath = py.local.path(to_add.pop())
-            # If this path is a directory, push all files and
-            # subdirectories to the stack
-            if owner is None or owner == apath.stat().owner:
-                if apath['isdir'] and not 'PROB_FILE_NOT_GRPRD' in apath['problems']:
-                    new = apath.listdir()
-                    to_add.extend(new)
-                else:
-                    # Otherwise just add that file to the checklist
-                    checklist.append(apath)
+            subpath = to_add.pop()
+
+            # Ignore symlinks unless explicitly asked for
+            if subpath.islink() and not link:
+                continue
+
+            # Ignore files in the ignore list
+
+
+            # Check files
+            if subpath.isfile():
+                self.checklist.append(subpath)
+
+            # Add directory contents to the stack
+            elif subpath.isdir():
+                to_add.extend(subpath.listdir())
 
         # Update checker records
-        self.checklist = checklist
         self.status['files'] = len(self.checklist)
 
     def update_checklist(self, cached, link=False, verbose=True, owner=None):
@@ -111,14 +116,12 @@ class OneshotChecker(CheckerBase):
         """
 
         prunelist = []
-        recheck = []
-        for path in cached:
+        for result in cached:
             try:
                 # If the ctime of the given file is later than the
                 # last check, the file needs to be rechecked.
-                recent = path.new()
-                if owner is None or owner == recent.stat().owner:
-                    if recent['lastmod'] > path['lastcheck']:
+                if owner is None or owner == path.stat().owner:
+                    if path.mtime() > :
                         if recent['isfile']:
                             recent['problems'] = set() # We'll regenerate
                             # the list later.
