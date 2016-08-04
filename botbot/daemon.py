@@ -9,7 +9,6 @@ from inotify.constants import *
 from .checker import CheckerBase
 from .sqlcache import get_dbpath
 from .report import DaemonReporter
-from . import fileinfo
 from .config import CONFIG
 
 _EVENT_MASK = IN_CREATE | IN_ATTRIB | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO

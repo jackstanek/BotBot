@@ -6,6 +6,8 @@ import sqlite3
 from time import time
 
 from .problems import every_problem
+from .md5sum import get_file_hash
+from . import checkinfo as ci
 
 def get_dbpath():
     """Get the path to the SQLite database"""
@@ -18,30 +20,9 @@ def db_exists():
     """Check if the database already exists"""
     return os.path.isfile(get_dbpath())
 
-
-def serialize_problems(fi):
-    """Turn a set of problems in a FileInfo dict into a string"""
-    probset = fi['problems']
-    if probset is not None:
-        fi['problems'] = ','.join(probset)
-    else:
-        fi['problems'] = ''
-
-def decode_problems(fi):
-    """Turn a string of problems in a fresh SQL fileinfo to a set"""
-    probstr = fi['problems']
-    if len(probstr) > 0:
-        fi['problems'] = set(probstr.split(','))
-    else:
-        fi['problems'] = set()
-
 class FileDatabase:
     """Database of files and associate information"""
     def __init__(self, dbpath):
-        # Dict keys that are the column names
-        self.fi_keys = ['path', 'mode', 'uid', 'username',
-                        'size', 'lastmod', 'lastcheck', 'isfile',
-                        'isdir', 'important', 'problems']
         self.conn = sqlite3.connect(dbpath)
         self.conn.row_factory = sqlite3.Row
         self.curs = self.conn.cursor()
@@ -55,71 +36,37 @@ class FileDatabase:
 
         self.conn.commit()
 
-    def _prep_fileinfos(self, rows):
-        files = [dict(r) for r in rows]
-        for fi in files:
-            decode_problems(fi)
-
-        return files
-
     def _create_table(self):
         # Create the file table
         self.curs.execute(
             'create table files\
             (path text primary key,\
-            mode integer,\
-            uid integer,\
-            username text,\
-            size integer,\
-            lastmod float,\
-            lastcheck float,\
-            isfile integer,\
-            isdir integer,\
-            important integer,\
             md5sum text,\
             problems text)'  # Problems are stored in the
                              # database# as comma-separated
                              # problem identifier strings. yee
         )
 
-    def store_file_problems(self, *checked):
-        """Store a list of FileInfos with their problems in the database"""
-
-        # Copy the list
-        mod = list(checked)
-        for fi in mod:
-            try:
-                serialize_problems(fi)
-            except KeyError:
-                pass
+    def store_file_problems(self, checked):
+        """Store a list of check results with their problems in the database"""
 
         self.curs.executemany(
             'insert or replace into files values (\
             :path,\
-            :mode,\
-            :uid,\
-            :username,\
-            :size,\
-            :lastmod,\
-            :lastcheck,\
-            :isfile,\
-            :isdir,\
-            :important,\
             :md5sum,\
             :problems\
             )',
-            mod
+            [
+                {
+                    'path': p.path.strpath,
+                    'md5sum': get_file_hash(p.path),
+                    'problems': p.serialize_problems()
+                }
+                for p in checked
+            ]
         )
-        self.conn.commit()
 
-    def get_stored_problems(self, path):
-        """Get a set of problems associated with a path at the last last check"""
-        self.curs.execute(
-            'select problems from files where path=?',
-            path
-        )
-        probs = self.curs.fetchone()['problems'].split(',')
-        return set(probs)
+        self.conn.commit()
 
     def get_cached_filelist(self, path, uid=None):
         """Get a list of FileInfo dictionaries from the database"""
@@ -129,18 +76,25 @@ class FileDatabase:
             query += ' and uid = ?'
             args += [uid]
 
-        self.curs.execute(
+        cached = self.curs.execute(
             query,
             args
         )
 
-        return self._prep_fileinfos(self.curs.fetchall())
+        return [
+            ci.CheckResult(
+                {
+                    "path":
+                }
+            )
+        ]
 
     def get_files_by_attribute(self, path, attr, shared=True):
         """
         Get a dictionary where keys are values of attr and values are lists
         of files with that attribute
         """
+        # TODO: Reimplement!
         filelist = self.get_cached_filelist(path)
         if attr != 'problems':
             attrvals = list(set(f[attr] for f in filelist))
@@ -155,18 +109,6 @@ class FileDatabase:
                 attrlists.append([f for f in filelist if f[attr] == val])
 
         return dict(zip(attrvals, attrlists))
-
-    def get_files_after_grace_period(self, graceperiod=10):
-        """
-        Get files which have problems and haven't been fixed within the
-        grace period.
-        """
-        self.curs.execute(
-            'select * from files where lastcheck < ? and problems like \'%PROB%\'',
-            (time() - graceperiod * 60,)
-        )
-
-        return self._prep_fileinfos(self.curs.fetchall())
 
     def prune(self, *old):
         """Remove db entries based on the FileInfos supplied in old"""

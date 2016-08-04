@@ -24,32 +24,22 @@ def _is_important(path):
 class CheckResult():
     """Holds the result of a check"""
 
-    def __init__(self, path, lastcheck=time.time()):
+    def __init__(self, path, lastcheck=time.time(), probstr=None):
         self.path = path
-        self.problems = set()
+        self.lastcheck = lastcheck
+        if probstr:
+            self.decode_probstr(probstr)
+        else:
+            self.problems = set()
 
     def add_problem(self, probstr):
         """Add a problem to this file"""
         self.problems.add(probstr)
 
-    def get_info_dict(self):
-        """Get a dictionary fit for use with the SQL file cache"""
-        def _serialize_problems():
-            return ','.join(self.problems)
+    def serialize_problems(self):
+        """Turn a set of problems from the CheckResult into a string"""
+        return ','.join(self.problems)
 
-        path = self.path
-        stat = self.path.stat()
-
-        infodict = {
-            'path': path.strpath,
-            'mode': stat.mode,
-            'username': stat.owner,
-            'size': path.size(),
-            'lastmod': path.mtime(),
-            'ptype': _get_ptype(path),
-            'md5sum': get_file_hash(path),
-            'important': _is_important(path),
-            'problems': _serialize_problems()
-        }
-
-        return infodict
+    def decode_probstr(self, probstr):
+        """Decode a problem string"""
+        self.problems = set(probstr.split(','))
