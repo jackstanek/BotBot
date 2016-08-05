@@ -2,23 +2,23 @@
 
 import stat
 
-def file_groupreadable(fi):
+def file_groupreadable(path):
     """Check whether a given path has bad permissons."""
-    if not bool(stat.S_IRGRP & fi['mode']):
+    if not bool(stat.S_IRGRP & path.stat().mode):
         return 'PROB_FILE_NOT_GRPRD'
 
-def file_group_executable(fi):
+def file_group_executable(path):
     """Check if a file should be group executable"""
-    mode = fi['mode']
+    mode = path.stat().mode
     if stat.S_ISDIR(mode):
         return
     if bool(stat.S_IXUSR & mode) and not bool(stat.S_IXGRP & mode):
         return 'PROB_FILE_NOT_GRPEXEC'
 
-def dir_group_readable(fi):
+def dir_group_readable(path):
     """Check if a directory is accessible and readable"""
-    mode = fi['mode']
-    if not stat.S_ISDIR(fi['mode']):
+    mode = path.stat().mode
+    if not stat.S_ISDIR(mode):
         return
     else:
         if not bool(stat.S_IXGRP & mode):
