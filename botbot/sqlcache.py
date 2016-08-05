@@ -41,6 +41,7 @@ class FileDatabase:
         self.curs.execute(
             'create table files\
             (path text primary key,\
+            lastcheck int,\
             md5sum text,\
             problems text)'  # Problems are stored in the
                              # database# as comma-separated
@@ -53,12 +54,14 @@ class FileDatabase:
         self.curs.executemany(
             'insert or replace into files values (\
             :path,\
+            :lastcheck,\
             :md5sum,\
             :problems\
             )',
             [
                 {
                     'path': p.path.strpath,
+                    'lastcheck': p.lastcheck,
                     'md5sum': get_file_hash(p.path),
                     'problems': p.serialize_problems()
                 }
@@ -68,7 +71,7 @@ class FileDatabase:
 
         self.conn.commit()
 
-    def get_cached_filelist(self, path, uid=None):
+    def get_cached_results(self, path, uid=None):
         """Get a list of FileInfo dictionaries from the database"""
         query = 'select * from files where path like ?'
         args = [path + '%']
@@ -83,10 +86,9 @@ class FileDatabase:
 
         return [
             ci.CheckResult(
-                {
-                    "path":
-                }
+                dict(res)
             )
+            for res in cached
         ]
 
     def get_files_by_attribute(self, path, attr, shared=True):

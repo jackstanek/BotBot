@@ -7,14 +7,6 @@ import py
 from .md5sum import get_file_hash
 from .config import CONFIG
 
-def _get_ptype(path):
-    if path.islink():
-        return 'link'
-    elif path.isfile():
-        return 'file'
-    elif path.isdir():
-        return 'dir'
-
 def _is_important(path):
     exts = CONFIG.get('important', 'ext',
                       fallback='.sam, .bam')
@@ -34,7 +26,8 @@ class CheckResult():
 
     def add_problem(self, probstr):
         """Add a problem to this file"""
-        self.problems.add(probstr)
+        if probstr:
+            self.problems.add(probstr)
 
     def serialize_problems(self):
         """Turn a set of problems from the CheckResult into a string"""

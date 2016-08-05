@@ -40,7 +40,7 @@ class CheckerBase:
         """
         result = ci.CheckResult(path)
         for check in self.checks:
-            check(path, result)
+            result.add_problem(check(path))
 
         self.checked.append(result)
 
@@ -129,6 +129,9 @@ class OneshotChecker(CheckerBase):
         # If no cached tree exists, (or if we explicitly want to build
         # a new one) build one if we need one
         if not cached:
+            # Build a checklist.
+            self.build_new_checklist(path)
+
             # Check all the files against every check.
             while self.checklist:
                 cp = self.checklist.pop()

@@ -35,7 +35,7 @@ def _hash(fo, bytecount=4096):
 def get_file_hash(path, bytecount=4096):
     """Get md5 hash of a file"""
     try:
-        with open(path, mode='br') as infile:
+        with path.open(mode='br') as infile:
             return _hash(infile, bytecount=bytecount)
     except PermissionError:
         return ''
