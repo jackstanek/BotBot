@@ -40,10 +40,6 @@ class ReporterBase():
     def _get_supporting_prob_info(self, probid):
         return problems.every_problem.get(probid)
 
-    def write_report(self, fmt, shared, attr='problems'):
-        """Write a report. This base is just a stub."""
-        pass
-
     def _get_env(self, template):
         tmppath = os.path.join(_DEFAULT_RES_PATH,
                                self._get_template_filename(template))
