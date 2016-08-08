@@ -63,23 +63,28 @@ class OneshotReporter(ReporterBase):
                 return True
         return False
 
+    def _get_pretty_sorted_problist(self):
+        ep = problems.every_problem
+        return {ep.get(probkey) if ep.get(probkey) else probkey:
+                [result for result in self.chkr.checked if probkey in result.problems]
+                for probkey in set.union(
+                        *(p.problems for p in self.chkr.checked)
+                )
+        }
+
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
-        filelist = self.chkr.db.get_files_by_attribute(self.chkr.path, attr, shared=shared)
+        printlist = self._get_pretty_sorted_problist()
 
-        # Prune unwanted listings
-        filelist = prune_empty_listings(filelist, attr)
-        if not shared:
-            filelist = prune_shared_probs(filelist, attr)
-
-        if self._should_print_report(filelist):
+        if self._should_print_report(printlist):
             env = self._get_env(_GENERIC_REPORT_NAME)
 
-            tempgen = env.get_template(_GENERIC_REPORT_NAME).generate({
-                'attr': attr,
-                'values': filelist,
-                'status': self.chkr.status
-            })
+            tempgen = env.get_template(_GENERIC_REPORT_NAME).generate(
+                {
+                    'pl': printlist,
+                    'status': self.chkr.status
+                }
+            )
 
             if self.out != sys.stdout:
                 print('Writing report to {}.'.format(self.out))
@@ -96,49 +101,6 @@ class OneshotReporter(ReporterBase):
 
         else:
             print('No problems here!')
-
-def prune_shared_probs(fl, attr):
-    """Remove shared problem listings"""
-    shared_probs = ('PROB_DIR_NOT_WRITABLE',
-                    'PROB_FILE_NOT_GRPRD',
-                    'PROB_FILE_NOT_GRPEXEC',
-                    'PROB_DIR_NOT_WRITABLE',
-                    'PROB_DIR_NOT_ACCESSIBLE')
-    pruned = dict()
-    if attr == 'problems':
-        for key, val in fl.items():
-            if key not in shared_probs:
-                pruned[key] = val
-    else:
-        for key, val in fl.items():
-            pruned[key] = []
-            for fi in val:
-                sps, fips = set(shared_probs), set(fi['problems'])
-
-                spc = len(set.intersection(sps, fips))
-                if spc != len(fips):
-                    pruned[key].append(fi)
-
-    return pruned
-
-def prune_empty_listings(fl, attr):
-    """Return a new dictionary with empty listings removed"""
-
-    new = dict()
-    if attr == 'problems':
-        for key, value in fl.items():
-            if len(value) > 0:
-                new[key] = value
-    else:
-        for key, val in fl.items():
-            for fi in val:
-                if len(fi['problems']) > 0:
-                    if key in new:
-                        new[key].append(fi)
-                    else:
-                        new[key] = [fi]
-
-    return new
 
 class DaemonReporter(ReporterBase):
     """Reports issues in daemon mode"""

@@ -1,9 +1,10 @@
 Files sorted by {{ attr }}
 
-{% for key, value in values.items() %}
-{{ key }}:
-{% for fi in value %}
-   - {{ fi.path }}: owned by {{ fi.username }}
+{% for header, filelist in pl.items() %}
+{{ header.message }}:
+   (To fix: {{ header.fix }})
+{% for item in filelist %}
+   - {{ item.path.strpath }}: owned by {{ item.path.stat().owner }}
 {% endfor %}
 {% endfor %}
 
