@@ -57,6 +57,6 @@ every_problem = {
                                 'This environment variable is not set',
                                 'Try exporting an appropriate definition in your ~/.bash_profile'),
     'PROB_OLD_LARGE': Problem(14,
-                              'This file is old and large'
+                              'This file is old and large',
                               'Try compressing it or moving it to secondary storage')
 }
