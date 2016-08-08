@@ -4,7 +4,6 @@ import stat
 import pytest
 
 from botbot import schecks
-from botbot import fileinfo as fi
 
 def test_group_readable_checker(tmpdir):
     # Create a test file

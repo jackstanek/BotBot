@@ -6,7 +6,7 @@ from string import ascii_letters
 
 import pytest
 
-from botbot import checker, problems, checks, fileinfo
+from botbot import checker, problems, checks
 
 def create_random_directory_tree(ic, directory):
     """Create a directory tree with ic files in it (files and directories)"""

@@ -4,7 +4,6 @@ import random
 import subprocess
 import pytest
 
-from botbot import fileinfo as fi
 from botbot import md5sum as md5
 
 def test_hasher():

@@ -14,13 +14,6 @@ def test_FileDatabase_constructor(tmpdir):
     assert f
     prev.chdir()
 
-def test_bidirectional_problem_serialization():
-    for probs in combinations(ascii_letters, 3):
-        fi = {'problems': set(probs)}
-        sqlcache.serialize_problems(fi)
-        sqlcache.decode_problems(fi)
-        assert fi['problems'] == set(probs)
-
 def test_db_finders(tmpdir):
     prev = tmpdir.chdir()
 
