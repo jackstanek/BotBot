@@ -139,6 +139,9 @@ class OneshotChecker(CheckerBase):
 
             self.db.store_file_problems(self.checked)
 
+        else:
+            self.checked = self.db.get_cached_results(path)
+
         # Record stats and write the report. We out!
         self.status['time'] = time.time() - starttime
         self.reporter.write_report(fmt, shared)

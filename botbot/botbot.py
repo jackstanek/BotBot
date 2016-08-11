@@ -1,4 +1,4 @@
-"""Main method"""
+""
 import os
 import sys
 
@@ -76,7 +76,8 @@ def run_file_check(args, outpath):
         'link': args.follow_symlinks if hasattr(args, 'follow_symlinks') else False,
         'verbose': args.verbose if hasattr(args, 'verbose') else False,
         'force': args.force if hasattr(args, 'force') else False,
-        'me': args.me if hasattr(args, 'me') else False
+        'me': args.me if hasattr(args, 'me') else False,
+        'cached': args.cached if hasattr(args, 'cached') else False
     }
 
     # Run the checker!
