@@ -16,13 +16,20 @@ def _is_important(path):
 class CheckResult():
     """Holds the result of a check"""
 
-    def __init__(self, path, lastcheck=time.time(), probstr=None):
-        self.path = path
+    def __init__(self, path, lastcheck=time.time(), problems=None, md5sum=None):
+        if isinstance(path, str):
+            self.path = py.path.local(path)
+        elif isinstance(path, py.path.local):
+            self.path = path
+
         self.lastcheck = lastcheck
-        if probstr:
-            self.decode_probstr(probstr)
-        else:
-            self.problems = set()
+
+        self.problems = set()
+        if problems:
+            if isinstance(problems, str):
+                self.decode_probstr(problems)
+
+        self.md5sum = md5sum
 
     def add_problem(self, probstr):
         """Add a problem to this file"""
