@@ -86,7 +86,7 @@ class FileDatabase:
 
         return [
             ci.CheckResult(
-                dict(res)
+                **dict(res)
             )
             for res in cached
         ]

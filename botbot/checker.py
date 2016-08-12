@@ -124,7 +124,7 @@ class OneshotChecker(CheckerBase):
         # Munge that path boys!
         path = os.path.expanduser(path)
         path = os.path.abspath(path)
-        self.path = path
+        self.path = py.path.local(path)
 
         # If no cached tree exists, (or if we explicitly want to build
         # a new one) build one if we need one
@@ -138,6 +138,9 @@ class OneshotChecker(CheckerBase):
                 self.check_file(cp)
 
             self.db.store_file_problems(self.checked)
+
+        else:
+            self.checked = self.db.get_cached_results(self.path.strpath)
 
         # Record stats and write the report. We out!
         self.status['time'] = time.time() - starttime

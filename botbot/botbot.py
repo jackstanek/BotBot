@@ -70,17 +70,18 @@ def run_file_check(args, outpath):
     all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
     chkr.register(*all_file_checks)
 
-    # Set up default options
-    opt = {
-        'shared': args.shared if hasattr(args, 'shared') else True,
-        'link': args.follow_symlinks if hasattr(args, 'follow_symlinks') else False,
-        'verbose': args.verbose if hasattr(args, 'verbose') else False,
-        'force': args.force if hasattr(args, 'force') else False,
-        'me': args.me if hasattr(args, 'me') else False
+    # Get the options
+    opts = {
+        'shared': args.shared,
+        'link': args.follow_symlinks,
+        'verbose': args.verbose,
+        'cached': args.cached,
+        'force': args.force_recheck,
+        'me': args.me
     }
 
     # Run the checker!
-    chkr.check_all(path, **opt)
+    chkr.check_all(path, **opts)
 
 def run_env_check(args, outpath):
     # Import relevant environment checks
