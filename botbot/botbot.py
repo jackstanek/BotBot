@@ -27,31 +27,42 @@ def initialize_parser():
     ## Recheck options
     recheck = fs.add_mutually_exclusive_group()
     recheck.add_argument('-c', '--cached',
-                        action='store_true',
-                        help='Only return cached issues (no recheck)')
+                         action='store_true',
+                         help='Only return cached issues (no recheck)',
+                         default=False)
+
     recheck.add_argument('-k', '--force-recheck',
                         action='store_true',
-                        help='Force a recheck of the tree')
+                        help='Force a recheck of the tree',
+                        default=False)
 
     ## Directory options
     fs.add_argument('path',
                     help='Path to check')
     fs.add_argument('-s', '--shared',
                     help='Use the shared folder ruleset',
-                    action='store_true')
+                    action='store_true',
+                    default=False)
 
     fs.add_argument('-l', '--follow-symlinks',
                     help='Follow symlinks',
-                    action='store_true')
+                    action='store_true',
+                    default=False)
+
     fs.add_argument('-m', '--me',
                     help='Only check files that belong to you',
-                    action='store_true')
+                    action='store_true',
+                    default=False)
 
     ## Output options
     parser.add_argument('-o', '--out',
                         help='Write report to a file instead of stdout')
 
     return parser
+
+def choose(namespace, attr, default=None):
+    d = vars(namespace)
+    return d[attr] if hasattr(d, attr) else default
 
 def run_file_check(args, outpath):
     # Import relevant file-checking checker code
@@ -72,12 +83,12 @@ def run_file_check(args, outpath):
 
     # Get the options
     opts = {
-        'shared': args.shared,
-        'link': args.follow_symlinks,
-        'verbose': args.verbose,
-        'cached': args.cached,
-        'force': args.force_recheck,
-        'me': args.me
+        'shared': choose(args, 'shared', False),
+        'link': choose(args, 'follow_symlinks', False),
+        'verbose': choose(args, 'verbose', False),
+        'cached': choose(args, 'cached', False),
+        'force': choose(args, 'force_recheck', False),
+        'me': choose(args, 'me', False)
     }
 
     # Run the checker!
