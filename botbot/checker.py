@@ -130,7 +130,7 @@ class OneshotChecker(CheckerBase):
         # a new one) build one if we need one
         if not cached:
             # Build a checklist.
-            self.build_new_checklist(path)
+            self.build_new_checklist(path, link=link)
 
             # Check all the files against every check.
             while self.checklist:
