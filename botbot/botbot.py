@@ -89,18 +89,18 @@ def run_file_check(args, outpath):
     # Run the checker!
     chkr.check_all(path, **opts)
 
-def run_env_check(args, outpath):
+    def run_env_check(args, outpath):
     # Import relevant environment checks
-    from . import env, envchecks
+        from . import env, envchecks
 
-    # Initialize environment checker
-    chkr = env.EnvironmentChecker(outpath)
+        # Initialize environment checker
+        chkr = env.EnvironmentChecker(outpath)
 
-    # Add env checks to the checker
-    chkr.register(*envchecks.ALLENVCHECKS)
+        # Add env checks to the checker
+        chkr.register(*envchecks.ALLENVCHECKS)
 
-    # Run the checks
-    chkr.check_all()
+        # Run the checks
+        chkr.check_all()
 
 
 def main():
