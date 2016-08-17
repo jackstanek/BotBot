@@ -1,5 +1,6 @@
 psutil==3.4.2
 jinja2>=2.8
+py
 git+https://github.com/jackstanek/PyInotify#egg=inotify-0.2.7
 
 -e .
