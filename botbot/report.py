@@ -59,7 +59,7 @@ class OneshotReporter(ReporterBase):
 
     def _should_print_report(self, filelist):
         for values in filelist.values():
-            if len(values) > 0:
+            if values:
                 return True
         return False
 
@@ -84,6 +84,8 @@ class OneshotReporter(ReporterBase):
 
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
+
+        # Remove
         printlist = self._get_pretty_sorted_problist()
         if not shared:
             self._remove_shared_probs(printlist)
