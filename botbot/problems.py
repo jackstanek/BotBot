@@ -4,7 +4,7 @@ from collections import namedtuple
 
 Problem = namedtuple('Problem', ('code', 'message', 'fix'))
 
-every_problem = {
+shared_problems = {
     'PROB_DIR_NOT_WRITABLE': Problem(1,
                                      'Directory not writable',
                                      'Run \'chmod 0655\' on this directory'),
@@ -13,6 +13,16 @@ every_problem = {
                                    'File not group readable',
                                    'Run \'chmod 0644\' on this file'),
 
+    'PROB_FILE_NOT_GRPEXEC': Problem(7,
+                                     'File is not group executable',
+                                     'Run chmod 0755 on this file'),
+
+    'PROB_DIR_NOT_ACCESSIBLE': Problem(8,
+                                       'Directory is not accessible to the group',
+                                       'Run chmod 0755 on this directory'),
+}
+
+regular_problems = {
     'PROB_FILE_IS_FASTQ': Problem(3,
                                   'File is a fastq file',
                                   'Don\'t copy fastq files, instead use \'ln -s\''),
@@ -29,14 +39,6 @@ every_problem = {
                                       'The *.sam file has been compressed, but it still exists',
                                       'Delete the uncompressed copy'),
 
-    'PROB_FILE_NOT_GRPEXEC': Problem(7,
-                                     'File is not group executable',
-                                     'Run chmod 0755 on this file'),
-
-    'PROB_DIR_NOT_ACCESSIBLE': Problem(8,
-                                       'Directory is not accessible to the group',
-                                       'Run chmod 0755 on this directory'),
-
     'PROB_UNKNOWN_ERROR': Problem(9,
                                   'Unknown error occurred',
                                   'Not sure what to do'),
@@ -44,7 +46,9 @@ every_problem = {
     'PROB_OLD_LARGE_PLAINTEXT': Problem(10,
                                         'File is an old large plaintext file',
                                         'Consider compressing'),
+}
 
+env_problems = {
     'PROB_PATH_NOT_COMPLETE': Problem(11,
                                       'The PATH environment variable does not contain all necessary paths',
                                       'Add the path to the PATH environment variable'),
@@ -56,7 +60,11 @@ every_problem = {
     'PROB_VAR_NOT_SET': Problem(13,
                                 'This environment variable is not set',
                                 'Try exporting an appropriate definition in your ~/.bash_profile'),
-    'PROB_OLD_LARGE': Problem(14,
-                              'This file is old and large',
-                              'Try compressing it or moving it to secondary storage')
+
 }
+
+every_problem = dict(
+    list(shared_problems.items()) +
+    list(regular_problems.items()) +
+    list(env_problems.items())
+)

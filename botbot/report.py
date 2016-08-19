@@ -63,7 +63,7 @@ class OneshotReporter(ReporterBase):
                 return True
         return False
 
-    def _get_pretty_sorted_problist(self):
+    def _get_pretty_sorted_problist(self, remove_shared=False):
         ep = problems.every_problem
         return {ep.get(probkey) if ep.get(probkey) else probkey:
                 [result for result in self.chkr.checked if probkey in result.problems]
@@ -72,9 +72,21 @@ class OneshotReporter(ReporterBase):
                 )
         }
 
+    def _remove_shared_probs(self, pl):
+        i = 0
+        scodes = [p.code for p in problems.shared_problems.values()]
+
+        while i < len(pl):
+            if pl[i].code in scodes:
+                del pl[i]
+            else:
+                i += 1
+
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
         printlist = self._get_pretty_sorted_problist()
+        if not shared:
+            self._remove_shared_probs(printlist)
 
         if self._should_print_report(printlist):
             env = self._get_env(_GENERIC_REPORT_NAME)
