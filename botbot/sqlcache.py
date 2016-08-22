@@ -62,7 +62,7 @@ class FileDatabase:
                 {
                     'path': p.path.strpath,
                     'lastcheck': p.lastcheck,
-                    'md5sum': get_file_hash(p.path),
+                    'md5sum': p.md5sum,
                     'problems': p.serialize_problems()
                 }
                 for p in checked

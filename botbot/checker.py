@@ -106,15 +106,19 @@ class OneshotChecker(CheckerBase):
                 # actually access this directory.
 
                 try:
-                    to_add.extend(subpath.listdir())
+                    try:
+                        to_add.extend(subpath.listdir())
+
+                    except PermissionError as err:
+                        self.checked.append(
+                            ci.CheckResult(
+                                subpath,
+                                problems={'PROB_DIR_NOT_ACCESSIBLE'}
+                            )
+                        )
 
                 except py.error.Error:
-                    self.checked.append(
-                        ci.CheckResult(
-                            subpath,
-                            problems={'PROB_DIR_NOT_ACCESSIBLE'}
-                        )
-                    )
+                    pass
 
         # Update checker records
         self.status['files'] = len(self.checklist)

@@ -65,19 +65,21 @@ class OneshotReporter(ReporterBase):
 
     def _get_pretty_sorted_problist(self, remove_shared=False):
         ep = problems.every_problem
-        return {ep.get(probkey) if ep.get(probkey) else probkey:
+        if self.chkr.checked:
+            return {
+                ep.get(probkey) if ep.get(probkey) else probkey:
                 [result for result in self.chkr.checked if probkey in result.problems]
                 for probkey in set.union(
                         *(p.problems for p in self.chkr.checked)
                 )
-        }
+            }
 
     def _remove_shared_probs(self, pl):
         i = 0
-        scodes = [p.code for p in problems.shared_problems.values()]
+        scodes = set(problems.shared_problems.keys())
 
         while i < len(pl):
-            if pl[i].code in scodes:
+            if set.intersection(scodes, pl[i].problems):
                 del pl[i]
             else:
                 i += 1
