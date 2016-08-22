@@ -104,12 +104,17 @@ class OneshotChecker(CheckerBase):
             elif subpath.isdir():
                 # Do a special, but basic check here: make sure we can
                 # actually access this directory.
-                try:
-                    to_add.extend(subpath.listdir())
 
-                except py.error.EACCESS:
-                    self.checked.append(ci.CheckResult(to_add,
-                                                       problems={'PROB_DIR_NOT_ACCESSIBLE'}))
+                if not subpath.stat().mode & 0o050:
+                    self.checked.append(
+                        ci.CheckResult(
+                            subpath,
+                            problems={'PROB_DIR_NOT_ACCESSIBLE'}
+                        )
+                    )
+
+                else:
+                    to_add.extend(subpath.listdir())
 
         # Update checker records
         self.status['files'] = len(self.checklist)
