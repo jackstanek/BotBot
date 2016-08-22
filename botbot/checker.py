@@ -110,8 +110,10 @@ class OneshotChecker(CheckerBase):
 
                 except py.error.Error:
                     self.checked.append(
-                        ci.CheckResult(subpath),
-                        problems={'PROB_DIR_NOT_ACCESSIBLE'}
+                        ci.CheckResult(
+                            subpath,
+                            problems={'PROB_DIR_NOT_ACCESSIBLE'}
+                        )
                     )
 
         # Update checker records
