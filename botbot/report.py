@@ -85,10 +85,12 @@ class OneshotReporter(ReporterBase):
     def write_report(self, fmt, shared, attr='problems'):
         """Write the summary of what transpired."""
 
-        # Remove
-        printlist = self._get_pretty_sorted_problist()
+        # Remove shared issues if desired
         if not shared:
             self._remove_shared_probs(printlist)
+
+        # Format the list for easy templating :)
+        printlist = self._get_pretty_sorted_problist()
 
         if self._should_print_report(printlist):
             env = self._get_env(_GENERIC_REPORT_NAME)
