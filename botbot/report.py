@@ -86,8 +86,9 @@ class OneshotReporter(ReporterBase):
         """Write the summary of what transpired."""
 
         # Remove shared issues if desired
+        checked = self.chkr.checked
         if not shared:
-            self._remove_shared_probs(printlist)
+            self._remove_shared_probs(checked)
 
         # Format the list for easy templating :)
         printlist = self._get_pretty_sorted_problist()
