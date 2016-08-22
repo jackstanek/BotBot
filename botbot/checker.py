@@ -109,7 +109,7 @@ class OneshotChecker(CheckerBase):
                     try:
                         to_add.extend(subpath.listdir())
 
-                    except PermissionError as err:
+                    except py.error.Error:
                         self.checked.append(
                             ci.CheckResult(
                                 subpath,
@@ -117,7 +117,7 @@ class OneshotChecker(CheckerBase):
                             )
                         )
 
-                except py.error.Error:
+                except PermissionError:
                     pass
 
         # Update checker records

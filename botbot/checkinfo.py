@@ -28,6 +28,10 @@ class CheckResult():
         if problems:
             if isinstance(problems, str):
                 self.decode_probstr(problems)
+            elif isinstance(problems, set):
+                self.problems = problems
+            else:
+                raise TypeError('problems must be a set or a str')
 
         self.md5sum = md5sum
 
