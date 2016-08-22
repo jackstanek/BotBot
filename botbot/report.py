@@ -73,6 +73,8 @@ class OneshotReporter(ReporterBase):
                         *(p.problems for p in self.chkr.checked)
                 )
             }
+        else:
+            return {}
 
     def _remove_shared_probs(self, pl):
         i = 0
