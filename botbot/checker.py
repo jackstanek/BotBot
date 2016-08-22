@@ -107,7 +107,7 @@ class OneshotChecker(CheckerBase):
                 try:
                     to_add.extend(subpath.listdir())
 
-                except PermissionError:
+                except py.error.EACCESS:
                     self.checked.append(ci.CheckResult(to_add,
                                                        problems={'PROB_DIR_NOT_ACCESSIBLE'}))
 
