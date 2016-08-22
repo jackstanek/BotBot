@@ -102,7 +102,14 @@ class OneshotChecker(CheckerBase):
 
             # Add directory contents to the stack
             elif subpath.isdir():
-                to_add.extend(subpath.listdir())
+                # Do a special, but basic check here: make sure we can
+                # actually access this directory.
+                try:
+                    to_add.extend(subpath.listdir())
+
+                except PermissionError:
+                    self.checked.append(ci.CheckResult(to_add,
+                                                       problems={'PROB_DIR_NOT_ACCESSIBLE'}))
 
         # Update checker records
         self.status['files'] = len(self.checklist)
