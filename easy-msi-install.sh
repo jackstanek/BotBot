@@ -103,7 +103,6 @@ function test-conda-bin-dir-in-path()
     for path in $PATH_N; do
         if [[ $(get-canonical-path $path) == $BIN_BASE ]]; then
             green "Found $BIN_BASE in PATH..."
-            return 0
         else
             vecho "Checked $path..."
         fi
@@ -112,6 +111,7 @@ function test-conda-bin-dir-in-path()
     red "Could not find conda installation in $BIN_BASE..."
     green "Adding conda to \$PATH bash config..."
     add-conda-to-path
+
 }
 
 function do-everything()
