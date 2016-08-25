@@ -93,7 +93,7 @@ function separate-path-var()
 
 function add-conda-to-path()
 {
-    echo "export PATH=$PATH:$BIN_BASE" >> $HOME/.bash_profile
+    echo "export PATH=\$PATH:$BIN_BASE" >> $HOME/.bash_profile
 }
 
 function test-conda-bin-dir-in-path()
@@ -103,6 +103,7 @@ function test-conda-bin-dir-in-path()
     for path in $PATH_N; do
         if [[ $(get-canonical-path $path) == $BIN_BASE ]]; then
             green "Found $BIN_BASE in PATH..."
+            exit 0
         else
             vecho "Checked $path..."
         fi
