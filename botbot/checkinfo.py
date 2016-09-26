@@ -31,7 +31,7 @@ class CheckResult():
             elif isinstance(problems, set):
                 self.problems = problems
             else:
-                raise TypeError('problems must be a set or a str')
+                raise TypeError('problems must be a set, str, or None')
 
         self.md5sum = md5sum
 

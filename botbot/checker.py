@@ -4,7 +4,6 @@ import stat
 import os
 import time
 from fnmatch import fnmatch
-from pwd import getpwuid
 
 import py
 
@@ -12,6 +11,13 @@ from . import report as rep
 from . import sqlcache as sql
 from . import ignore as ig
 from . import checkinfo as ci
+from .problems import every_problem as ep
+
+def get_username(pypath):
+    from pwd import getpwuid
+
+    st = pypath.stat()
+    return getpwuid(st.st_uid)
 
 class CheckerBase:
     """
@@ -24,7 +30,8 @@ class CheckerBase:
                                            # previous check, updated
                                            # after every check
         self.path = '' # Base path we're checking
-        self.checked = [] # List of checked files
+        self.checked = {} # keys: users; values: dicts with (keys:
+                          # problem obj; values: paths)
 
     def register(self, *funcs):
         """
@@ -38,11 +45,27 @@ class CheckerBase:
         """
         Check a file against all registered checkers.
         """
+
+        from .problems import every_problem as ep
+
         result = ci.CheckResult(path)
         for check in self.checks:
             result.add_problem(check(path))
 
-        self.checked.append(result)
+        # get the username
+        un = get_username(path)
+
+        # Check if this user has any already-checked files
+        if un not in self.checked.values():
+            self.checked[un] = {ep.get(prob)}
+
+        # Otherwise, file problematic problems properly
+        prob = ep.get(prob)
+        for prob in result.problems:
+            if not self.checked.get(un).get(prob):
+                self.checked[un][prob] = {path}
+            else:
+                self.checked.get(un).get(prob).add(path)
 
 class OneshotChecker(CheckerBase):
     """

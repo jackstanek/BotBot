@@ -63,19 +63,6 @@ class OneshotReporter(ReporterBase):
                 return True
         return False
 
-    def _get_pretty_sorted_problist(self, remove_shared=False):
-        ep = problems.every_problem
-        if self.chkr.checked:
-            return {
-                ep.get(probkey) if ep.get(probkey) else probkey:
-                [result for result in self.chkr.checked if probkey in result.problems]
-                for probkey in set.union(
-                        *(p.problems for p in self.chkr.checked)
-                )
-            }
-        else:
-            return {}
-
     def _remove_shared_probs(self, pl):
         i = 0
         scodes = set(problems.shared_problems.keys())
@@ -95,7 +82,8 @@ class OneshotReporter(ReporterBase):
             self._remove_shared_probs(checked)
 
         # Format the list for easy templating :)
-        printlist = self._get_pretty_sorted_problist()
+        # Actually nah. Changed 9/20/2016
+        printlist = checked
 
         if self._should_print_report(printlist):
             env = self._get_env(_GENERIC_REPORT_NAME)

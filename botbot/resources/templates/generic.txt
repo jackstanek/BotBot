@@ -1,11 +1,11 @@
-Files sorted by {{ attr }}
-
-{% for header, filelist in pl.items() %}
-{{ header.message }}:
-   (To fix: {{ header.fix }})
-{% for item in filelist %}
-   - {{ item.path.strpath }}: owned by {{ item.path.stat().owner }}
-{% endfor %}
+{% for owner, issue in filelist.values() %}
+Issues for {{ owner }}:
+  {% for problem, paths in issue.values() %}
+  {{ problem.message }}: (To fix: {{ problem.fix }})
+    {% for path in paths %}
+    - {{ path }}
+    {% endfor %}
+  {% endfor %}
 {% endfor %}
 
 Checked {{ status.files }} files in {{ '%.2f' | format(status.time) }} seconds.
