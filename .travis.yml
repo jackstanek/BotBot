@@ -22,7 +22,7 @@ install:
   - conda info -a
 
   # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n BotBot python=$TRAVIS_PYTHON_VERSION python
+  - conda create -q -n BotBot python=$TRAVIS_PYTHON_VERSION python pytest pytest-cov
   - source activate BotBot
   - python setup.py install
 
