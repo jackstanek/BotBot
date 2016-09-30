@@ -100,14 +100,9 @@ function check-conda-install()
     if [[ -z $CONDA ]]; then
         red "conda is not installed. Attempting to install..."
         echo "Note: if you do not have sudo privileges, conda will be installed locally."
-        sudo pip install conda
-        local _conda_install_result=$?
 
-        if [[ $_conda_install_result -ne 0 ]]; then
-            red "Could not install conda using pip. Attempting to install in $BASE..."
-
-            install-conda-by-hand
-        else
+        install-conda-by-hand
+    else
             green "Successfully installed conda..."
         fi
     else
