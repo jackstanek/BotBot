@@ -17,7 +17,7 @@ def get_username(pypath):
     from pwd import getpwuid
 
     st = pypath.stat()
-    return getpwuid(st.st_uid)
+    return getpwuid(st.uid)
 
 class CheckerBase:
     """
@@ -45,7 +45,6 @@ class CheckerBase:
         """
         Check a file against all registered checkers.
         """
-
         from .problems import every_problem as ep
 
         result = ci.CheckResult(path)
@@ -57,10 +56,9 @@ class CheckerBase:
 
         # Check if this user has any already-checked files
         if un not in self.checked.values():
-            self.checked[un] = {ep.get(prob)}
+            self.checked[un] = set()
 
         # Otherwise, file problematic problems properly
-        prob = ep.get(prob)
         for prob in result.problems:
             if not self.checked.get(un).get(prob):
                 self.checked[un][prob] = {path}

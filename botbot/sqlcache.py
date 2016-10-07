@@ -59,13 +59,7 @@ class FileDatabase:
             :problems\
             )',
             [
-                {
-                    'path': p.path.strpath,
-                    'lastcheck': p.lastcheck,
-                    'md5sum': p.md5sum,
-                    'problems': p.serialize_problems()
-                }
-                for p in checked
+                {'path': }
             ]
         )
 
