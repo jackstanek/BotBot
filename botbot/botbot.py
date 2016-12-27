@@ -135,5 +135,8 @@ def main():
         elif args.cmd == 'env':
             cmds = (run_env_check,)
 
-    for cmd in cmds:
-        cmd(args, outpath)
+
+        for cmd in cmds:
+            cmd(args, outpath)
+    else:
+        parser.print_help()
