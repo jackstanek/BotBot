@@ -73,7 +73,7 @@ class OneshotChecker(CheckerBase):
     # checks is a set of all the checking functions this checker knows of.  All
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
-    def __init__(self, outpath, dbpath):
+    def __init__(self, outpath):
         super().__init__(dbpath)
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
@@ -93,8 +93,8 @@ class OneshotChecker(CheckerBase):
         Build a list of files to check. If link is True, follow symlinks.
         """
 
-        # Try to clear out the FileInfo cache
-        self.db.clear()
+        # # Try to clear out the FileInfo cache
+        # self.db.clear()
 
         # Make the stored path object
         if isinstance(path, py.path.local):
@@ -174,10 +174,11 @@ class OneshotChecker(CheckerBase):
                 cp = self.checklist.pop()
                 self.check_file(cp)
 
-            self.db.store_file_problems(self.checked)
+            # self.db.store_file_problems(self.checked)
 
         else:
-            self.checked = self.db.get_cached_results(self.path.strpath)
+            # self.checked = self.db.get_cached_results(self.path.strpath)
+            pass
 
         # Record stats and write the report. We out!
         self.status['time'] = time.time() - starttime

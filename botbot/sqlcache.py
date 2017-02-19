@@ -59,7 +59,7 @@ class FileDatabase:
             :problems\
             )',
             [
-                {'path': }
+                #{'path': }
             ]
         )
 
