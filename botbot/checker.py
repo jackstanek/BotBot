@@ -24,14 +24,11 @@ class CheckerBase:
     Defines a foundation for other checker objects. Allows for
     checking individual files against a list of check functions.
     """
-    def __init__(self, dbpath):
+    def __init__(self):
         self.checks = set()
-        self.db = sql.FileDatabase(dbpath) # Information about
-                                           # previous check, updated
-                                           # after every check
         self.path = '' # Base path we're checking
-        self.checked = {} # keys: users; values: dicts with (keys:
-                          # problem obj; values: paths)
+        self.checked = dict() # keys: users; values: dicts with (keys:
+        # problem obj; values: paths)
 
     def register(self, *funcs):
         """
@@ -74,7 +71,7 @@ class OneshotChecker(CheckerBase):
     # checkers return a number signifying a specific problem with the
     # file specified in the path.
     def __init__(self, outpath):
-        super().__init__(dbpath)
+        super().__init__()
         self.checks = set() # All checks to perform
         self.checklist = list() # List of FileInfos to check at some point
         self.path = None

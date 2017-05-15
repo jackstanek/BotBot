@@ -70,7 +70,7 @@ def run_file_check(args, outpath):
         path = args.path
 
     # Initialize the checker
-    chkr = checker.OneshotChecker(outpath, sqlcache.get_dbpath())
+    chkr = checker.OneshotChecker(outpath)
 
     # Add all file checks to the checker
     all_file_checks = checks.ALLCHECKS + schecks.ALLSCHECKS
@@ -134,7 +134,6 @@ def main():
         # Environment variable checker
         elif args.cmd == 'env':
             cmds = (run_env_check,)
-
 
         for cmd in cmds:
             cmd(args, outpath)

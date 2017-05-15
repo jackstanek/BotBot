@@ -63,53 +63,8 @@ class OneshotReporter(ReporterBase):
                 return True
         return False
 
-    def _remove_shared_probs(self, pl):
-        i = 0
-        scodes = set(problems.shared_problems.keys())
-
-        while i < len(pl):
-            if set.intersection(scodes, pl[i].problems):
-                del pl[i]
-            else:
-                i += 1
-
     def write_report(self, fmt, shared, attr='problems'):
-        """Write the summary of what transpired."""
-
-        # Remove shared issues if desired
-        checked = self.chkr.checked
-        if not shared:
-            self._remove_shared_probs(checked)
-
-        # Format the list for easy templating :)
-        # Actually nah. Changed 9/20/2016
-        printlist = checked
-
-        if self._should_print_report(printlist):
-            env = self._get_env(_GENERIC_REPORT_NAME)
-
-            tempgen = env.get_template(_GENERIC_REPORT_NAME).generate(
-                {
-                    'pl': printlist,
-                    'status': self.chkr.status
-                }
-            )
-
-            if self.out != sys.stdout:
-                print('Writing report to {}.'.format(self.out))
-                out = open(self.out, mode='w')
-            else:
-                print('Report:')
-                out = sys.stdout
-
-            for line in tempgen:
-                print(line, file=out, end='')
-
-            print('\n', file=out, end='')
-            out.close()
-
-        else:
-            print('No problems here!')
+        print(self.chkr.checked)
 
 class DaemonReporter(ReporterBase):
     """Reports issues in daemon mode"""
