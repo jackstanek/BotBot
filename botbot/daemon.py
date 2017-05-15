@@ -7,7 +7,6 @@ import errno
 import inotify.adapters
 from inotify.constants import *
 from .checker import CheckerBase
-from .sqlcache import get_dbpath
 from .report import DaemonReporter
 from .config import CONFIG
 

@@ -8,7 +8,6 @@ from fnmatch import fnmatch
 import py
 
 from . import report as rep
-from . import sqlcache as sql
 from . import ignore as ig
 from . import checkinfo as ci
 from .problems import every_problem as ep

@@ -3,7 +3,6 @@ import os
 import sys
 
 from botbot import __version__
-from . import sqlcache
 from . import ignore as ig
 from . import daemon
 from .config import CONFIG, config_sanity_check, InvalidConfigurationError
