@@ -53,7 +53,7 @@ class CheckerBase:
 
         # Check if this user has any already-checked files
         if un not in self.checked.values():
-            self.checked[un] = set()
+            self.checked[un] = dict()
 
         # Otherwise, file problematic problems properly
         for prob in result.problems:
