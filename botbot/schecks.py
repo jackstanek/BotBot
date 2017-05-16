@@ -26,4 +26,4 @@ def dir_group_readable(path):
         elif not bool(stat.S_IWGRP & mode):
             return 'PROB_DIR_NOT_WRITABLE'
 
-ALLSCHECKS = [file_groupreadable, file_group_executable, dir_group_readable]
+ALLSCHECKS = (file_groupreadable, file_group_executable, dir_group_readable)
