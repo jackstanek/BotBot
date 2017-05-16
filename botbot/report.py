@@ -64,7 +64,14 @@ class OneshotReporter(ReporterBase):
         return False
 
     def write_report(self, fmt, shared, attr='problems'):
-        print(self.chkr.checked)
+        # print(self.chkr.checked)
+        for user, probs in self.chkr.checked.items():
+            if probs:
+                print(user.pw_gecos)
+                for prob, files in probs.items():
+                    print('\t' + prob)
+                    for f in files:
+                        print('\t\t' + str(f))
 
 class DaemonReporter(ReporterBase):
     """Reports issues in daemon mode"""
