@@ -50,5 +50,5 @@ def is_old_and_large(path):
     if path.size() > int(large) and mod_days >= int(old):
         return 'PROB_OLD_LARGE'
 
-ALLCHECKS = [is_fastq, sam_should_compress, is_large_plaintext,
-             is_old_and_large]
+ALLCHECKS = (is_fastq, sam_should_compress, is_large_plaintext,
+             is_old_and_large)

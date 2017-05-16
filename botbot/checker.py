@@ -135,7 +135,12 @@ class OneshotChecker(CheckerBase):
                         )
 
                 except PermissionError:
-                    pass
+                    self.checked.append(
+                        ci.CheckResult(
+                            subpath,
+                            problems={'PROB_NOT_GRPRD'}
+                        )
+                    )
 
         # Update checker records
         self.status['files'] = len(self.checklist)
