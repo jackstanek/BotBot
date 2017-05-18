@@ -51,7 +51,7 @@ class CheckerBase:
         un = get_username(path)
 
         # Check if this user has any already-checked files
-        if un not in self.checked.values():
+        if un not in self.checked.keys():
             self.checked[un] = dict()
 
         # Otherwise, file problematic problems properly
@@ -123,16 +123,15 @@ class OneshotChecker(CheckerBase):
                 # actually access this directory.
 
                 try:
-                    try:
-                        to_add.extend(subpath.listdir())
+                    to_add.extend(subpath.listdir())
 
-                    except py.error.Error:
-                        self.checked.append(
-                            ci.CheckResult(
-                                subpath,
-                                problems={'PROB_DIR_NOT_ACCESSIBLE'}
-                            )
+                except py.error.Error:
+                    self.checked.append(
+                        ci.CheckResult(
+                            subpath,
+                            problems={'PROB_DIR_NOT_ACCESSIBLE'}
                         )
+                    )
 
                 except PermissionError:
                     self.checked.append(
