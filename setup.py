@@ -23,16 +23,11 @@ def find_version(*file_paths):
 
 setup(
     name='BotBot',
-    version=find_version('botbot', '__init__.py'),
+    version=find_version('src', 'botbot', '__init__.py'),
     description='Laboratory computational resource management',
     author='Jack Stanek',
     author_email='stane064@umn.edu',
     url='http://github.com/jackstanek/BotBot',
-    entry_points={
-        'console_scripts':[
-            'botbot = botbot.botbot:main',
-        ]
-    },
-    packages=['botbot'],
-    include_package_data=True
+    package_dir={'': 'src'},
+    packages=['botbot']
 )
